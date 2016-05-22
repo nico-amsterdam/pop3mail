@@ -1,0 +1,13 @@
+#!/bin/sh
+downloadargs=
+if [ $# -gt 0 ]; then
+   downloadargs="\"$1\""
+   shift
+fi
+for arg in "$@"
+do
+   downloadargs="$downloadargs, \"$arg\""
+done
+mixargs="Pop3mail.DownloaderCLI.main([$downloadargs])"
+echo mix run -e "$mixargs"
+mix run -e "$mixargs"
