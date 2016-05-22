@@ -7,7 +7,7 @@ defmodule Pop3mail.WordDecoder do
 
    def decode_text(input_text) do
      decoded_text_list = [{"us-ascii", input_text}]
-     if String.contains?(input_text, "?=") do
+     if String.contains?(input_text, "=?") do
         # RFC 2045
         # When displaying a particular header field that contains multiple
         # 'encoded-word's, any 'linear-white-space' that separates a pair of
@@ -62,7 +62,7 @@ defmodule Pop3mail.WordDecoder do
    end
 
    # copies text as it is. Does NOT convert to a common character set like utf-8.
-   def decoded_text_list_to_string(decoded_text, add_charset_name) do
+   def decoded_text_list_to_string(decoded_text, add_charset_name \\ false) do
       Enum.map(decoded_text, fn({charset, text}) -> if add_charset_name and charset != "us-ascii" and String.length(text) > 0, do: text = "#{text} (#{charset})"; text; end) |> Enum.join
    end
 

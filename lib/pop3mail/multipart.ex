@@ -228,6 +228,7 @@ defmodule Pop3mail.Multipart do
                         fn(param) -> lc_text = String.downcase(param); String.contains?(param, "=") and String.starts_with?(lc_text, parametername) end,
                         fn(key_value) -> { get_param_number(key_value), key_value =~ ~r/^[^=]*\*=/ , get_value(key_value) |> String.strip |> StringUtils.unquoted } end)
        if length(name_parts) > 0 do
+         charset = ""
          if length(name_parts) > 1 do
             # Parameter continuation: In theory the parameters can be in the wrong order. Never seen it though
             # sort
@@ -238,21 +239,29 @@ defmodule Pop3mail.Multipart do
          {_,with_charset,_} = Enum.at(name_parts, 0)
          filename = Enum.map(name_parts, fn({_,_,val}) -> val end) |> Enum.join
          if with_charset do
+            # format is: [charset] ' [language] ' url encoded text
             uu_decoded = :erlang.binary_to_list(filename) |> :http_uri.decode |> :erlang.list_to_binary
-            decoded_filename = String.split(uu_decoded, "'") |> Enum.drop(2) |> Enum.join("'")
+            splitted = String.split(uu_decoded, "'")
+            decoded_filename = splitted |> Enum.drop(2) |> Enum.join("'")
             if String.length(decoded_filename) > 0 do
                filename = decoded_filename
+               charset  = Enum.at(splitted, 0)
             end
          else
            # RFC2047 can also be used to encode
            # Content-Type: IMAGE/png; NAME="=?UTF-8?B?cjAucG5n?="
-           if String.contains?(filename, "?=") do
+           if String.contains?(filename, "=?") do
               decoded_text_list = WordDecoder.decode_text(filename)
               charsets = WordDecoder.get_charsets_besides_ascii(decoded_text_list)
+              charset = Enum.join(charsets, "_") 
+              filename = WordDecoder.decoded_text_list_to_string(decoded_text_list)
            end
          end
          if String.length(filename) > 0 do
             multipart_part = %{multipart_part | filename: filename}
+            if String.length(charset) > 0 do
+               multipart_part = %{multipart_part | filename_charset: charset}
+            end
          end
        end
        multipart_part
