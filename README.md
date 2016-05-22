@@ -9,7 +9,7 @@
 - This program reads from a POP3 mail server, which means that it can only download mail from the inbox folder. If you want to access other folders you will need an IMAP client.
 - Gmail users: whether the read mail is permanently deleted or not, depends on your gmail settings, and not on the delete parameter of this program. 
 - Do NOT run the script as root.
-- Downloaded attachments can contain viruses, addware or malicious scripts. Run a virus scanner.
+- Downloaded attachments can contain viruses, addware or malicious scripts.
 
 ## Installation
 
@@ -36,19 +36,7 @@ Modules in the lib directory will be converted to scripts in the script director
 Assumed is that the modules all contain a main function.
 The file 'mix.exs' contains the task to create the scripts during the compilation phase.
         
-### Run the script
-
-The script downloads email and writes the content in the inbox folder.
- 
-```sh
-$ chmod +x pop3_email_downloader.sh
-$ ./pop3_email_downloader.sh --help
-$ ./pop3_email_downloader.sh --username=<your gmail username> --password=<your gmail password> --max=20 --raw
-```
-
-The script defaults to gmail, but you can specify other host and port names.
-
-### Use in an Elixir project
+### Install in an Elixir project
 
 If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
 
@@ -64,6 +52,51 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
           [applications: [:pop3mail]]
         end
 
+## Usage
+
+### Run the script
+
+The script downloads email and writes the content in the inbox folder.
+ 
+```sh
+$ chmod +x pop3_email_downloader.sh
+$ ./pop3_email_downloader.sh --help
+$ ./pop3_email_downloader.sh --username=<your gmail username> --password=<your gmail password> --max=10 --raw
+```
+
+or without shell script:
+
+```sh
+$ mix run -e 'Pop3mail.DownloaderCLI.main(["--help"])'
+$ mix run -e 'Pop3mail.DownloaderCLI.main(["--username=<user gmail username>", "--password=<your gmail password>", "--max=10", "--raw"])'
+```
+
+The script defaults to gmail, but you can specify other host and port names.
+
+## Use in Elixir
+
+Example:
+
+```sh
+$ iex -S mix
+
+# notice that you must use single quotes here
+iex(1)> {:ok, client} = :epop_client.connect('user@gmail.com', 'password', [{:addr, 'pop.gmail.com'},{:port,995},:ssl])
+iex(2)> :epop_client.stat(client) 
+iex(3)> {:ok, mail_content} = :epop_client.retrieve(client, 1) 
+iex(4)> {:message, header_list, body_char_list } = :epop_message.parse(mail_content)
+iex(5)> Pop3mail.header_lookup(header_list, "Subject")
+iex(6)> Pop3mail.header_lookup(header_list, "From")
+iex(7)> Pop3mail.header_lookup(header_list, "Date")
+iex(8)> part_list = Pop3mail.decode_body(header_list, body_char_list)
+iex(9)> Enum.at(part_list, 0).charset 
+iex(10)> Enum.at(part_list, 0).content 
+iex(11)> {:ok, mail_content} = :epop_client.retrieve(client, 2) 
+iex(12)> {:message, header_list, body_char_list } = :epop_message.parse(mail_content)
+iex(13)> Pop3mail.header_lookup(header_list, "Subject")
+iex(14)> :epop_client.quit(client)
+```
+
 ## Reset Gmail
 
 Gmail remembers which mails are already read. Fortunetely Gmail can be reset to re-read all emails.
@@ -75,3 +108,11 @@ Go back to settings and select Download all mail, Save change.
 
 Now your email client should download all mail again.
 
+## Google unlock captcha
+
+https://accounts.google.com/displayunlockcaptcha
+
+
+## Acknowledgement
+
+Thanks Erik Søe Sørensen for upgrading the Epop client to the latest Erlang version.
