@@ -10,6 +10,10 @@
 - Gmail users: whether the read mail is permanently deleted or not, depends on your gmail settings, and not on the delete parameter of this program. 
 - Do NOT run the script as root.
 - Downloaded attachments can contain viruses, addware or malicious scripts.
+- This program does NOT convert charsets and neither does it at a [BOM](https://en.wikipedia.org/wiki/Byte_order_mark). 
+  If a message is send in ISO-8859-1, CP1251, KOI8-R it wil be stored as such.
+  Sometimes you must change the locale/charset/encoding (LC_CTYPE luit, chcp) in your terminal/device/program to be able to read the content.
+  Elixir programmers can use [codepagex](https://github.com/tallakt/codepagex) to perform conversions to utf-8.
 
 ## Installation from scratch
 
@@ -35,7 +39,7 @@ For usage, see usage chapter below.
 
 ## Install in an Elixir project
 
-[available in Hex](https://hex.pm/docs/publish), the package can be installed as:
+[available in Hex](https://hex.pm/packages/pop3mail), the package can be installed as:
 
   1. Add pop3mail to your list of dependencies in `mix.exs`:
 
@@ -69,9 +73,9 @@ $ mix run -e 'Pop3mail.DownloaderCLI.main(["--help"])'
 $ mix run -e 'Pop3mail.DownloaderCLI.main(["--username=<user gmail username>", "--password=<your gmail password>", "--max=10", "--raw"])'
 ```
 
-The script defaults to gmail, but you can specify other host and port names.
+The script defaults to gmail, but you can specify other host and port names on the commandline.
 
-## Use in Elixir
+### Use in Elixir
 
 Example:
 
@@ -87,12 +91,17 @@ iex(5)> Pop3mail.header_lookup(header_list, "Subject")
 iex(6)> Pop3mail.header_lookup(header_list, "From")
 iex(7)> Pop3mail.header_lookup(header_list, "Date")
 iex(8)> part_list = Pop3mail.decode_body(header_list, body_char_list)
-iex(9)> Enum.at(part_list, 0).charset 
-iex(10)> Enum.at(part_list, 0).content 
-iex(11)> {:ok, mail_content} = :epop_client.retrieve(client, 2) 
-iex(12)> {:message, header_list, body_char_list } = :epop_message.parse(mail_content)
-iex(13)> Pop3mail.header_lookup(header_list, "Subject")
-iex(14)> :epop_client.quit(client)
+iex(9)> length(part_list)
+iex(10)> part = Enum.at(part_list, 0)
+iex(11)> part.media_type
+iex(12)> part.filename
+iex(13)> part.charset
+iex(14)> part.content
+iex(15)> :epop_client.delete(client, 1)
+iex(16)> {:ok, mail_content} = :epop_client.retrieve(client, 2) 
+iex(17)> {:message, header_list, body_char_list } = :epop_message.parse(mail_content)
+iex(18)> Pop3mail.header_lookup(header_list, "Subject")
+iex(19)> :epop_client.quit(client)
 ```
 
 ## Reset Gmail
@@ -111,6 +120,10 @@ Now your email client should download all mail again.
 https://accounts.google.com/displayunlockcaptcha
 
 
-## Acknowledgement
+## License
+
+MIT
+
+## Acknowledgment
 
 Thanks Erik Søe Sørensen for upgrading the Epop client to the latest Erlang version.

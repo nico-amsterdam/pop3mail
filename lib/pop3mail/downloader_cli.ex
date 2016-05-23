@@ -39,23 +39,23 @@ defmodule Pop3mail.DownloaderCLI do
    end
 
    # "print last line of unknown options"
-   defp show_error([]), do: IO.puts(:stderr, "Type 'backup_pop3_mail.exs --help' for more information.")
+   defp show_error([]), do: IO.puts(:stderr, "Type 'pop3_email_downloader.sh --help' for more information.")
 
    # "print unknown options"
    defp show_error([{ option, _ } | tail]) do
-      IO.puts(:stderr, "backup_pop3_mail.exs: Unknown option '" <> to_string(option) <> "'")
+      IO.puts(:stderr, "pop3_email_downloader.sh: Unknown option '" <> to_string(option) <> "'")
       show_error tail
    end
 
    # "print unknown arguments"
    defp show_error([arg | tail]) do
-      IO.puts(:stderr, "backup_pop3_mail.exs: Unknown argument '" <> arg <> "'")
+      IO.puts(:stderr, "pop3_email_downloader.sh: Unknown argument '" <> arg <> "'")
       show_error tail
    end
 
    # "print usage line"
    defp show_help do
-     IO.puts "usage: backup_pop3_mail.exs [--username=[recent:]USERNAME] [--password=PASSWORD] [--max=INTEGER] [--delete] [--server=SERVER] [--port=INTEGER] [--ssl=false] [--delivered] [--raw] [--help]"
+     IO.puts "usage: pop3_email_downloader.sh [--username=[recent:]USERNAME] [--password=PASSWORD] [--max=INTEGER] [--delete] [--server=SERVER] [--port=INTEGER] [--ssl=false] [--delivered] [--raw] [--help]"
      IO.puts "This program wil read your gmail e-mails and save them including attachments on disk. See inbox directory."
    end
 
