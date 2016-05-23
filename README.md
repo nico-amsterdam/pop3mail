@@ -10,7 +10,7 @@
 - Gmail users: whether the read mail is permanently deleted or not, depends on your gmail settings, and not on the delete parameter of this program. 
 - Do NOT run the script as root.
 - Downloaded attachments can contain viruses, addware or malicious scripts.
-- This program does NOT convert charsets and neither does it at a [BOM](https://en.wikipedia.org/wiki/Byte_order_mark). 
+- This program does NOT convert charsets and neither does it add a [BOM](https://en.wikipedia.org/wiki/Byte_order_mark). 
   If a message is send in ISO-8859-1, CP1251, KOI8-R it wil be stored as such.
   Sometimes you must change the locale/charset/encoding (LC_CTYPE luit, chcp) in your terminal/device/program to be able to read the content.
   Elixir programmers can use [codepagex](https://github.com/tallakt/codepagex) to perform conversions to utf-8.
