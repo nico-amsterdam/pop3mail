@@ -51,7 +51,7 @@ defmodule Pop3mail.Multipart do
         # ignore first line because that's the text after the boundary and it should be empty
         [_| other_lines] = lines
         if String.length(String.strip(line)) > 0 do
-          Logger.warn "    Missing newline after boundary at line: " <> line
+          Logger.warn "    Missing newline after boundary" <> StringUtils.printable(" at line: " <> line)
           # fix error: add the line
           other_lines = lines
         end
@@ -76,7 +76,7 @@ defmodule Pop3mail.Multipart do
      # there should be an empty line after the headers
      if String.length(String.strip(line)) > 0 do
         # this is not always the case or we have an unknown header here.
-        Logger.warn "    Missing newline or unknown header in body at line: " <> line
+        Logger.warn "    Missing newline or unknown header in body" <> StringUtils.printable(" at line: " <> line)
         # fix; don't skip line
         otherlines = [line | otherlines]
      end
@@ -185,7 +185,7 @@ defmodule Pop3mail.Multipart do
 
    def parse_part_unknown_header(multipart_part, encoding, [line | otherlines]) do
      {line, otherlines} = lines_continued(line, otherlines)
-     Logger.warn "    Unknown header line in body ignored: " <> line
+     Logger.warn "    Unknown header line in body ignored" <> StringUtils.printable(": " <> line)
      parse_part_lines(multipart_part, encoding, otherlines)
    end
 
@@ -223,7 +223,7 @@ defmodule Pop3mail.Multipart do
    end
 
    def decode_base64(text) do
-     char_list = to_char_list(text)
+     char_list = :erlang.binary_to_list(text)
      try do
        :base64.decode(char_list)
      rescue

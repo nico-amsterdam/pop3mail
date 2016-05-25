@@ -5,9 +5,9 @@ defmodule Pop3mail.EpopDownloader do
 
    @doc "Read all emails and save them to disk."
    def download(username, password, pop3_server, pop3_port, ssl, max_mails, delete, delivered, save_raw, output_dir) do
-     username = to_char_list username 
-     password = to_char_list password 
-     pop3_server = to_char_list pop3_server
+     username = to_char_list(username)
+     password = to_char_list(password)
+     pop3_server = to_char_list(pop3_server)
      connect_options = [{:addr, pop3_server}, {:port, pop3_port}]
      if is_nil(ssl) or ssl do
        connect_options = connect_options ++ [:ssl]

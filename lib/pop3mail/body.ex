@@ -2,6 +2,7 @@ defmodule Pop3mail.Body do
   alias Pop3mail.FileStore
   alias Pop3mail.Part
   alias Pop3mail.Multipart
+  alias Pop3mail.StringUtils
 
   require Logger
 
@@ -15,7 +16,8 @@ defmodule Pop3mail.Body do
          # currently there is no filename, set default
          multipart_part = FileStore.set_default_filename(multipart_part)
       end
-      Logger.info "    " <> multipart_part.filename
+      Logger.info "    " <> StringUtils.printable(multipart_part.filename, "file")
+
       case FileStore.store_part(multipart_part, base_dir) do
            {:error, reason} -> Logger.error reason
            :ok -> ""

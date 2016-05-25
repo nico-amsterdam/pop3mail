@@ -6,14 +6,14 @@ defmodule Pop3mail.DownloaderCLI do
      usage: pop3_email_downloader.sh [--username=[recent:]USERNAME]
             [--password=PASSWORD] [--max=INTEGER] [--delete] [--server=SERVER]
             [--port=INTEGER] [--ssl=false] [--delivered] [--raw] [--help]
-     Read e-mails from the inbox and save's them including attachments on disk 
+     Read e-mails from the inbox and save them including attachments on disk 
      in the 'inbox' subdirectory.
      
      --delete     delete e-mail after downloading. Default: false
                   Notice that Gmail ignores the delete 
                   and instead uses the Gmail account settings.
      --delivered  true/false. Skip e-mails with/without Delivered-To header. 
-                  If you move an e-mail from your sent box to your inbox it 
+                  If you moved an e-mail from your sent box to your inbox it 
                   will not have the Delivered-To header. Default: don't skip
      --help       show this information.
      --max        maximum number of e-mails to download. Default: unlimited 

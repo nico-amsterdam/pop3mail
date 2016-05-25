@@ -48,7 +48,7 @@ defmodule Pop3mail.WordDecoder do
    end
 
    def decode_word(text, encoding) when encoding in ["B", "b"] do
-      char_list = to_char_list(text) 
+      char_list = :erlang.binary_to_list(text) 
       try do
         :base64.decode(char_list)
       rescue

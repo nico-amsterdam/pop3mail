@@ -13,4 +13,12 @@ defmodule Pop3mail.StringUtils do
       text
    end
 
+   def printable(str, printable_alternative \\ "") do
+      if String.printable?(str) do
+        str
+      else
+        printable_alternative
+      end
+   end
+
 end

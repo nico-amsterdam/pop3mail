@@ -18,7 +18,7 @@ defmodule Pop3mail.DateConverter do
             # add leading zero
             date_str = String.slice(date_str, 0..4) <> "0" <> day_and_date
           end
-          date_char_list = to_char_list date_str
+          date_char_list = to_char_list(date_str)
           {{year, month, day}, {hour, minutes, seconds}} = :httpd_util.convert_request_date(date_char_list)
           zero_pad(year, 4) <> zero_pad(month) <> zero_pad(day) <> "_" <> zero_pad(hour) <> zero_pad(minutes) <> zero_pad(seconds)
    end
