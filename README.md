@@ -41,7 +41,7 @@ For usage, see usage chapter below.
 
 [available in Hex](https://hex.pm/packages/pop3mail), the package can be installed as:
 
-  1. Add pop3mail to your list of dependencies in `mix.exs`:
+  1. Add pop3mail and the erlang epop client to your list of dependencies in `mix.exs`:
 
         def deps do
           [{:pop3mail, "~> 0.1.0"}, 
@@ -104,6 +104,11 @@ iex(18)> Pop3mail.header_lookup(header_list, "Subject")
 iex(19)> :epop_client.quit(client)
 ```
 
+## Spam mail
+
+You better turn off the spam folder of your email account if you not regulary checking the folder with an IMAP client. 
+In gmail you cannot turn it off, but you can create a filter for spam with the option 'Never send it to spam'.
+
 ## Reset Gmail
 
 Gmail remembers which mails are already read. Fortunetely Gmail can be reset to re-read all emails.
@@ -116,6 +121,8 @@ Go back to settings and select Download all mail, Save change.
 Now your email client should download all mail again.
 
 ## Google unlock captcha
+
+I never needed it, but just in case:
 
 https://accounts.google.com/displayunlockcaptcha
 

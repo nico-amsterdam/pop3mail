@@ -15,7 +15,7 @@ defmodule Pop3mail.QuotedPrintable do
        case Integer.parse(hex_value, 16) do
          :error -> '=' ++ [header1, header2] ++ decode(data) 
          {char_as_int, ""} -> [char_as_int] ++ decode(data)
-         _ -> '=' ++ [header1, header2] ++ decode(data) 
+         {_, _} -> '=' ++ [header1, header2] ++ decode(data)  # wrongly encoded
        end
    end
 
