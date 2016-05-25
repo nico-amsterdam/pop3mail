@@ -7,7 +7,7 @@
 ## Before you start
 
 - This program reads from a POP3 mail server, which means that it can only download mail from the inbox folder. If you want to access other folders you will need an IMAP client.
-- Gmail users: whether the read mail is permanently deleted or not, depends on your gmail settings, and not on the delete parameter of this program. 
+- Gmail users: whether the read mail is permanently deleted or not, depends on your Gmail settings, and not on the delete parameter of this program. 
 - Do NOT run the script as root.
 - Downloaded attachments can contain viruses, addware or malicious scripts.
 - This program does NOT convert charsets and neither does it add a [BOM](https://en.wikipedia.org/wiki/Byte_order_mark). 
@@ -63,17 +63,17 @@ The script downloads email and writes the content in the inbox folder.
 ```sh
 $ chmod +x pop3_email_downloader.sh
 $ ./pop3_email_downloader.sh --help
-$ ./pop3_email_downloader.sh --username=<your gmail username> --password=<your gmail password> --max=10 --raw
+$ ./pop3_email_downloader.sh --username=<your email username> --password=<your email password> --max=10 --raw
 ```
 
 or without shell script:
 
 ```sh
 $ mix run -e 'Pop3mail.DownloaderCLI.main(["--help"])'
-$ mix run -e 'Pop3mail.DownloaderCLI.main(["--username=<user gmail username>", "--password=<your gmail password>", "--max=10", "--raw"])'
+$ mix run -e 'Pop3mail.DownloaderCLI.main(["--username=<user email username>", "--password=<your email password>", "--max=10", "--raw"])'
 ```
 
-The script defaults to gmail, but you can specify other host and port names on the commandline.
+The script defaults to Gmail, but you can specify other POP3 server and port names on the commandline.
 
 ### Use in Elixir
 
@@ -104,10 +104,10 @@ iex(18)> Pop3mail.header_lookup(header_list, "Subject")
 iex(19)> :epop_client.quit(client)
 ```
 
-## Spam mail
+## Spam folder
 
-You better turn off the spam folder of your email account if you not regulary checking the folder with an IMAP client. 
-In gmail you cannot turn it off, but you can create a filter for spam with the option 'Never send it to spam'.
+You better turn off the spam folder of your email account if you don't want to miss any e-mail.
+In Gmail you cannot turn it off, but you can create a filter for spam with the option 'Never send it to spam'.
 
 ## Reset Gmail
 
