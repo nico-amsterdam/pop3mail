@@ -34,4 +34,13 @@ defmodule Pop3mail do
       Pop3mail.Multipart.parse_multipart(boundary_name, raw_content, path)
    end
 
+   def decode_raw_file(filename, output_dir) do
+      unless File.dir?(output_dir), do: File.mkdir! output_dir
+      case :file.read_file(filename) do
+         {:ok, mail_content} -> to_char_list(mail_content) |> Pop3mail.EpopDownloader.parse_process_and_store(1, nil, false, output_dir)
+         {:error, :enoent} -> IO.puts(:stderr, "File '" <> filename <> "' not found.")
+         {:error, error_code} -> IO.puts(:stderr, "Error: #{error_code}")
+      end
+   end
+
 end

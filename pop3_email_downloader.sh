@@ -9,5 +9,5 @@ do
    downloadargs="$downloadargs, \"$arg\""
 done
 mixargs="Pop3mail.DownloaderCLI.main([$downloadargs])"
-echo mix run -e "$mixargs"
+echo mix run -e "'$mixargs'"
 mix run -e "$mixargs"

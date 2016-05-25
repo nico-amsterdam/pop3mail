@@ -50,6 +50,11 @@ defmodule Pop3mail.Multipart do
      else
         # ignore first line because that's the text after the boundary and it should be empty
         [_| other_lines] = lines
+        if String.length(String.strip(line)) > 0 do
+          Logger.warn "    Missing newline after boundary at line: " <> line
+          # fix error: add the line
+          other_lines = lines
+        end
         new_part = %Part{path: path, index: index}
         multipart_part = parse_part_lines(new_part, "raw", other_lines)
         # return list of parts
@@ -71,7 +76,7 @@ defmodule Pop3mail.Multipart do
      # there should be an empty line after the headers
      if String.length(String.strip(line)) > 0 do
         # this is not always the case or we have an unknown header here.
-        Logger.warn "Missing newline or unknown header in body at line: " <> line
+        Logger.warn "    Missing newline or unknown header in body at line: " <> line
         # fix; don't skip line
         otherlines = [line | otherlines]
      end
@@ -180,7 +185,7 @@ defmodule Pop3mail.Multipart do
 
    def parse_part_unknown_header(multipart_part, encoding, [line | otherlines]) do
      {line, otherlines} = lines_continued(line, otherlines)
-     Logger.warn "Unknown header line in body ignored: " <> line
+     Logger.warn "    Unknown header line in body ignored: " <> line
      parse_part_lines(multipart_part, encoding, otherlines)
    end
 
@@ -211,10 +216,19 @@ defmodule Pop3mail.Multipart do
    def decode(encoding, text) do
        case String.downcase(encoding) do
          "quoted-printable" -> QuotedPrintable.decode(text) |> :erlang.list_to_binary
-         "base64" -> to_char_list(text) |> :base64.decode
+         "base64" -> decode_base64(text)
          # others: for example: 7bit
          _ -> text
        end
+   end
+
+   def decode_base64(text) do
+     char_list = to_char_list(text)
+     try do
+       :base64.decode(char_list)
+     rescue
+       _ -> Logger.warn "    Mail contains invalid encoded base64 content. Please check."; "Pop3mail noticed this error; Invalid base64 encoded text:\n" <> text 
+     end
    end
 
    # Content-Disposition: attachment; filename=abc.pdf

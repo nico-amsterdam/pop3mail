@@ -48,7 +48,12 @@ defmodule Pop3mail.WordDecoder do
    end
 
    def decode_word(text, encoding) when encoding in ["B", "b"] do
-      to_char_list(text) |> :base64.decode
+      char_list = to_char_list(text) 
+      try do
+        :base64.decode(char_list)
+      rescue
+        _ -> text
+      end
    end
 
    def decode_word(text, encoding) when encoding in ["Q", "q"] do

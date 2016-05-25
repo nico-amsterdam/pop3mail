@@ -22,7 +22,9 @@ defmodule Pop3mail.EpopDownloader do
    def retrieve_and_store_all(epop_client, max_mails, delete, delivered, save_raw, output_dir) do
      try do
         {:ok, {count, size_total}} = :epop_client.stat(epop_client)
-        Logger.info "#{count} messages, #{size_total} bytes total."
+        count_formatted = format_number(count)
+        size_total_formatted = format_number(size_total)
+        Logger.info "#{count_formatted} messages, #{size_total_formatted} bytes total."
         count = min(count, max_mails)
         if count > 0 do
             # create inbox directory to store emails
@@ -34,6 +36,11 @@ defmodule Pop3mail.EpopDownloader do
         :epop_client.quit(epop_client)
      end
    end
+
+   defp format_number(num) do
+     # reverse digits, add a dot after every 3 places and reverse again
+     Regex.replace(~r/(\d{3})/, String.reverse(to_string(num)), "\\1.") |> String.replace_suffix(".", "") |> String.reverse
+   end 
 
    def retrieve_and_store(epop_client, mail_loop_counter, delete, delivered, save_raw, base_dir) do
       {:ok, mail_content} = :epop_client.retrieve(epop_client, mail_loop_counter)
