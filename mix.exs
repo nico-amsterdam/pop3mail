@@ -34,9 +34,10 @@ defmodule Pop3mail.Mixfile do
 
   defp description do
     """
-    Pop3 client to download email (including attachments) from the inbox via the commandline or Elixir API.
-    Written in Elixir, using an Erlang pop3 client with SSL support derived from the epop package.
+    Pop3 client to download email (including attachments) from the inbox.
     Decodes multipart content, quoted-printables, base64 and encoded-words.
+    Uses an Erlang pop3 client with SSL support derived from the epop package. Add this dependency in mix.exs: 
+    {:erlpop, github: "trifork/erlpop"}
     """
   end
 

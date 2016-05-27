@@ -3,7 +3,7 @@ defmodule Pop3mail.DownloaderCLI do
    
    defp usage_text do
      """
-     usage: pop3_email_downloader.sh [--username=[recent:]USERNAME]
+     usage: pop3mail_downloader [--username=[recent:]USERNAME]
             [--password=PASSWORD] [--max=INTEGER] [--delete] [--server=SERVER]
             [--port=INTEGER] [--ssl=false] [--delivered] [--raw] [--help]
      Read e-mails from the inbox and save them including attachments on disk 
@@ -67,17 +67,17 @@ defmodule Pop3mail.DownloaderCLI do
    end
 
    # "print last line of unknown options"
-   defp show_error([]), do: IO.puts(:stderr, "Type 'pop3_email_downloader.sh --help' for more information.")
+   defp show_error([]), do: IO.puts(:stderr, "Type 'pop3mail_downloader --help' for more information.")
 
    # "print unknown options"
    defp show_error([{ option, _ } | tail]) do
-      IO.puts(:stderr, "pop3_email_downloader.sh: Unknown option '" <> to_string(option) <> "'")
+      IO.puts(:stderr, "pop3mail_downloader: Unknown option '" <> to_string(option) <> "'")
       show_error tail
    end
 
    # "print unknown arguments"
    defp show_error([arg | tail]) do
-      IO.puts(:stderr, "pop3_email_downloader.sh: Unknown argument '" <> arg <> "'")
+      IO.puts(:stderr, "pop3mail_downloader: Unknown argument '" <> arg <> "'")
       show_error tail
    end
 

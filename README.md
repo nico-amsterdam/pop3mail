@@ -21,6 +21,9 @@
 
 Follow the instructions on http://elixir-lang.org/install.html
 
+Also install [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) and optionally also rebar3.
+
+
 ### Clone project
 
 ```sh
@@ -61,19 +64,25 @@ For usage, see usage chapter below.
 The script downloads email and writes the content in the inbox folder.
  
 ```sh
-$ chmod +x pop3_email_downloader.sh
-$ ./pop3_email_downloader.sh --help
-$ ./pop3_email_downloader.sh --username=<your email username> --password=<your email password> --max=10 --raw
+$ pop3mail_downloader --help
+$ pop3mail_downloader --username=<your email username> --password=<your email password> --max=10 --raw
 ```
 
-or without shell script:
+or without shell/batch script:
 
+\*nix
 ```sh
 $ mix run -e 'Pop3mail.DownloaderCLI.main(["--help"])'
 $ mix run -e 'Pop3mail.DownloaderCLI.main(["--username=<user email username>", "--password=<your email password>", "--max=10", "--raw"])'
 ```
 
-The script defaults to Gmail, but you can specify other POP3 server and port names on the commandline.
+Windows
+```dos
+C:\pop3mail\mix run -e "Pop3mail.DownloaderCLI.main([""--help""])"
+C:\pop3mail\mix run -e "Pop3mail.DownloaderCLI.main([""--username=<user email username>"", ""--password=<your email password>"", ""--max=10"", ""--raw""])"
+```
+
+The script defaults to Gmail, but you can specify other POP3 server and port settings.
 
 ### Use in Elixir
 
@@ -106,7 +115,7 @@ iex(19)> :epop_client.quit(client)
 
 ## Spam folder
 
-You better turn off the spam folder of your email account if you don't want to miss any e-mail.
+You better turn off the spam folder of your email account if you don't want to miss any e-mail with this program.
 In Gmail you cannot turn it off, but you can create a filter for spam with the option 'Never send it to spam'.
 
 ## Reset Gmail
@@ -122,9 +131,9 @@ Now your email client should download all mail again.
 
 ## Google unlock captcha
 
-I never needed it, but just in case:
+If you get an error 'web login required', push the 'Continue' button in the browser:
 
-https://accounts.google.com/displayunlockcaptcha
+https://accounts.google.com/DisplayUnlockCaptcha
 
 
 ## License
