@@ -27,7 +27,7 @@ defmodule Pop3mail.Header do
 
    defp create_content_and_store(from_decoded, to_decoded, cc_decoded, subject_decoded, mention_charset, date, filename_prefix, filename_addition, dirname) do
       # create file content
-      line_sep = :io_lib.nl() |> to_string
+      line_sep = FileStore.get_line_separator()
       content = "Date: " <> date <> line_sep <> 
                 "From: " <> WordDecoder.decoded_text_list_to_string(from_decoded, mention_charset) <> line_sep <> 
                 "To: " <> WordDecoder.decoded_text_list_to_string(to_decoded, mention_charset) 

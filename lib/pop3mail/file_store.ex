@@ -46,7 +46,7 @@ defmodule Pop3mail.FileStore do
      dirname = Path.join(base_dir, multipart_part.path)
      unless File.dir?(dirname), do: File.mkdir_p! dirname 
      pathname = Path.join(dirname,  remove_unwanted_chars(multipart_part.filename, 50))
-     if String.starts_with?(multipart_part.media_type, "text/") and :io_lib.nl() != '\r\n' do
+     if String.starts_with?(multipart_part.media_type, "text/") and get_line_separator() != '\r\n' do
         # store text file in unix format
         multipart_part = dos2unix(multipart_part)
      end
@@ -55,9 +55,17 @@ defmodule Pop3mail.FileStore do
      # It's not very safe, does accept any pathname. Don't run this as root.
      :file.write_file(pathname, multipart_part.content)
    end
+   
+   def get_line_separator() do
+      # in theory :io_lib.nl() should return '\r\n' on windows, but it's not.
+      case :os.type() do
+         { :win32, _ } -> "\r\n"
+         _ -> :io_lib.nl() |> to_string
+      end
+   end
 
    def dos2unix(multipart_part) do
-      line_sep = :io_lib.nl() |> to_string
+      line_sep = get_line_separator()
       unix_text = multipart_part.content |> String.split("\r\n") |> Enum.join(line_sep)
       %{multipart_part | content: unix_text}
    end
