@@ -7,13 +7,17 @@
 ## Before you start
 
 - This program reads from a POP3 mail server, which means that it can only download mail from the inbox folder. If you want to access other folders you will need an IMAP client.
-- Gmail users: whether the read mail is permanently deleted or not, depends on your Gmail settings, and not on the delete parameter of this program. 
 - Do NOT run the script as root.
 - Downloaded attachments can contain viruses, addware or malicious scripts.
 - This program does NOT convert charsets and neither does it add a [BOM](https://en.wikipedia.org/wiki/Byte_order_mark). 
   If a message is send in ISO-8859-1, CP1251, KOI8-R it wil be stored as such.
   Sometimes you must change the locale/charset/encoding (LC_CTYPE luit, chcp) in your terminal/device/program to be able to read the content.
   Elixir programmers can use [codepagex](https://github.com/tallakt/codepagex) to perform conversions to utf-8.
+
+Gmail users:
+- Whether the read mail is permanently deleted or not, depends on your Gmail settings, and not on the delete parameter of this program. 
+- Gmail returns chunks of maximum 250-350 emails. Repeatedly run this program to get all emails.
+
 
 ## Installation from scratch
 
@@ -115,7 +119,7 @@ iex(19)> :epop_client.quit(client)
 
 ## Spam folder
 
-You better turn off the spam folder of your email account if you don't want to miss any e-mail with this program.
+You better turn off the spam folder of your email account if you don't want to miss any email with this program.
 In Gmail you cannot turn it off, but you can create a filter for spam with the option 'Never send it to spam'.
 
 ## Reset Gmail

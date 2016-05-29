@@ -23,7 +23,7 @@ defmodule Pop3mail.FileStore do
    
    def mkdir(base_dir, name, unsafe_addition) do
       if String.length(unsafe_addition) > 0 do
-          shortened_unsafe_addition = remove_unwanted_chars(unsafe_addition, 22)
+          shortened_unsafe_addition = remove_unwanted_chars(unsafe_addition, 32)
           dirname = Path.join( base_dir , name <> "_" <> shortened_unsafe_addition)
           if !File.dir?(dirname) do
               # check if the operating system is able to create this directory, if not, try without unsafe addition
