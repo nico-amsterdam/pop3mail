@@ -1,6 +1,6 @@
 defmodule Pop3mail.FileStore do
 
-   @content_type2file_extension %{ "text/plain" => "txt", "text/html" => "html" }
+   @content_type2file_extension %{"text/plain" => "txt", "text/html" => "html"}
    # store most important header details in header.txt
    def store_mail_header(content, filename_prefix, unsafe_addition, dirname) do
       if String.length(unsafe_addition) > 0 do
@@ -24,7 +24,7 @@ defmodule Pop3mail.FileStore do
    def mkdir(base_dir, name, unsafe_addition) do
       if String.length(unsafe_addition) > 0 do
           shortened_unsafe_addition = remove_unwanted_chars(unsafe_addition, 32)
-          dirname = Path.join( base_dir , name <> "_" <> shortened_unsafe_addition)
+          dirname = Path.join(base_dir, name <> "_" <> shortened_unsafe_addition)
           if !File.dir?(dirname) do
               # check if the operating system is able to create this directory, if not, try without unsafe addition
               dirname = 
@@ -59,7 +59,7 @@ defmodule Pop3mail.FileStore do
    def get_line_separator() do
       # in theory :io_lib.nl() should return '\r\n' on windows, but it's not.
       case :os.type() do
-         { :win32, _ } -> "\r\n"
+         {:win32, _} -> "\r\n"
          _ -> :io_lib.nl() |> to_string
       end
    end
@@ -72,12 +72,17 @@ defmodule Pop3mail.FileStore do
 
    # characters we don't want in filenames can be filtered out with this function.
    def remove_unwanted_chars(text, max_chars) do
-      # I don't like spaces in filenames. file can contain dash - but should not start with it.
-      String.replace(text, "@", " at ") |> String.replace(~r/\s+/u, "_") |> String.replace(~r/[^A-Za-z0-9\x80-\xFF_.-]/u , "") |> String.replace_prefix("-", "") |> String.slice(0..max_chars) 
+      # Remove all control characters. I don't like spaces in filenames. file can contain dash - but should not start with it.
+      text 
+      |> String.replace("@", " at ") 
+      |> String.replace(~r/\s+/u, "_")
+      |> String.replace(~r/[^A-Za-z0-9\x80-\xFF_.-]/u , "") 
+      |> String.replace_prefix("-", "") 
+      |> String.slice(0..max_chars) 
    end
 
    def get_default_filename(media_type, charset, index) do
-        file_extension = @content_type2file_extension[media_type] || String.split(media_type, "/") |> List.last
+        file_extension = @content_type2file_extension[media_type] || (media_type |> String.split("/") |> List.last)
         filename = "message" <> to_string(index)
         lc_charset = String.downcase(charset)
         if lc_charset != "us-ascii" do

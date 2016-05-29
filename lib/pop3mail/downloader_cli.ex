@@ -41,7 +41,7 @@ defmodule Pop3mail.DownloaderCLI do
          help:      :boolean,
          delete:    :boolean,
          delivered: :boolean,
-         raw:       :boolean ])
+         raw:       :boolean])
      if options[:help] do
         show_help
      else
@@ -50,16 +50,21 @@ defmodule Pop3mail.DownloaderCLI do
    end
 
    defp process_options(options,[],[]) do
-     username  = options[:username] || IO.gets("Please enter your gmail account name: ") |> String.replace_suffix("\n", "")
-     password  = options[:password] || IO.gets("Please enter your password: ") |> String.replace_suffix("\n", "")
-     max_mails = options[:max]
-     ssl       = options[:ssl]
-     delete    = options[:delete]
-     save_raw  = options[:raw]
-     server    = options[:server] || "pop.gmail.com"
-     port      = options[:port] || 995
-     delivered = options[:delivered]
-     EpopDownloader.download(username, password, server, port, ssl, max_mails, delete, delivered, save_raw, "inbox")
+     username = options[:username] || IO.gets("Please enter your gmail account name: ") |> String.replace_suffix("\n", "")
+     password = options[:password] || IO.gets("Please enter your password: ") |> String.replace_suffix("\n", "")
+     epop_options = %EpopDownloader.Options{
+       username:   username,
+       password:   password,
+       max_mails:  options[:max],
+       ssl:        options[:ssl],
+       delete:     options[:delete],
+       save_raw:   options[:raw],
+       server:     options[:server] || "pop.gmail.com",
+       port:       options[:port] || 995,
+       delivered:  options[:delivered],
+       output_dir: "inbox"
+     }
+     EpopDownloader.download(epop_options)
    end
 
    defp process_options(_,illegal_args,failed_options) do
@@ -70,7 +75,7 @@ defmodule Pop3mail.DownloaderCLI do
    defp show_error([]), do: IO.puts(:stderr, "Type 'pop3mail_downloader --help' for more information.")
 
    # "print unknown options"
-   defp show_error([{ option, _ } | tail]) do
+   defp show_error([{option, _} | tail]) do
       IO.puts(:stderr, "pop3mail_downloader: Unknown option '" <> to_string(option) <> "'")
       show_error tail
    end

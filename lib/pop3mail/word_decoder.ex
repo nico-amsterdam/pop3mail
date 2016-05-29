@@ -58,17 +58,26 @@ defmodule Pop3mail.WordDecoder do
 
    def decode_word(text, encoding) when encoding in ["Q", "q"] do
       # RFC2047: The 8-bit hexadecimal value 20 (e.g., ISO-8859-1 SPACE) may be represented as "_" (underscore, ASCII 95.).
-      String.replace(text, "_", " ") |> QuotedPrintable.decode |> :erlang.list_to_binary
+      text 
+      |> String.replace("_", " ")
+      |> QuotedPrintable.decode
+      |> :erlang.list_to_binary
    end
 
    # returns sorted unique list. Because the non-encoded text has the us-ascii charset (a subset of utf-8 iso-8859-1 cp1251) we are particulary interested in the other charsets.
    def get_charsets_besides_ascii(decoded_text_list) do
-     Enum.map(decoded_text_list, fn({charset, _}) -> charset end) |> Enum.filter( fn(charset) -> charset != "us-ascii" end ) |> Enum.sort |> Enum.dedup
+     decoded_text_list
+     |> Enum.map(fn({charset, _}) -> charset end) 
+     |> Enum.filter(fn(charset) -> charset != "us-ascii" end)
+     |> Enum.sort 
+     |> Enum.dedup
    end
 
    # copies text as it is. Does NOT convert to a common character set like utf-8.
    def decoded_text_list_to_string(decoded_text, add_charset_name \\ false) do
-      Enum.map(decoded_text, fn({charset, text}) -> if add_charset_name and charset != "us-ascii" and String.length(text) > 0, do: text = "#{text} (#{charset})"; text; end) |> Enum.join
+      decoded_text
+      |> Enum.map(fn({charset, text}) -> if add_charset_name and charset != "us-ascii" and String.length(text) > 0, do: text = "#{text} (#{charset})"; text; end) 
+      |> Enum.join
    end
 
 end

@@ -14,10 +14,6 @@ defmodule Pop3mail do
       Pop3mail.DownloaderCLI.main(args)
    end
 
-   def download(username, password, pop3_server, pop3_port, ssl, max_mails, delete, delivered, save_raw, output_dir) do
-      Pop3mail.download(username, password, pop3_server, pop3_port, ssl, max_mails, delete, delivered, save_raw, output_dir)
-   end
-
    def header_lookup(header_list, header_name) do
       Pop3mail.Header.lookup(header_list, header_name)
    end
@@ -37,8 +33,8 @@ defmodule Pop3mail do
    def decode_raw_file(filename, output_dir) do
       unless File.dir?(output_dir), do: File.mkdir! output_dir
       case :file.read_file(filename) do
-         {:ok, mail_content} -> :erlang.binary_to_list(mail_content) |> Pop3mail.EpopDownloader.parse_process_and_store(1, nil, false, output_dir)
-         {:error, :enoent} -> IO.puts(:stderr, "File '" <> filename <> "' not found.")
+         {:ok, mail_content}  -> mail_content |> :erlang.binary_to_list |> Pop3mail.EpopDownloader.parse_process_and_store(1, nil, false, output_dir)
+         {:error, :enoent}    -> IO.puts(:stderr, "File '" <> filename <> "' not found.")
          {:error, error_code} -> IO.puts(:stderr, "Error: #{error_code}")
       end
    end

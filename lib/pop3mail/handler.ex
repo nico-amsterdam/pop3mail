@@ -9,47 +9,67 @@ defmodule Pop3mail.Handler do
 
   require Logger
 
-   def check_process_and_store(mail_content, mail_loop_counter, header_list, body_char_list, delivered, save_raw, base_dir) do
-     # skip or not
-      run = is_nil(delivered) or (delivered == (String.length(Header.lookup(header_list, "Delivered-To")) > 2))
+   defmodule Mail do
+      defstruct mail_content: '', mail_loop_counter: 0, header_list: [], body_char_list: ''
+   end
+
+   defmodule Options do
+      defstruct delivered: nil, save_raw: false, base_dir: ""
+   end
+
+
+   def check_process_and_store(mail, options) do
+     # skip or not. don't skip if delivered=nil or delivered is true/false and there is/isn't a Delivered-To header.
+      run = is_nil(options.delivered) or (options.delivered == has_delivered_to_header(mail.header_list))
       if run do
-          process_and_store(mail_content, mail_loop_counter, header_list, body_char_list, save_raw, base_dir)
+          process_and_store(mail, options)
       else
-          date = Header.lookup(header_list, "Date")
-          Logger.info "  Mail #{mail_loop_counter} dated #{date} not stored because of delivered=#{delivered} parameter."
+          date = Header.lookup(mail.header_list, "Date")
+          Logger.info "  Mail #{mail.mail_loop_counter} dated #{date} not stored because of delivered=#{mail.delivered} parameter."
       end
    end
 
-   def process_and_store(mail_content, mail_loop_counter, header_list, body_char_list, save_raw, base_dir) do
-      date    = Header.lookup(header_list, "Date")
-      subject = Header.lookup(header_list, "Subject")
-      from    = Header.lookup(header_list, "From")
+   defp has_delivered_to_header(header_list) do
+      delivered_to = Header.lookup(header_list, "Delivered-To")
+      String.length(delivered_to) > 2
+   end
+
+   def process_and_store(mail, options) do
+      date    = Header.lookup(mail.header_list, "Date")
+      subject = Header.lookup(mail.header_list, "Subject")
+      from    = Header.lookup(mail.header_list, "From")
       date_dirname = convert_date_to_dirname(date)
-      Logger.info "  Process mail #{mail_loop_counter}: #{date}"
+      Logger.info "  Process mail #{mail.mail_loop_counter}: #{date}"
 
       # create directory based on date received
-      dirname = FileStore.mkdir(base_dir, date_dirname, remove_encodings(subject))
+      dirname = FileStore.mkdir(options.base_dir, date_dirname, remove_encodings(subject))
 
-      if save_raw do
-         # for debugging
-         case FileStore.store_raw(mail_content, dirname) do
-              {:error, reason} -> Logger.error reason
-              :ok -> ""
-         end
-      end
+      if options.save_raw, do: save_raw(mail.mail_content, dirname)
 
       filename_prefix = "header"
       # you get a sender name with removed encodings
       sender_name = get_sender_name(from)
-
+      
       # store header info in a header file
+      store_header(mail.header_list, filename_prefix, sender_name, dirname)
+
+      # body
+      process_and_store_body(mail.header_list, mail.body_char_list, dirname)
+   end
+   
+   defp store_header(header_list, filename_prefix, sender_name, dirname) do
       case Header.store(header_list, filename_prefix, sender_name, dirname) do
            :ok -> :ok
            {:error, reason} -> Logger.error reason
       end
-
-      # body
-      process_and_store_body(header_list, body_char_list, dirname)
+   end
+   
+   defp save_raw(mail_content, dirname) do
+      # for debugging
+      case FileStore.store_raw(mail_content, dirname) do
+           :ok -> :ok
+           {:error, reason} -> Logger.error reason
+      end
    end
 
 
@@ -85,13 +105,18 @@ defmodule Pop3mail.Handler do
 
    def get_sender_name(from) do
      sender_name = from
-     from_splitted = from |> String.split(~r/[<>]/)
+     from_splitted = String.split(from, ~r/[<>]/)
      # if the format was:  name <email adres> you should have a array of 2
      if length(from_splitted) >= 2 do
-        from_name = Enum.at(from_splitted, 0) |> String.strip |> StringUtils.unquoted
+        from_name = from_splitted 
+                    |> Enum.at(0) 
+                    |> String.strip 
+                    |> StringUtils.unquoted
         if String.length(from_name) == 0 do
            # can only pick up the email between the < > brackets
-           sender_name = Enum.at(from_splitted, 1) |> String.strip
+           sender_name = from_splitted 
+                         |> Enum.at(1)
+                         |> String.strip
         else
            sender_name = remove_encodings(sender_name)
         end
@@ -104,7 +129,9 @@ defmodule Pop3mail.Handler do
    # What you get is a binary which you might be able to read depending on the character encoding set in your terminal/device/program.
    def remove_encodings(text) do
       decoded_text_list = WordDecoder.decode_text(text)
-      Enum.map(decoded_text_list, fn({_, val}) -> val end) |> Enum.join
+      decoded_text_list 
+      |> Enum.map(fn({_, val}) -> val end) 
+      |> Enum.join
    end
 
 end

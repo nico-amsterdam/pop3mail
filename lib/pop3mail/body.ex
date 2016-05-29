@@ -28,7 +28,7 @@ defmodule Pop3mail.Body do
       decoded_binary = Multipart.decode(encoding, body_text)
 
       # pretend that the mail body is a multipart part, so it can be handled by the same code that handles multipart content
-      mail_body_part = %Part{ index: 1, content: decoded_binary }
+      mail_body_part = %Part{index: 1, content: decoded_binary}
          |> Multipart.parse_content_type(content_type) # extract from content_type the media_type, charset, boundary and put them in the mail_body_part
          |> Multipart.parse_disposition(disposition)   # disposition may contain filename
 
