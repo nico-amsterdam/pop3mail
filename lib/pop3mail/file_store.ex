@@ -2,16 +2,45 @@ defmodule Pop3mail.FileStore do
 
    @content_type2file_extension %{ "text/plain" => "txt", "text/html" => "html" }
    # store most important header details in header.txt
-   def store_mail_header(content, filename, dirname) do
-     path = Path.join(dirname, filename)
-     :file.write_file(path, content)
+   def store_mail_header(content, filename_prefix, unsafe_addition, dirname) do
+      if String.length(unsafe_addition) > 0 do
+         filename = filename_prefix <> "_" <> remove_unwanted_chars(unsafe_addition, 35) <> ".txt"
+         path = Path.join(dirname, filename)
+         case :file.write_file(path, content) do
+            :ok -> :ok
+            {:error, _} -> store_mail_header(content, filename_prefix, "", dirname)
+         end
+      else
+         path = Path.join(dirname, filename_prefix <> ".txt")
+         :file.write_file(path, content)
+      end
    end
    
    # store_raw
    def store_raw(mail_content, dirname) do
          :file.write_file(Path.join(dirname, "raw.txt"), mail_content)
    end
-
+   
+   def mkdir(base_dir, name, unsafe_addition) do
+      if String.length(unsafe_addition) > 0 do
+          shortened_unsafe_addition = remove_unwanted_chars(unsafe_addition, 22)
+          dirname = Path.join( base_dir , name <> "_" <> shortened_unsafe_addition)
+          if !File.dir?(dirname) do
+              # check if the operating system is able to create this directory, if not, try without unsafe addition
+              dirname = 
+                  case File.mkdir(dirname) do
+                    :ok -> dirname
+                    {:error, _} -> mkdir(base_dir, name, "")  # drop the unsafe addition and re-try
+                  end
+          end
+          dirname
+       else
+          dirname = Path.join(base_dir , name)
+          unless File.dir?(dirname), do: File.mkdir!(dirname)      
+          dirname
+       end
+   end
+   
    # store body content
    def store_part(multipart_part, base_dir) do
      dirname = Path.join(base_dir, multipart_part.path)

@@ -32,9 +32,17 @@ defmodule Pop3mail.Multipart do
    end
 
    def parse_multipart(boundary_name, raw_content, path) do
-     # split at --boundary
-     [_ | parts] = String.split(raw_content, "--" <> boundary_name)
-     Enum.with_index(parts, 1) |> Enum.flat_map(&(parse_part(&1, path)))
+     # get text till end boundary
+     multipart_list = String.split(raw_content, "--" <> boundary_name <> "--")
+     if length(multipart_list) <= 1 do 
+        Logger.warn "    End boundary #{boundary_name} not found."
+     else
+         if length(multipart_list) > 2, do: Logger.warn "    Multiple end boundaries #{boundary_name} found."
+         multipart = Enum.at(multipart_list, 0)
+         # split at --boundary
+         [_ | parts] = String.split(multipart, "--" <> boundary_name <> "\r\n")
+         Enum.with_index(parts, 1) |> Enum.flat_map(&(parse_part(&1, path)))
+     end
    end
 
 
@@ -42,24 +50,10 @@ defmodule Pop3mail.Multipart do
      # part = %{multipart_part | index: index}
      # bare carriage returns or bare linefeeds are not allowed in email.
      lines = String.split(part, ~r/\r\n/)
-     line = List.first(lines)
-     # Because we did split at --boundary, the end boundary '--boundary--' is split in '--boundary' and '--'. So '--' indicates that we are ready with the multipart.
-     if String.starts_with?(line, "--") or length(lines) < 2 do
-       # ready with the multipart
-       []
-     else
-        # ignore first line because that's the text after the boundary and it should be empty
-        [_| other_lines] = lines
-        if String.length(String.strip(line)) > 0 do
-          Logger.warn "    Missing newline after boundary" <> StringUtils.printable(" at line: " <> line)
-          # fix error: add the line
-          other_lines = lines
-        end
-        new_part = %Part{path: path, index: index}
-        multipart_part = parse_part_lines(new_part, "raw", other_lines)
-        # return list of parts
-        [multipart_part] 
-     end
+     new_part = %Part{path: path, index: index}
+     multipart_part = parse_part_lines(new_part, "raw", lines)
+     # return list of parts
+     [multipart_part] 
    end
 
    # header lines are processed, now decode the content

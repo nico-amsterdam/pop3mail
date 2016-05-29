@@ -8,7 +8,7 @@ defmodule Pop3mail.Header do
      Enum.filter_map(header_list, fn({:header, name, _}) -> name == header_name end, fn({:header, _, val}) -> val end) |>  Enum.join(", ")
    end
 
-   def store(header_list, filename_prefix, dirname) do
+   def store(header_list, filename_prefix, filename_addition, dirname) do
       date    = lookup(header_list, "Date")
       # RFC2047, search for encoded words and put these in decoded text list, like  [{charset1,content1},{charset2,content2}]
       from_decoded    = lookup(header_list, "From")    |> WordDecoder.decode_text
@@ -22,10 +22,10 @@ defmodule Pop3mail.Header do
       end
       # mention the charset in the file content if multiple charsets are used:
       mention_charset = length(charsets) > 1
-      create_content_and_store(from_decoded, to_decoded, cc_decoded, subject_decoded, mention_charset, date, filename_prefix <> ".txt", dirname)
+      create_content_and_store(from_decoded, to_decoded, cc_decoded, subject_decoded, mention_charset, date, filename_prefix, filename_addition, dirname)
    end
 
-   defp create_content_and_store(from_decoded, to_decoded, cc_decoded, subject_decoded, mention_charset, date, filename, dirname) do
+   defp create_content_and_store(from_decoded, to_decoded, cc_decoded, subject_decoded, mention_charset, date, filename_prefix, filename_addition, dirname) do
       # create file content
       line_sep = :io_lib.nl() |> to_string
       content = "Date: " <> date <> line_sep <> 
@@ -40,6 +40,6 @@ defmodule Pop3mail.Header do
       if String.length(subject) > 0, do: content = content <> line_sep <> "Subject: " <> subject
      
       # store
-      FileStore.store_mail_header(content, filename, dirname)
+      FileStore.store_mail_header(content, filename_prefix, filename_addition, dirname)
    end
 end

@@ -15,7 +15,8 @@ defmodule Pop3mail.Handler do
       if run do
           process_and_store(mail_content, mail_loop_counter, header_list, body_char_list, save_raw, base_dir)
       else
-          Logger.info "  Skipped mail #{mail_loop_counter}: delivered = #{delivered}"
+          date = Header.lookup(header_list, "Date")
+          Logger.info "  Mail #{mail_loop_counter} dated #{date} not stored because of delivered=#{delivered} parameter."
       end
    end
 
@@ -27,8 +28,7 @@ defmodule Pop3mail.Handler do
       Logger.info "  Process mail #{mail_loop_counter}: #{date}"
 
       # create directory based on date received
-      dirname = Path.join( base_dir , date_dirname <> "_" <> FileStore.remove_unwanted_chars(remove_encodings(subject), 22))
-      unless File.dir?(dirname), do: File.mkdir! dirname 
+      dirname = FileStore.mkdir(base_dir, date_dirname, remove_encodings(subject))
 
       if save_raw do
          # for debugging
@@ -41,13 +41,11 @@ defmodule Pop3mail.Handler do
       filename_prefix = "header"
       # you get a sender name with removed encodings
       sender_name = get_sender_name(from)
-      if String.length(sender_name) > 0 do
-         filename_prefix = filename_prefix <> "_" <> FileStore.remove_unwanted_chars(sender_name, 35)
-      end
+
       # store header info in a header file
-      case Header.store(header_list, filename_prefix, dirname) do
+      case Header.store(header_list, filename_prefix, sender_name, dirname) do
+           :ok -> :ok
            {:error, reason} -> Logger.error reason
-           :ok -> ""
       end
 
       # body

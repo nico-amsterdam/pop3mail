@@ -21,10 +21,11 @@ defmodule Pop3mail.EpopDownloader do
 
    def retrieve_and_store_all(epop_client, max_mails, delete, delivered, save_raw, output_dir) do
      try do
+        # This information returned by the server is not always reliable
         {:ok, {count, size_total}} = :epop_client.stat(epop_client)
         count_formatted = format_number(count)
         size_total_formatted = format_number(size_total)
-        Logger.info "#{count_formatted} messages, #{size_total_formatted} bytes total."
+        Logger.info "#{count_formatted} e-mails, #{size_total_formatted} bytes total."
         count = min(count, max_mails)
         if count > 0 do
             # create inbox directory to store emails
@@ -43,10 +44,12 @@ defmodule Pop3mail.EpopDownloader do
    end 
 
    def retrieve_and_store(epop_client, mail_loop_counter, delete, delivered, save_raw, base_dir) do
-      {:ok, mail_content} = :epop_client.retrieve(epop_client, mail_loop_counter)
-      parse_process_and_store(mail_content, mail_loop_counter, delivered, save_raw, base_dir)
-      if delete do
-        :ok = :epop_client.delete(epop_client, mail_loop_counter)
+      case :epop_client.retrieve(epop_client, mail_loop_counter) do
+        {:ok, mail_content} -> parse_process_and_store(mail_content, mail_loop_counter, delivered, save_raw, base_dir)
+                               if delete do
+                                 :ok = :epop_client.delete(epop_client, mail_loop_counter)
+                               end
+        {:error, reason} -> Logger.error reason
       end
    end
 

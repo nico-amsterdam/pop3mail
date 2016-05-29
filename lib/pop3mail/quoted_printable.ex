@@ -1,5 +1,7 @@
 #  RFC 2045 # 6.7 Quoted-Printable Content-Transfer-Encoding
 defmodule Pop3mail.QuotedPrintable do
+
+   require Logger
    
    def decode(""), do: [] 
    
@@ -13,9 +15,9 @@ defmodule Pop3mail.QuotedPrintable do
    def decode(<< "=", header1 :: size(8), header2 :: size(8), data :: binary >>) do
        hex_value = to_string [header1, header2] 
        case Integer.parse(hex_value, 16) do
-         :error -> '=' ++ [header1, header2] ++ decode(data) 
+         :error -> Logger.warn("=" <> to_string([header1, header2])); '=' ++ [header1, header2] ++ decode(data) 
          {char_as_int, ""} -> [char_as_int] ++ decode(data)
-         {_, _} -> '=' ++ [header1, header2] ++ decode(data)  # wrongly encoded
+         {_, _} -> Logger.warn("=" <> to_string([header1, header2])); '=' ++ [header1, header2] ++ decode(data)  # wrongly encoded
        end
    end
 
