@@ -90,15 +90,23 @@ defmodule Pop3mail.Multipart do
          String.starts_with?(lc_line, "content-transfer-encoding:") -> parse_part_transfer_encoding(multipart_part, encoding, all_lines) 
          String.starts_with?(lc_line, "content-disposition:")       -> parse_part_disposition(multipart_part, encoding, all_lines) 
          String.starts_with?(lc_line, "content-id:")                -> parse_part_content_id(multipart_part, encoding, all_lines) 
-         String.starts_with?(lc_line, "content-description:")       -> parse_part_skip(multipart_part, encoding, all_lines) 
-         String.starts_with?(lc_line, "mime-version:")              -> parse_part_skip(multipart_part, encoding, all_lines) 
-         String.starts_with?(lc_line, "date:")                      -> parse_part_skip(multipart_part, encoding, all_lines) 
-         # X- for example X-Attachment-Id or X-Android-Body-Quoted-Part
-         String.starts_with?(lc_line, "x-") && String.contains?(lc_line, ":")       -> parse_part_skip(multipart_part, encoding, all_lines) 
-         String.starts_with?(lc_line, "content-") && String.contains?(lc_line, ":") -> parse_part_unknown_header(multipart_part, encoding, all_lines) 
+         is_skip_header(lc_line)                                    -> parse_part_skip(multipart_part, encoding, all_lines) 
+         is_unknown_header(lc_line)                                 -> parse_part_unknown_header(multipart_part, encoding, all_lines) 
          true -> parse_part_finish(multipart_part, encoding, all_lines) 
        end
    end
+
+   defp is_unknown_header(lc_line) do
+      String.starts_with?(lc_line, "content-") && String.contains?(lc_line, ":")
+   end
+
+   defp is_skip_header(lc_line) do
+      String.starts_with?(lc_line, "content-description:") ||
+      String.starts_with?(lc_line, "mime-version:")        ||
+      String.starts_with?(lc_line, "date:")                ||
+      (String.starts_with?(lc_line, "x-") && String.contains?(lc_line, ":")) # X- for example X-Attachment-Id or X-Android-Body-Quoted-Part
+   end
+
 
    def lines_continued(line1, [line2 | otherlines]) do
       # count number of double-quotes, and determine if we are now even or odd
@@ -135,21 +143,27 @@ defmodule Pop3mail.Multipart do
    end
 
    def parse_content_type_parameters(multipart_part, content_type_parameters) do
-       media_type = (List.first(content_type_parameters) || "") |> String.strip |> StringUtils.unquoted |> String.downcase
+       first_content_type_parameter =  List.first(content_type_parameters) || ""
+       media_type = first_content_type_parameter 
+                    |> String.strip
+                    |> StringUtils.unquoted
+                    |> String.downcase
 
        if String.length(media_type) > 0 do
          multipart_part = %{multipart_part | media_type: media_type}
        end
 
-       boundary_keyval = Enum.find(content_type_parameters, fn(param) -> String.downcase(param) |> String.starts_with?("boundary") end)
+       boundary_keyval = Enum.find(content_type_parameters, fn(param) -> param |> String.downcase |> String.starts_with?("boundary") end)
        if !is_nil(boundary_keyval) and String.contains?(boundary_keyval, "=") do
-         boundary_name = get_value(boundary_keyval) |> String.strip |> StringUtils.unquoted
+         value = get_value(boundary_keyval)
+         boundary_name = value |> String.strip |> StringUtils.unquoted
          multipart_part = %{multipart_part | boundary: boundary_name}
        end
 
-       charset_keyval = Enum.find(content_type_parameters, fn(param) -> String.downcase(param) |> String.starts_with?("charset") end)
+       charset_keyval = Enum.find(content_type_parameters, fn(param) -> param |> String.downcase |> String.starts_with?("charset") end)
        if !is_nil(charset_keyval) and String.contains?(charset_keyval, "=") do
-         charset = get_value(charset_keyval) |> String.strip |> StringUtils.unquoted |> String.downcase
+         value = get_value(charset_keyval)
+         charset = value |> String.strip |> StringUtils.unquoted |> String.downcase
          multipart_part = %{multipart_part | charset: charset}
        end
 
@@ -206,18 +220,22 @@ defmodule Pop3mail.Multipart do
           # split on ;
           disposition_parameters = String.split(disposition, ~r/\s*;\s*/)
           if length(disposition_parameters) > 0 do
-             type = disposition_parameters 
-                    |> Enum.at(0) 
-                    |> String.strip 
-                    |> String.downcase
-             if String.length(type) > 0 do
-                is_inline = (type == "inline")
-                multipart_part = %{multipart_part | inline: is_inline}
-             end
-             multipart_part = extract_and_set_filename(multipart_part, disposition_parameters, "filename")
+             multipart_part = parse_disposition_parameters(multipart_part, disposition_parameters)
           end
        end
        multipart_part
+   end
+
+   def parse_disposition_parameters(multipart_part, disposition_parameters) do
+      type = disposition_parameters 
+             |> Enum.at(0) 
+             |> String.strip 
+             |> String.downcase
+      if String.length(type) > 0 do
+         is_inline = (type == "inline")
+         multipart_part = %{multipart_part | inline: is_inline}
+      end
+      extract_and_set_filename(multipart_part, disposition_parameters, "filename")
    end
 
    def decode(encoding, text) do
@@ -250,11 +268,21 @@ defmodule Pop3mail.Multipart do
 
        name_parts = Enum.filter_map(content_parameters, 
                         fn(param)     -> String.contains?(param, "=") and String.starts_with?(String.downcase(param), parametername) end,
-                        fn(key_value) -> {get_param_number(key_value), key_value =~ ~r/^[^=]*\*=/ , get_value(key_value) |> String.strip |> StringUtils.unquoted} end)
+                        &map_parameter(&1))
        if length(name_parts) > 0 do
           multipart_part = extract_and_set_filename_from_name_parts(multipart_part, name_parts)
        end
        multipart_part
+   end
+
+   defp map_parameter(key_value) do
+      param_number = get_param_number(key_value)
+      with_charset = (key_value =~ ~r/^[^=]*\*=/)
+      value = get_value(key_value) 
+      unquoted_value = value 
+                       |> String.strip 
+                       |> StringUtils.unquoted
+      {param_number, with_charset, unquoted_value}
    end
    
    defp extract_and_set_filename_from_name_parts(multipart_part, name_parts) do
@@ -271,25 +299,16 @@ defmodule Pop3mail.Multipart do
                     |> Enum.map(fn({_,_,val}) -> val end) 
                     |> Enum.join
          if with_charset do
-            # format is: [charset] ' [language] ' url encoded text
-            uu_decoded = filename
-                         |> :erlang.binary_to_list 
-                         |> :http_uri.decode 
-                         |> :erlang.list_to_binary
-            splitted = String.split(uu_decoded, "'")
-            decoded_filename = splitted |> Enum.drop(2) |> Enum.join("'")
+            {decoded_filename, decoded_charset} = decoded_extended_filename_and_charset(filename)
             if String.length(decoded_filename) > 0 do
                filename = decoded_filename
-               charset  = Enum.at(splitted, 0)
+               charset  = decoded_charset
             end
          else
            # RFC2047 can also be used to encode, for example:
            # Content-Type: IMAGE/png; NAME="=?UTF-8?B?cjAucG5n?="
            if String.contains?(filename, "=?") do
-              decoded_text_list = WordDecoder.decode_text(filename)
-              charsets = WordDecoder.get_charsets_besides_ascii(decoded_text_list)
-              charset = Enum.join(charsets, "_") 
-              filename = WordDecoder.decoded_text_list_to_string(decoded_text_list)
+              {filename, charset} = decoded_word_filename_and_charset(filename)
            end
          end
          if String.length(filename) > 0 do
@@ -299,6 +318,27 @@ defmodule Pop3mail.Multipart do
             end
          end
          multipart_part
+   end
+   
+   defp decoded_word_filename_and_charset(filename) do
+      decoded_text_list = WordDecoder.decode_text(filename)
+      charsets = WordDecoder.get_charsets_besides_ascii(decoded_text_list)
+      charset = Enum.join(charsets, "_") 
+      filename = WordDecoder.decoded_text_list_to_string(decoded_text_list)
+      {filename, charset}
+   end
+
+   defp decoded_extended_filename_and_charset(filename) do
+      # RFC2231, extended-initial-value
+      # format is: [charset] ' [language] ' url encoded text
+      uu_decoded = filename
+                   |> :erlang.binary_to_list 
+                   |> :http_uri.decode 
+                   |> :erlang.list_to_binary
+      splitted = String.split(uu_decoded, "'")
+      decoded_filename = splitted |> Enum.drop(2) |> Enum.join("'")
+      filename_charset = Enum.at(splitted, 0)
+      {decoded_filename, filename_charset}
    end
 
    def get_param_number(key_value) do

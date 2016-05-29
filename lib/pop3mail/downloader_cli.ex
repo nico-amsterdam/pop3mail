@@ -49,9 +49,14 @@ defmodule Pop3mail.DownloaderCLI do
      end
    end
 
+   defp ask(question) do
+     answer = IO.gets(question)
+     String.replace_suffix(answer, "\n", "")
+   end
+
    defp process_options(options,[],[]) do
-     username = options[:username] || IO.gets("Please enter your gmail account name: ") |> String.replace_suffix("\n", "")
-     password = options[:password] || IO.gets("Please enter your password: ") |> String.replace_suffix("\n", "")
+     username = options[:username] || ask("Please enter your gmail account name: ")
+     password = options[:password] || ask("Please enter your password: ")
      epop_options = %EpopDownloader.Options{
        username:   username,
        password:   password,

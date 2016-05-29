@@ -45,7 +45,12 @@ defmodule Pop3mail.EpopDownloader do
 
    defp format_number(num) do
      # reverse digits, add a dot after every 3 places and reverse again
-     Regex.replace(~r/(\d{3})/, String.reverse(to_string(num)), "\\1.") |> String.replace_suffix(".", "") |> String.reverse
+     num
+     |> to_string
+     |> String.reverse
+     |> String.replace(~r/(\d{3})/, "\\1.")
+     |> String.replace_suffix(".", "")
+     |> String.reverse
    end 
 
    def retrieve_and_store(epop_client, mail_loop_counter, options) do
