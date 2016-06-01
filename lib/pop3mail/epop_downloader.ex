@@ -64,17 +64,25 @@ defmodule Pop3mail.EpopDownloader do
    end
 
    def parse_process_and_store(mail_content, mail_loop_counter, delivered, save_raw, output_dir) do
-      {:message, header_list, body_char_list} = :epop_message.parse(mail_content)
+      options = %Handler.Options{
+        delivered: delivered,
+        save_raw: save_raw,
+        base_dir: output_dir
+      }
+      try do
+        {:message, header_list, body_char_list} = :epop_message.parse(mail_content)
+        process_and_store(mail_content, mail_loop_counter, header_list, body_char_list, options)
+      rescue
+        e in ErlangError -> {error, reason} = e.original; Logger.error "  #{error}: #{reason}"
+      end
+   end
+
+   defp process_and_store(mail_content, mail_loop_counter, header_list, body_char_list, options) do
       mail = %Handler.Mail{
         mail_content: mail_content,
         mail_loop_counter: mail_loop_counter,
         header_list: header_list,
         body_char_list: body_char_list
-      }
-      options = %Handler.Options{
-        delivered: delivered,
-        save_raw: save_raw,
-        base_dir: output_dir
       }
       Handler.check_process_and_store(mail, options)
    end

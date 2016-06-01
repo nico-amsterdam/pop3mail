@@ -4,7 +4,7 @@ defmodule Pop3mail.FileStore do
    # store most important header details in header.txt
    def store_mail_header(content, filename_prefix, unsafe_addition, dirname) do
       if String.length(unsafe_addition) > 0 do
-         filename = filename_prefix <> "_" <> remove_unwanted_chars(unsafe_addition, 35) <> ".txt"
+         filename = filename_prefix <> "." <> remove_unwanted_chars(unsafe_addition, 35) <> ".txt"
          path = Path.join(dirname, filename)
          case :file.write_file(path, content) do
             :ok -> :ok

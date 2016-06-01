@@ -34,14 +34,16 @@ defmodule Pop3mail.Multipart do
    def parse_multipart(boundary_name, raw_content, path) do
      # get text till end boundary
      multipart_list = String.split(raw_content, "--" <> boundary_name <> "--")
-     if length(multipart_list) <= 1 do 
-        Logger.warn "    End boundary #{boundary_name} not found."
+     multipart = Enum.at(multipart_list, 0)
+     # split at --boundary
+     [_ | parts] = String.split(multipart, "--" <> boundary_name <> "\r\n")
+     if length(parts) == 0 do
+        Logger.warn "    Boundary #{boundary_name} not found."
+        []
      else
-         if length(multipart_list) > 2, do: Logger.warn "    Multiple end boundaries #{boundary_name} found."
-         multipart = Enum.at(multipart_list, 0)
-         # split at --boundary
-         [_ | parts] = String.split(multipart, "--" <> boundary_name <> "\r\n")
-         parts |> Enum.with_index(1) |> Enum.flat_map(&(parse_part(&1, path)))
+        if length(multipart_list) <= 1, do: Logger.warn "    End boundary #{boundary_name} not found."
+        if length(multipart_list)  > 2, do: Logger.warn "    Multiple end boundaries #{boundary_name} found."
+        parts |> Enum.with_index(1) |> Enum.flat_map(&(parse_part(&1, path)))
      end
    end
 
