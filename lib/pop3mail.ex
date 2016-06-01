@@ -14,6 +14,22 @@ defmodule Pop3mail do
       Pop3mail.DownloaderCLI.main(args)
    end
 
+   def downloader(params) do
+     epop_options = %Pop3mail.EpopDownloader.Options{
+       username:   params["username"],
+       password:   params["password"],
+       max_mails:  params["max"],
+       ssl:        params["ssl"],
+       delete:     params["delete"],
+       save_raw:   params["raw"],
+       server:     params["server"] || "pop.gmail.com",
+       port:       params["port"] || 995,
+       delivered:  params["delivered"],
+       output_dir: params["output_dir"] || "inbox"
+     }
+     Pop3mail.EpopDownloader.download(epop_options)
+   end
+
    def header_lookup(header_list, header_name) do
       Pop3mail.Header.lookup(header_list, header_name)
    end

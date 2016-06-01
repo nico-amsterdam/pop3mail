@@ -46,19 +46,11 @@ For usage, see usage chapter below.
 
 ## Install in an Elixir project
 
-[available in Hex](https://hex.pm/packages/pop3mail), the package can be installed as:
-
-  1. Add pop3mail and the erlang epop client to your list of dependencies in `mix.exs`:
+[available in Hex](https://hex.pm/packages/pop3mail), add pop3mail and the erlang epop client to your list of dependencies in `mix.exs`:
 
         def deps do
-          [{:pop3mail, "~> 0.1.0"}, 
+          [{:pop3mail, "~> 0.1.2"}, 
            {:erlpop, github: "trifork/erlpop"}]
-        end
-
-  2. Ensure pop3mail is started before your application:
-
-        def application do
-          [applications: [:pop3mail]]
         end
 
 ## Usage

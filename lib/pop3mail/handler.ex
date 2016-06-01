@@ -118,7 +118,7 @@ defmodule Pop3mail.Handler do
                          |> Enum.at(1)
                          |> String.strip
         else
-           sender_name = remove_encodings(sender_name)
+           sender_name = remove_encodings(from_name)
         end
      end
      sender_name
