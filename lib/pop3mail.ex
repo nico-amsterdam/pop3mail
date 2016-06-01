@@ -10,22 +10,22 @@ defmodule Pop3mail do
    """
 
    @doc "Call main optionally with username and password. E.g. main([\"--username=a.b@gmail.com\", \"--password=secret\"])"
-   def downloader_cli(args) do
-      Pop3mail.DownloaderCLI.main(args)
+   def cli(args) do
+      Pop3mail.CLI.main(args)
    end
 
    def downloader(params) do
      epop_options = %Pop3mail.EpopDownloader.Options{
        username:   params["username"],
        password:   params["password"],
-       max_mails:  params["max"],
+       server:     params["server"],
+       port:       params["port"],
        ssl:        params["ssl"],
+       max_mails:  params["max"],
        delete:     params["delete"],
-       save_raw:   params["raw"],
-       server:     params["server"] || "pop.gmail.com",
-       port:       params["port"] || 995,
        delivered:  params["delivered"],
-       output_dir: params["output_dir"] || "inbox"
+       save_raw:   params["raw"],
+       output_dir: params["output_dir"]
      }
      Pop3mail.EpopDownloader.download(epop_options)
    end

@@ -12,6 +12,6 @@ for /f "tokens=1*" %%a in ("%t%") do (
    set t=%%b
    )
 if defined t goto :loop
-set mixargs=Pop3mail.DownloaderCLI.main([%argsmin1%%lastarg%])
+set mixargs=Pop3mail.CLI.main([%argsmin1%%lastarg%])
 echo mix run -e "%mixargs%"
 mix run -e "%mixargs%"

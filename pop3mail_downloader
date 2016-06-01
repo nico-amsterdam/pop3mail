@@ -8,6 +8,6 @@ for arg in "$@"
 do
    downloadargs="$downloadargs, \"$arg\""
 done
-mixargs="Pop3mail.DownloaderCLI.main([$downloadargs])"
+mixargs="Pop3mail.CLI.main([$downloadargs])"
 echo mix run -e "'$mixargs'"
 mix run -e "$mixargs"

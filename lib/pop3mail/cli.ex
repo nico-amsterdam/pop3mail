@@ -1,4 +1,4 @@
-defmodule Pop3mail.DownloaderCLI do
+defmodule Pop3mail.CLI do
   alias Pop3mail.EpopDownloader
    
    defp usage_text do
@@ -17,6 +17,7 @@ defmodule Pop3mail.DownloaderCLI do
                   will not have the Delivered-To header. Default: don't skip
      --help       show this information.
      --max        maximum number of e-mails to download. Default: unlimited 
+     --output     output directory. Default: inbox
      --password   e-mail account password.
      --port       pop3 server port. Default: 995
      --raw        also save the unprocessed mail in a file called 'raw.txt'.
@@ -32,16 +33,17 @@ defmodule Pop3mail.DownloaderCLI do
    @doc "Call main optionally with username and password. E.g. main([\"--username=a.b@gmail.com\", \"--password=secret\"])"
    def main(args) do
      {options, illegal_args, failed_options} = OptionParser.parse(args, strict: [
-         password:  :string,
-         username:  :string,
-         server:    :string,
-         port:      :integer,
-         ssl:       :boolean,
-         max:       :integer,
-         help:      :boolean,
-         delete:    :boolean,
-         delivered: :boolean,
-         raw:       :boolean])
+         password:   :string,
+         username:   :string,
+         server:     :string,
+         port:       :integer,
+         ssl:        :boolean,
+         max:        :integer,
+         delete:     :boolean,
+         delivered:  :boolean,
+         help:       :boolean,
+         raw:        :boolean,
+         output:     :string])
      if options[:help] do
         show_help
      else
@@ -60,14 +62,14 @@ defmodule Pop3mail.DownloaderCLI do
      epop_options = %EpopDownloader.Options{
        username:   username,
        password:   password,
-       max_mails:  options[:max],
-       ssl:        options[:ssl],
-       delete:     options[:delete],
-       save_raw:   options[:raw],
        server:     options[:server] || "pop.gmail.com",
        port:       options[:port] || 995,
+       ssl:        options[:ssl],
+       max_mails:  options[:max],
+       delete:     options[:delete],
        delivered:  options[:delivered],
-       output_dir: "inbox"
+       save_raw:   options[:raw],
+       output_dir: options[:output] || "inbox"
      }
      EpopDownloader.download(epop_options)
    end
