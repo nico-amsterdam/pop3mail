@@ -6,7 +6,6 @@ defmodule Pop3mail.Handler do
   alias Pop3mail.WordDecoder
   alias Pop3mail.StringUtils
 
-
   require Logger
 
    defmodule Mail do
@@ -26,6 +25,7 @@ defmodule Pop3mail.Handler do
       else
           date = Header.lookup(mail.header_list, "Date")
           Logger.info "  Mail #{mail.mail_loop_counter} dated #{date} not stored because of delivered=#{mail.delivered} parameter."
+          {:skip, mail.header_list}
       end
    end
 
@@ -51,38 +51,40 @@ defmodule Pop3mail.Handler do
       sender_name = get_sender_name(from)
       
       # store header info in a header file
-      store_header(mail.header_list, filename_prefix, sender_name, dirname)
+      header_result = store_header(mail.header_list, filename_prefix, sender_name, dirname)
 
       # body
-      process_and_store_body(mail.header_list, mail.body_char_list, dirname)
+      [header_result] ++ process_and_store_body(mail.header_list, mail.body_char_list, dirname)
    end
    
    defp store_header(header_list, filename_prefix, sender_name, dirname) do
-      case Header.store(header_list, filename_prefix, sender_name, dirname) do
-           :ok -> :ok
-           {:error, reason} -> Logger.error reason
+      result = Header.store(header_list, filename_prefix, sender_name, dirname)
+      case result do
+           {:ok, _} -> result
+           {:error, reason, _} -> Logger.error reason; result
       end
    end
    
    defp save_raw(mail_content, dirname) do
       # for debugging
-      case FileStore.store_raw(mail_content, dirname) do
-           :ok -> :ok
-           {:error, reason} -> Logger.error reason
+      result = FileStore.store_raw(mail_content, "raw.eml", dirname)
+      case result do
+           {:ok, _} -> result
+           {:error, reason, _} -> Logger.error reason; result
       end
    end
 
-
    def process_and_store_body(header_list, body_char_list, dirname) do
-
-      multipart_part_list = decode_body(header_list, body_char_list)
+      multipart_part_list = decode_body_char_list(header_list, body_char_list)
+      # It's worthwhile to free some memory if there is a big list of attachments
+      :erlang.garbage_collect()
 
       # store mail body, the multipart parts
       Body.store_multiparts(multipart_part_list, dirname)
    end
 
    # This is the main function
-   def decode_body(header_list, body_char_list) do
+   def decode_body_char_list(header_list, body_char_list) do
       content_type = Header.lookup(header_list, "Content-Type")
       encoding = Header.lookup(header_list, "Content-Transfer-Encoding")
       # disposition in the header indicates inline or attachment. Can contain a filename
@@ -95,12 +97,12 @@ defmodule Pop3mail.Handler do
    # date format must be conform RFC 2822
    # returns yyyymmdd_hhmmss
    def convert_date_to_dirname(date_str) do
-        try do
-          DateConverter.convert_date(date_str)
-        rescue
-          # :bad_date
-          _ -> FileStore.remove_unwanted_chars(date_str, 26)
-        end
+      try do
+        DateConverter.convert_date(date_str)
+      rescue
+        # :bad_date
+        _ -> FileStore.remove_unwanted_chars(date_str, 26)
+      end
    end
 
    def get_sender_name(from) do

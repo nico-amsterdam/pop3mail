@@ -7,24 +7,25 @@ defmodule Pop3mail.FileStore do
          filename = filename_prefix <> "." <> remove_unwanted_chars(unsafe_addition, 35) <> ".txt"
          path = Path.join(dirname, filename)
          case :file.write_file(path, content) do
-            :ok -> :ok
+            :ok -> {:ok, path}
             {:error, _} -> store_mail_header(content, filename_prefix, "", dirname)
          end
       else
          path = Path.join(dirname, filename_prefix <> ".txt")
-         :file.write_file(path, content)
+         write_file(path, content)
       end
    end
    
    # store_raw
-   def store_raw(mail_content, dirname) do
-         :file.write_file(Path.join(dirname, "raw.txt"), mail_content)
+   def store_raw(mail_content, filename, dirname) do
+     path = Path.join(dirname, filename)
+     write_file(path, mail_content)
    end
-   
+
    def mkdir(base_dir, name, unsafe_addition) do
       if String.length(unsafe_addition) > 0 do
-          shortened_unsafe_addition = remove_unwanted_chars(unsafe_addition, 32)
-          dirname = Path.join(base_dir, name <> "_" <> shortened_unsafe_addition)
+          shortened_unsafe_addition = remove_unwanted_chars(unsafe_addition, 45)
+          dirname = Path.join(base_dir, name <> "-" <> shortened_unsafe_addition)
           if !File.dir?(dirname) do
               # check if the operating system is able to create this directory, if not, try without unsafe addition
               dirname = 
@@ -45,15 +46,22 @@ defmodule Pop3mail.FileStore do
    def store_part(multipart_part, base_dir) do
      dirname = Path.join(base_dir, multipart_part.path)
      unless File.dir?(dirname), do: File.mkdir_p! dirname 
-     pathname = Path.join(dirname,  remove_unwanted_chars(multipart_part.filename, 50))
+     path = Path.join(dirname,  remove_unwanted_chars(multipart_part.filename, 50))
      if String.starts_with?(multipart_part.media_type, "text/") and get_line_separator() != '\r\n' do
         # store text file in unix format
         multipart_part = dos2unix(multipart_part)
      end
-     # IO.inspect pathname
+     # IO.inspect path
      # file.write_file does not attempt encoding conversions
-     # It's not very safe, does accept any pathname. Don't run this as root.
-     :file.write_file(pathname, multipart_part.content)
+     # It's not very safe, does accept any path. Don't run this as root.
+     write_file(path, multipart_part.content)
+   end
+
+   defp write_file(path, content) do
+     case :file.write_file(path, content) do
+        :ok -> {:ok, path}
+        {:error, reason} -> {:error, reason, path}
+     end
    end
    
    def get_line_separator() do
@@ -73,12 +81,19 @@ defmodule Pop3mail.FileStore do
    # characters we don't want in filenames can be filtered out with this function.
    def remove_unwanted_chars(text, max_chars) do
       # Remove all control characters. I don't like spaces in filenames. file can contain dash - but should not start with it.
-      text 
-      |> String.replace("@", " at ") 
-      |> String.replace(~r/\s+/u, "_")
-      |> String.replace(~r/[^A-Za-z0-9\x80-\xFF_.-]/u , "") 
-      |> String.replace_prefix("-", "") 
-      |> String.slice(0..max_chars) 
+      if String.printable?(text) do
+        text
+        |> String.replace(~r/\s+/u, " ")
+        |> String.replace(~r/[\x00-\x1F\x7F:\\{\}\<\>\*\"\/\\]/u, "")
+        |> String.slice(0..max_chars)
+        |> String.strip
+      else
+        text 
+        |> String.replace(~r/\s+/, " ")
+        |> String.replace(~r/[^0-9;=@A-Z_a-z !#$%&\(\)\+,\-\.~`\|^]/ , "") 
+        |> String.slice(0..max_chars) 
+        |> String.strip
+      end
    end
 
    def get_default_filename(media_type, charset, index) do

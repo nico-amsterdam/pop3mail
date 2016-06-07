@@ -7,7 +7,7 @@ defmodule Pop3mail.Header do
      header_name = to_char_list(header_name)
      header_list 
      |> Enum.filter_map(fn({:header, name, _}) -> name == header_name end, 
-                        fn({:header, _, val}) -> val end) 
+                        fn({:header, _,  val}) -> val end) 
      |> Enum.join(", ")
    end
 

@@ -19,25 +19,25 @@ defmodule Pop3mail.EpopDownloader do
      end
      case :epop_client.connect(username, password, connect_options) do
        {:ok,    client} -> retrieve_and_store_all(client, options)
-       {:error, reason} -> Logger.error reason
+       {:error, reason} -> Logger.error reason; {:error, reason}
      end
-     Logger.info "Ready."
    end
 
    def retrieve_and_store_all(epop_client, options) do
      try do
         # This information returned by the server is not always reliable
-        {:ok, {count, size_total}} = :epop_client.stat(epop_client)
-        count_formatted = format_number(count)
+        {:ok, {total_count, size_total}} = :epop_client.stat(epop_client)
+        count_formatted = format_number(total_count)
         size_total_formatted = format_number(size_total)
-        Logger.info "#{count_formatted} e-mails, #{size_total_formatted} bytes total."
-        count = min(count, options.max_mails)
+        Logger.info "#{count_formatted} emails, #{size_total_formatted} bytes total."
+        count = min(total_count, options.max_mails)
         if count > 0 do
             # create inbox directory to store emails
             unless File.dir?(options.output_dir), do: File.mkdir! options.output_dir
             # loop all messages
             1..count |> Enum.map(&retrieve_and_store(epop_client, &1, options))
         end
+        {:ok, total_count}
      after
         :epop_client.quit(epop_client)
      end
@@ -55,11 +55,14 @@ defmodule Pop3mail.EpopDownloader do
 
    def retrieve_and_store(epop_client, mail_loop_counter, options) do
       case :epop_client.retrieve(epop_client, mail_loop_counter) do
-        {:ok, mail_content} -> parse_process_and_store(mail_content, mail_loop_counter, options.delivered ,options.save_raw , options.output_dir)
+        {:ok, mail_content} -> result = parse_process_and_store(mail_content, mail_loop_counter, options.delivered ,options.save_raw , options.output_dir)
                                if options.delete do
                                  :ok = :epop_client.delete(epop_client, mail_loop_counter)
                                end
-        {:error, reason} -> Logger.error reason
+                               # It's really time now to clean things up
+                               :erlang.garbage_collect()
+                               result
+        {:error, reason} -> Logger.error reason; {:error, reason}
       end
    end
 
@@ -73,7 +76,8 @@ defmodule Pop3mail.EpopDownloader do
         {:message, header_list, body_char_list} = :epop_message.parse(mail_content)
         process_and_store(mail_content, mail_loop_counter, header_list, body_char_list, options)
       rescue
-        e in ErlangError -> {error, reason} = e.original; Logger.error "  #{error}: #{reason}"
+        # parse error
+        e in ErlangError -> {error, reason} = e.original; Logger.error "  #{error}: #{reason}"; {error, mail_content}
       end
    end
 

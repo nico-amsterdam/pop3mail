@@ -1,36 +1,38 @@
 defmodule Pop3mail.CLI do
   alias Pop3mail.EpopDownloader
    
+   @moduledoc "Commandline interface for downloading emails and storing them on disk."
+
    defp usage_text do
      """
      usage: pop3mail_downloader [--username=[recent:]USERNAME]
             [--password=PASSWORD] [--max=INTEGER] [--delete] [--server=SERVER]
             [--port=INTEGER] [--ssl=false] [--delivered] [--raw] [--help]
-     Read e-mails from the inbox and save them including attachments on disk 
+     Read emails from the inbox and save them including attachments on disk 
      in the 'inbox' subdirectory.
      
-     --delete     delete e-mail after downloading. Default: false
+     --delete     delete email after downloading. Default: false
                   Notice that Gmail ignores the delete 
                   and instead uses the Gmail account settings.
-     --delivered  true/false. Skip e-mails with/without Delivered-To header. 
-                  If you moved an e-mail from your sent box to your inbox it 
+     --delivered  true/false. Skip emails with/without Delivered-To header. 
+                  If you moved an email from your sent box to your inbox it 
                   will not have the Delivered-To header. Default: don't skip
      --help       show this information.
-     --max        maximum number of e-mails to download. Default: unlimited 
+     --max        maximum number of emails to download. Default: unlimited 
      --output     output directory. Default: inbox
-     --password   e-mail account password.
+     --password   email account password.
      --port       pop3 server port. Default: 995
-     --raw        also save the unprocessed mail in a file called 'raw.txt'.
+     --raw        also save the unprocessed mail in a file called 'raw.eml'.
                   Usefull feature for error diagnostics.
      --server     pop3 server address. Default: pop.gmail.com
      --ssl        true/false. Turn on/off Secure Socket Layer. Default: true
-     --username   e-mail account name.  Gmail users can precede the name with 
+     --username   email account name.  Gmail users can precede the name with 
                   'recent:' to get the last 30 days mail, even if it has 
                   already been downloaded elsewhere.
      """
    end
 
-   @doc "Call main optionally with username and password. E.g. main([\"--username=a.b@gmail.com\", \"--password=secret\"])"
+   @doc "Call main with parameters. E.g. main([\"--username=a.b@gmail.com\", \"--password=secret\"]). Call with --help to get a list of all parameters."
    def main(args) do
      {options, illegal_args, failed_options} = OptionParser.parse(args, strict: [
          password:   :string,
@@ -51,13 +53,15 @@ defmodule Pop3mail.CLI do
      end
    end
 
+   # get user input. Used for username/password.
    defp ask(question) do
      answer = IO.gets(question)
      String.replace_suffix(answer, "\n", "")
    end
 
+   # All parameters are parsed succesful, so take the options, apply defaults and call the next method.
    defp process_options(options,[],[]) do
-     username = options[:username] || ask("Please enter your gmail account name: ")
+     username = options[:username] || ask("Please enter your email account name: ")
      password = options[:password] || ask("Please enter your password: ")
      epop_options = %EpopDownloader.Options{
        username:   username,
@@ -74,8 +78,11 @@ defmodule Pop3mail.CLI do
      EpopDownloader.download(epop_options)
    end
 
+   # there are incorrect commandline parameters 
    defp process_options(_,illegal_args,failed_options) do
-     show_error(illegal_args ++ failed_options)
+     all_errors = illegal_args ++ failed_options
+     show_error(all_errors)
+     {:error, all_errors}
    end
 
    # "print last line of unknown options"
@@ -93,10 +100,9 @@ defmodule Pop3mail.CLI do
       show_error tail
    end
 
-   # "print usage line"
-   defp show_help do
+   @doc "print usage line and a description for all parameters."
+   def show_help do
      IO.puts usage_text
    end
-
 
 end

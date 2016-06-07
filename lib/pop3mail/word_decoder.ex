@@ -6,7 +6,6 @@ defmodule Pop3mail.WordDecoder do
   alias Pop3mail.QuotedPrintable
 
    def decode_text(input_text) do
-     decoded_text_list = [{"us-ascii", input_text}]
      if String.contains?(input_text, "=?") do
         # RFC 2045
         # When displaying a particular header field that contains multiple
@@ -23,9 +22,12 @@ defmodule Pop3mail.WordDecoder do
         # make a list with us-ascii text and encoded-word's separated
         text_list = Regex.split(~r/()=\?[\w-]+\?[BQbq]\?[^\s]*\?=()/U, input_text, on: [1,2])
         
-        decoded_text_list = Enum.map(text_list, &decode_word(&1))
+        text_list
+        |> Enum.filter(fn(x) -> x != "" end)
+        |> Enum.map(&decode_word(&1))
+     else
+        [{"us-ascii", input_text}]
      end
-     decoded_text_list
    end
 
    # return a list with text and the text encoding

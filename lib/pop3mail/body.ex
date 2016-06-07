@@ -6,24 +6,9 @@ defmodule Pop3mail.Body do
 
   require Logger
 
-   def store_multiparts(multipart_part_list, dirname) do
-      Enum.map(multipart_part_list, &(store_part(&1, dirname)))
-   end
-   
-   def store_part(multipart_part, base_dir) do
-      # make sure we have a filename
-      if String.length(multipart_part.filename) == 0 do
-         # currently there is no filename, set default
-         multipart_part = FileStore.set_default_filename(multipart_part)
-      end
-      Logger.info "    " <> StringUtils.printable(multipart_part.filename, "file")
+   @moduledoc "Decode and store mail body"
 
-      case FileStore.store_part(multipart_part, base_dir) do
-           {:error, reason} -> Logger.error reason
-           :ok -> ""
-      end
-   end
-
+   @doc "Decode multipart content, base64, quoted-printables" 
    def decode_body(body_text, content_type, encoding, disposition) do
       decoded_binary = Multipart.decode(encoding, body_text)
 
@@ -34,6 +19,27 @@ defmodule Pop3mail.Body do
 
       # get multipart parts. Multipart will check if it is really a multipart, otherwise you get this part back.
       Multipart.parse_content(mail_body_part)
+   end
+
+   @doc "Store all found body parts on filesystem" 
+   def store_multiparts(multipart_part_list, dirname) do
+      Enum.map(multipart_part_list, &(store_part(&1, dirname)))
+   end
+   
+   @doc "Store one part on filesystem"
+   def store_part(multipart_part, base_dir) do
+      # make sure we have a filename
+      if String.length(multipart_part.filename) == 0 do
+         # currently there is no filename, set default
+         multipart_part = FileStore.set_default_filename(multipart_part)
+      end
+      Logger.info "    " <> StringUtils.printable(multipart_part.filename, "file")
+
+      result = FileStore.store_part(multipart_part, base_dir)
+      case result do
+        {:ok, _} -> result
+        {:error, reason, _} -> Logger.error reason; result
+      end
    end
 
 end

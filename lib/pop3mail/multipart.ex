@@ -43,16 +43,16 @@ defmodule Pop3mail.Multipart do
      else
         if length(multipart_list) <= 1, do: Logger.warn "    End boundary #{boundary_name} not found."
         if length(multipart_list)  > 2, do: Logger.warn "    Multiple end boundaries #{boundary_name} found."
-        parts |> Enum.with_index(1) |> Enum.flat_map(&(parse_part(&1, path)))
+        parts |> Enum.with_index(1) |> Enum.flat_map(&(parse_part(&1, boundary_name, path)))
      end
    end
 
 
-   def parse_part({part, index}, path) do
+   def parse_part({part, index}, boundary_name, path) do
      # part = %{multipart_part | index: index}
      # bare carriage returns or bare linefeeds are not allowed in email.
      lines = String.split(part, ~r/\r\n/)
-     new_part = %Part{path: path, index: index}
+     new_part = %Part{boundary: boundary_name, path: path, index: index}
      multipart_part = parse_part_lines(new_part, "raw", lines)
      # return list of parts
      [multipart_part] 
@@ -218,7 +218,7 @@ defmodule Pop3mail.Multipart do
    end
 
    def parse_disposition(multipart_part, disposition) do
-       if String.length(disposition) > 0 do
+       if !is_nil(disposition) and String.length(disposition) > 0 do
           # split on ;
           disposition_parameters = String.split(disposition, ~r/\s*;\s*/)
           if length(disposition_parameters) > 0 do
