@@ -4,11 +4,34 @@ defmodule Pop3mail.EpopDownloader do
 
   require Logger
 
+   @moduledoc "Retrieve and parse POP3 mail via the Epop client."
+
    defmodule Options do
+
+      @moduledoc """
+      A struct that holds pop3maili parameter options.
+
+      It's fields are:
+      * `delete`     - delete email after downloading. Default: false.
+      * `delivered`  - true/false/nil. Skip emails with/without/whatever Delivered-To header.
+      * `max_mails`  - maximum number of emails to download. nil = unlimited
+      * `output_dir` - output directory.
+      * `password`   - email account password.
+      * `port`       - pop3 server port.
+      * `save_raw`   - also save the unprocessed mail in a file called 'raw.eml'.
+      * `server`     - pop3 server address.
+      * `ssl`        - true/false. Turn on/off Secure Socket Layer.
+      * `username`   - email account name.
+      """
+
       defstruct username: "", password: "", server: "", port: 995, ssl: true, max_mails: nil, delete: false, delivered: nil, save_raw: false, output_dir: ""
    end
 
-   @doc "Read all emails and save them to disk."
+   @doc """
+   Read all emails and save them to disk.
+
+   `options` - EpopDownloader.Options
+   """
    def download(options) do
      username = to_char_list(options.username)
      password = to_char_list(options.password)
@@ -23,6 +46,13 @@ defmodule Pop3mail.EpopDownloader do
      end
    end
 
+
+   @doc """
+   Read all emails and save them to disk.
+
+   `epop_client` - client returned by :epop_client.connect function.
+   `options` - EpopDownloader.Options
+   """
    def retrieve_and_store_all(epop_client, options) do
      try do
         # This information returned by the server is not always reliable
@@ -43,6 +73,7 @@ defmodule Pop3mail.EpopDownloader do
      end
    end
 
+   # add thousand separators to make the number human readable.
    defp format_number(num) do
      # reverse digits, add a dot after every 3 places and reverse again
      num
@@ -53,6 +84,13 @@ defmodule Pop3mail.EpopDownloader do
      |> String.reverse
    end 
 
+   @doc """
+   Retrieve, parse and store an email.
+
+   `epop_client` - client returned by :epop_client.connect function.
+   `mail_loop_counter` - number of the email in the current session.
+   `options` - EpopDownloader.Options
+   """
    def retrieve_and_store(epop_client, mail_loop_counter, options) do
       case :epop_client.retrieve(epop_client, mail_loop_counter) do
         {:ok, mail_content} -> result = parse_process_and_store(mail_content, mail_loop_counter, options.delivered ,options.save_raw , options.output_dir)
@@ -66,6 +104,15 @@ defmodule Pop3mail.EpopDownloader do
       end
    end
 
+   @doc """
+   Parse headers, decode body and store everything.
+
+   `mail_content` - character list with the complete raw email message.
+   `mail_loop_count` - number of the email in the current session.
+   `delivered` - true/false/nil. Presence, absence or don't care of the 'Delivered-To' email header.
+   `save_raw` - true/false. Save or don't save the raw email message.
+   `output_dir` - directory where all emails are stored.
+   """
    def parse_process_and_store(mail_content, mail_loop_counter, delivered, save_raw, output_dir) do
       options = %Handler.Options{
         delivered: delivered,
@@ -81,6 +128,8 @@ defmodule Pop3mail.EpopDownloader do
       end
    end
 
+   # Decode body, store headers and body content. 
+   # `options` - Handler.Options
    defp process_and_store(mail_content, mail_loop_counter, header_list, body_char_list, options) do
       mail = %Handler.Mail{
         mail_content: mail_content,

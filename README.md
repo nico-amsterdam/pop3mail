@@ -49,7 +49,7 @@ For usage, see usage chapter below.
 [available in Hex](https://hex.pm/packages/pop3mail), add pop3mail and the erlang epop client to your list of dependencies in `mix.exs`:
 
         def deps do
-          [{:pop3mail, "~> 0.1.2"}, 
+          [{:pop3mail, "~> 0.1.3"}, 
            {:erlpop, github: "trifork/erlpop"}]
         end
 
@@ -95,7 +95,7 @@ iex(4)> {:message, header_list, body_char_list } = :epop_message.parse(mail_cont
 iex(5)> Pop3mail.header_lookup(header_list, "Subject")
 iex(6)> Pop3mail.header_lookup(header_list, "From")
 iex(7)> Pop3mail.header_lookup(header_list, "Date")
-iex(8)> part_list = Pop3mail.decode_body(header_list, body_char_list)
+iex(8)> part_list = Pop3mail.decode_body_char_list(header_list, body_char_list)
 iex(9)> length(part_list)
 iex(10)> part = Enum.at(part_list, 0)
 iex(11)> part.media_type

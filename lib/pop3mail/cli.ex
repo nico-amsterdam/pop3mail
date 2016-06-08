@@ -59,7 +59,7 @@ defmodule Pop3mail.CLI do
      String.replace_suffix(answer, "\n", "")
    end
 
-   # All parameters are parsed succesful, so take the options, apply defaults and call the next method.
+   # All parameters are parsed succesful, so take the options, apply defaults and call the download function.
    defp process_options(options,[],[]) do
      username = options[:username] || ask("Please enter your email account name: ")
      password = options[:password] || ask("Please enter your password: ")
@@ -88,15 +88,15 @@ defmodule Pop3mail.CLI do
    # "print last line of unknown options"
    defp show_error([]), do: IO.puts(:stderr, "Type 'pop3mail_downloader --help' for more information.")
 
-   # "print unknown options"
+   # "print unknown option"
    defp show_error([{option, _} | tail]) do
       IO.puts(:stderr, "pop3mail_downloader: Unknown option '" <> to_string(option) <> "'")
       show_error tail
    end
 
-   # "print unknown arguments"
-   defp show_error([arg | tail]) do
-      IO.puts(:stderr, "pop3mail_downloader: Unknown argument '" <> arg <> "'")
+   # "print unknown parameter"
+   defp show_error([argument | tail]) do
+      IO.puts(:stderr, "pop3mail_downloader: Unknown parameter '" <> argument <> "'")
       show_error tail
    end
 

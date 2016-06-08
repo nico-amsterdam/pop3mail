@@ -1,6 +1,8 @@
-#  RFC 2045 # 6.7 Quoted-Printable Content-Transfer-Encoding
 defmodule Pop3mail.QuotedPrintable do
 
+   @moduledoc "Decode quoted-printable text as in RFC 2045 # 6.7"
+
+   @doc "Decode `arg1` string. Returns the result as a character list."
    def decode(""), do: [] 
    
    # remove trailing \r\n

@@ -2,6 +2,15 @@ defmodule Pop3mail.Header do
   alias Pop3mail.WordDecoder
   alias Pop3mail.FileStore
 
+   @moduledoc "Email header related functions."
+
+   @doc """
+   Lookup value by header name. Returns a string.
+
+   If the searched header name occurs multiple times in the list, the result will be the concatenated comma separated value.
+
+   `header_list` - list with tuples {:header, header name as character list, value as character list} 
+   """
    def lookup(header_list, header_name) do
      # filter list on name, return comma separated
      header_name = to_char_list(header_name)
@@ -11,9 +20,17 @@ defmodule Pop3mail.Header do
      |> Enum.join(", ")
    end
 
+   @doc """
+   Store email headers Date,From,To,Cc and Subject in a text file.
+
+   filename is `filename_prefix` . `unsafe_addition` . txt 
+
+   `header_list` - list with tuples {:header, header name as character list, value as character list} 
+   `unsafe_addition` - append this to the filename if the filesytem allows it. 
+   """
    def store(header_list, filename_prefix, filename_addition, dirname) do
       date    = lookup(header_list, "Date")
-      # RFC2047, search for encoded words and put these in decoded text list, like  [{charset1,content1},{charset2,content2}]
+      # RFC 2047, search for encoded words and put these in decoded text list, like  [{charset1,content1},{charset2,content2}]
       from_decoded    = header_list |> lookup("From")    |> WordDecoder.decode_text
       subject_decoded = header_list |> lookup("Subject") |> WordDecoder.decode_text
       to_decoded      = header_list |> lookup("To")      |> WordDecoder.decode_text

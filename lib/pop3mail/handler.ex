@@ -8,15 +8,46 @@ defmodule Pop3mail.Handler do
 
   require Logger
 
+   @moduledoc "Glue code for received mail to call the parse, decode and store functions"
+
    defmodule Mail do
+
+      @moduledoc """
+      A struct that holds mail content.
+
+      It's fields are:
+        * `mail_content` - char list with the complete raw email content
+        * `mail_loop_counter` - Current number of the email in the retrieval loop. In an POP3 connection each email is numbered, starting at 1.
+        * `header_list` - list with tuples of {:header, header name, header value}. Name and value are character lists.
+        * `body_char_list` - email body. character list.
+      """
+
       defstruct mail_content: '', mail_loop_counter: 0, header_list: [], body_char_list: ''
    end
 
    defmodule Options do
+
+      @moduledoc """
+      A struct that holds options for the Pop3mail.Hander."
+
+      It's fields are:
+        * `delivered` - true/false/nil. Presence, absence or don't care of the 'Delivered-To' email header.
+        * `save_raw` - true/false. Save or don't save the raw email message.
+        * `base_dir` - directory where the emails must be stored.
+      """
+
       defstruct delivered: nil, save_raw: false, base_dir: ""
    end
 
 
+   @doc """
+   Check if the mail must be skipped, if not process and store the email.
+
+   It checks if the email has or hasn't got the Delivered-To header. Mail could be moved from the sent box to the inbox.
+
+   `mail`    - Handler.Mail
+   `options` - Handler.Options
+   """
    def check_process_and_store(mail, options) do
      # skip or not. don't skip if delivered=nil or delivered is true/false and there is/isn't a Delivered-To header.
       run = is_nil(options.delivered) or (options.delivered == has_delivered_to_header(mail.header_list))
@@ -29,11 +60,18 @@ defmodule Pop3mail.Handler do
       end
    end
 
+   # Lookup the 'Delivered-To' header and look if it contains something (it should be an email address).
    defp has_delivered_to_header(header_list) do
       delivered_to = Header.lookup(header_list, "Delivered-To")
       String.length(delivered_to) > 2
    end
 
+   @doc """
+   Create directory for the email based on date andd subject, save raw email, store header summary and store everything from the body.
+
+   `mail`    - Handler.Mail
+   `options` - Handler.Options
+   """
    def process_and_store(mail, options) do
       date    = Header.lookup(mail.header_list, "Date")
       subject = Header.lookup(mail.header_list, "Subject")
@@ -57,6 +95,7 @@ defmodule Pop3mail.Handler do
       [header_result] ++ process_and_store_body(mail.header_list, mail.body_char_list, dirname)
    end
    
+   # Store the header and log any errors.
    defp store_header(header_list, filename_prefix, sender_name, dirname) do
       result = Header.store(header_list, filename_prefix, sender_name, dirname)
       case result do
@@ -65,6 +104,7 @@ defmodule Pop3mail.Handler do
       end
    end
    
+   # Store the raw email content and log any errors.
    defp save_raw(mail_content, dirname) do
       # for debugging
       result = FileStore.store_raw(mail_content, "raw.eml", dirname)
@@ -74,16 +114,28 @@ defmodule Pop3mail.Handler do
       end
    end
 
+   @doc """
+   Decode and store body.
+
+   `header_list` - list with tuples of {:header, header name, header value}. Name and value are character lists.
+   """
    def process_and_store_body(header_list, body_char_list, dirname) do
       multipart_part_list = decode_body_char_list(header_list, body_char_list)
-      # It's worthwhile to free some memory if there is a big list of attachments
+
+      # It's worthwhile to free some memory here if there is a big list of attachments
       :erlang.garbage_collect()
 
       # store mail body, the multipart parts
       Body.store_multiparts(multipart_part_list, dirname)
    end
 
-   # This is the main function
+   @doc """
+   Decode body: multipart content, base64 and quoted-printable.
+   
+   Returns a list of Pop3mail.Part's.
+
+   `header_list` - list with tuples of {:header, header name, header value}. Name and value are character lists.
+   """
    def decode_body_char_list(header_list, body_char_list) do
       content_type = Header.lookup(header_list, "Content-Type")
       encoding = Header.lookup(header_list, "Content-Transfer-Encoding")
@@ -94,8 +146,11 @@ defmodule Pop3mail.Handler do
       Body.decode_body(body_binary, content_type, encoding, disposition)
    end
 
-   # date format must be conform RFC 2822
-   # returns yyyymmdd_hhmmss
+   @doc """
+   Convert date to a directory name meant for storing the email. Returned date is in format yyyymmdd_hhmmss
+
+   `date_str` - string with the date. Must be conform RFC 2822 date format.
+   """
    def convert_date_to_dirname(date_str) do
       try do
         DateConverter.convert_date(date_str)
@@ -105,6 +160,7 @@ defmodule Pop3mail.Handler do
       end
    end
 
+   @doc "Extract the sender name from the email 'From' header."
    def get_sender_name(from) do
      sender_name = from
      from_splitted = String.split(from, ~r/[<>]/)
@@ -126,9 +182,12 @@ defmodule Pop3mail.Handler do
      sender_name
    end
 
-   # This function makes sure that the encoding markers are removed and the text decoded.
-   # However, it does not convert to a standard encoding like utf-8 and it also doesn't mention the encoding types used.
-   # What you get is a binary which you might be able to read depending on the character encoding set in your terminal/device/program.
+   @doc """
+   This function makes sure that the encoding markers are removed and the text decoded.
+
+   However, it does not convert to a standard encoding like utf-8 and it also doesn't mention the encoding types used.
+   What you get is a binary which you might be able to read depending on the character encoding set in your terminal/device/program.
+   """
    def remove_encodings(text) do
       decoded_text_list = WordDecoder.decode_text(text)
       decoded_text_list 
