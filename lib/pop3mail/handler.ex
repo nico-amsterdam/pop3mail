@@ -28,7 +28,7 @@ defmodule Pop3mail.Handler do
    defmodule Options do
 
       @moduledoc """
-      A struct that holds options for the Pop3mail.Hander."
+      A struct that holds options for the Pop3mail.Hander.
 
       It's fields are:
         * `delivered` - true/false/nil. Presence, absence or don't care of the 'Delivered-To' email header.
