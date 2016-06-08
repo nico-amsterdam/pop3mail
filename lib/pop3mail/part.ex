@@ -6,7 +6,7 @@ defmodule Pop3mail.Part do
    It's fields are:
      * `content` - binary with the part's content.
      * `charset` - character encoding of the content (only applicable for text)
-     * `media_type` - Mime type. Examples: text/plain, text/html, text/rtf, application/octet-stream
+     * `media_type` - Mime type. Examples: text/plain, text/html, text/rtf, image/jpeg, application/octet-stream
      * `filename` - binary with filename of the attachment
      * `filename_charset` - character encoding of the filename
      * `inline` - true/false/nil. true=inline content, false=attachment, nil=not specified.
