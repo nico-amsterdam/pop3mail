@@ -54,7 +54,6 @@ defmodule Pop3mail.EpopDownloader do
    `options` - EpopDownloader.Options
    """
    def retrieve_and_store_all(epop_client, options) do
-     try do
         # This information returned by the server is not always reliable
         {:ok, {total_count, size_total}} = :epop_client.stat(epop_client)
         count_formatted = format_number(total_count)
@@ -67,10 +66,8 @@ defmodule Pop3mail.EpopDownloader do
             # loop all messages
             1..count |> Enum.map(&retrieve_and_store(epop_client, &1, options))
         end
-        {:ok, total_count}
-     after
         :epop_client.quit(epop_client)
-     end
+        {:ok, total_count}
    end
 
    # add thousand separators to make the number human readable.
@@ -119,9 +116,17 @@ defmodule Pop3mail.EpopDownloader do
         save_raw: save_raw,
         base_dir: output_dir
       }
+      parsed_result = epop_parse(mail_content)
+      case parsed_result do
+        {:message, header_list, body_char_list} -> process_and_store(mail_content, mail_loop_counter, header_list, body_char_list, options)
+        {_, _} -> parsed_result
+      end
+   end
+   
+   # call epop parser and catch parse exceptions
+   defp epop_parse(mail_content) do
       try do
-        {:message, header_list, body_char_list} = :epop_message.parse(mail_content)
-        process_and_store(mail_content, mail_loop_counter, header_list, body_char_list, options)
+        :epop_message.parse(mail_content)
       rescue
         # parse error
         e in ErlangError -> {error, reason} = e.original; Logger.error "  #{error}: #{reason}"; {error, mail_content}

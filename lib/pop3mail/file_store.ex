@@ -117,12 +117,12 @@ defmodule Pop3mail.FileStore do
    Remove characters which are undesirable for filesystems (like * : / \ < > [ ] " and control characters)
    """
    def remove_unwanted_chars(text, max_chars) do
-      # Remove all control characters. I don't like spaces in filenames. file can contain dash - but should not start with it.
+      # Remove all control characters. name should not end with dot.
       if String.printable?(text) do
         # for utf-8 compatible text we accept more than just the 7bit ascii range.
         text
         |> String.replace(~r/\s+/u, " ")
-        |> String.replace(~r/[\x00-\x1F\x7F:\[\]\<\>\*\"\/\\]/u, "")
+        |> String.replace(~r/[\x00-\x1F\x7F:\.\[\]\<\>\*\"\/\\]/u, "")
         |> String.slice(0..max_chars)
         |> String.strip
       else
@@ -130,7 +130,7 @@ defmodule Pop3mail.FileStore do
         # It's not perfect, this code can give funny results if feed with multibyte content.
         text 
         |> String.replace(~r/\s+/, " ")
-        |> String.replace(~r/[^0-9;=@A-Z_a-z !#$%&\(\)\{\}\+,\-\.~`\|^]/ , "") 
+        |> String.replace(~r/[^0-9;=@A-Z_a-z !#$%&\(\)\{\}\+,\-~`\|^]/ , "") 
         |> String.slice(0..max_chars) 
         |> String.strip
       end
