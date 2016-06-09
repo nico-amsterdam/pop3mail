@@ -64,7 +64,7 @@ defmodule Pop3mail.EpopDownloader do
             # create inbox directory to store emails
             unless File.dir?(options.output_dir), do: File.mkdir! options.output_dir
             # loop all messages
-            1..count |> Enum.map(&retrieve_and_store(epop_client, &1, options))
+            _ = 1..count |> Enum.map(&retrieve_and_store(epop_client, &1, options))
         end
         :epop_client.quit(epop_client)
         {:ok, total_count}
