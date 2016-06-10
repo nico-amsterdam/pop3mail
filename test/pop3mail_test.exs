@@ -73,6 +73,8 @@ defmodule Pop3mailTest do
       actual2  = Pop3mail.decode_body(body_text, content_type, encoding, "")
       assert length(actual2) == 3
       assert Enum.at(actual2, 0) == expected_enum1
+      assert Enum.at(actual2, 1) == expected_enum2
+      assert Enum.at(actual2, 2) == expected_enum3
 
   end
 end

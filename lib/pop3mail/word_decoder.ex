@@ -57,9 +57,8 @@ defmodule Pop3mail.WordDecoder do
    `encoding` - B/Q B=base64 encoded, Q=Quoted-printable
    """
    def decode_word(text, encoding) when encoding in ["B", "b"] do
-      char_list = :erlang.binary_to_list(text) 
       try do
-        :base64.decode(char_list)
+         Base.decode64!(text, ignore: :whitespace)
       rescue
         _ -> text
       end

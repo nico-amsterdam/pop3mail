@@ -389,9 +389,8 @@ defmodule Pop3mail.Multipart do
    `text` - base64 encoded text.
    """
    def decode_base64(text) do
-     char_list = :erlang.binary_to_list(text)
      try do
-       :base64.decode(char_list)
+       Base.decode64!(text, ignore: :whitespace)
      rescue
        _ -> Logger.warn "    Invalid encoded base64 content. Please check."; "ERROR: invalid base64 encoded text:\n" <> text 
      end
