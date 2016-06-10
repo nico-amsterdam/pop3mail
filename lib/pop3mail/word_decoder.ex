@@ -4,6 +4,7 @@
 # 
 defmodule Pop3mail.WordDecoder do
   alias Pop3mail.QuotedPrintable
+  alias Pop3mail.Base64Decoder
 
    @moduledoc "Decode words as defined in RFC 2047."
 
@@ -58,9 +59,9 @@ defmodule Pop3mail.WordDecoder do
    """
    def decode_word(text, encoding) when encoding in ["B", "b"] do
       try do
-         Base.decode64!(text, ignore: :whitespace)
+         Base64Decoder.decode!(text)
       rescue
-        _ -> text
+         _ -> text
       end
    end
 

@@ -3,6 +3,7 @@ defmodule Pop3mail.Multipart do
   alias Pop3mail.StringUtils
   alias Pop3mail.QuotedPrintable
   alias Pop3mail.WordDecoder
+  alias Pop3mail.Base64Decoder
 
   require Logger
 
@@ -390,9 +391,9 @@ defmodule Pop3mail.Multipart do
    """
    def decode_base64(text) do
      try do
-       Base.decode64!(text, ignore: :whitespace)
+        Base64Decoder.decode!(text)
      rescue
-       _ -> Logger.warn "    Invalid encoded base64 content. Please check."; "ERROR: invalid base64 encoded text:\n" <> text 
+        _ -> Logger.warn "    Invalid encoded base64 content. Please check."; "ERROR: invalid base64 encoded text:\n" <> text 
      end
    end
 

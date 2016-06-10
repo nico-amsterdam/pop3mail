@@ -117,22 +117,22 @@ defmodule Pop3mail.FileStore do
    Remove characters which are undesirable for filesystems (like \ / : * ? " < > | [ ] and control characters)
    """
    def remove_unwanted_chars(text, max_chars) do
-      # Remove all control characters. Windows doesn't like: \ / : * ? " < > |
+      # Remove all control characters. Windows doesn't like: \ / : * ? " < > | and dots add the end.
       if String.printable?(text) do
         # for utf-8 compatible text we accept more than just the 7bit ascii range.
         text
         |> String.replace(~r/\s+/u, " ")
-        |> String.replace(~r/[\x00-\x1F\x7F:\.\?\[\]\<\>\|\*\"\/\\]/u, "")
+        |> String.replace(~r/[\x00-\x1F\x7F:\?\[\]\<\>\|\*\"\/\\]/u, "")
         |> String.slice(0..max_chars)
-        |> String.strip
+        |> String.strip(?.)
       else
         # only return 7bit ascii characters.
         # It's not perfect, this code can give funny results if feed with multibyte content.
         text 
         |> String.replace(~r/\s+/, " ")
-        |> String.replace(~r/[^0-9;=@A-Z_a-z !#$%&\(\)\{\}\+,\-~`^]/ , "") 
+        |> String.replace(~r/[^0-9;=@A-Z_a-z !#$%&\(\)\{\}\+\.,\-~`^]/ , "") 
         |> String.slice(0..max_chars) 
-        |> String.strip
+        |> String.strip(?.)
       end
    end
 
