@@ -4,15 +4,12 @@ defmodule Pop3mail.Base64Decoder do
 
    @base64_decoder Application.get_env(:pop3mail, :base64_decoder) || Pop3mail.Base64Decoder.Standard
 
-   require Logger
-   
    defmodule Standard do
 
      @moduledoc "Standard Erlang base64 decoder"
 
      @doc "Decode base64 encoded text. Returns binary."
      def decode!(encoded_text) do
-        Logger.debug Application.get_env(:pop3mail, :base64_decoder)
         Base.decode64!(encoded_text, ignore: :whitespace)
      end
 
