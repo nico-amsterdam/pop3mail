@@ -8,7 +8,7 @@
 
 - This program reads from a POP3 mail server, which means that it can only download mail from the inbox folder. If you want to access other folders you will need an IMAP client.
 - Big attachments requires BIG memory. Decoding an attachment of 12 MB can consume 300 MB of RAM.
-  Elixir programmers can replace the default base64_decoder with their own.
+  Elixir programmers can replace the default Pop3mail.Base64Decoder with their own.
 - On linux when there is not enough memory, the program will end as 'Killed.'
   It's killed by the OOM Killer. Run dmesg to see the log message.
 - On windows when there is not enough memory the program get stuck, or worse windows get stuck. 

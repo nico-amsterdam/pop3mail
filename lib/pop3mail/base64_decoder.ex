@@ -1,7 +1,7 @@
 defmodule Pop3mail.Base64Decoder do
 
    @moduledoc """
-   Replaceable base64 decoder. Replace with your own implementation via the application config :pop3mail, base64_decoder: &lt;replacement&gt;.
+   Replaceable base64 decoder. Replace with your own implementation via the application config :pop3mail, base64_decoder: &lt;replacement&gt;
 
    After changing the config/config.exs run:
    * mix deps.compile pop3mail
