@@ -74,7 +74,12 @@ defmodule Pop3mail.FileStore do
    def store_part(multipart_part, base_dir) do
      dirname = Path.join(base_dir, multipart_part.path)
      unless File.dir?(dirname), do: File.mkdir_p! dirname 
-     path = Path.join(dirname,  remove_unwanted_chars(multipart_part.filename, 50))
+     
+     # this is also protection against filenames like: /etc/passwd
+     safe_filename = remove_unwanted_chars(multipart_part.filename, 50)
+     if safe_filename == "", do: safe_filename = "unknown"
+     path = Path.join(dirname, safe_filename)
+     
      if String.starts_with?(multipart_part.media_type, "text/") and get_line_separator() != '\r\n' do
         # store text file in unix format
         multipart_part = dos2unix(multipart_part)
@@ -117,22 +122,25 @@ defmodule Pop3mail.FileStore do
    Remove characters which are undesirable for filesystems (like \ / : * ? " < > | [ ] and control characters)
    """
    def remove_unwanted_chars(text, max_chars) do
-      # Remove all control characters. Windows doesn't like: \ / : * ? " < > | and dots add the end.
+      # Remove all control characters. Windows doesn't like: \ / : * ? " < > | and dots or spaces add the start/end.
       if String.printable?(text) do
         # for utf-8 compatible text we accept more than just the 7bit ascii range.
+        # It's not perfect, this code can give funny results if the text isn't utf-8 compatible
         text
         |> String.replace(~r/\s+/u, " ")
+        |> String.replace(~r/^[\s\.]+/u, "")
         |> String.replace(~r/[\x00-\x1F\x7F:\?\[\]\<\>\|\*\"\/\\]/u, "")
         |> String.slice(0..max_chars)
-        |> String.strip(?.)
+        |> String.replace(~r/[\s\.]+$/u, "")
       else
         # only return 7bit ascii characters.
         # It's not perfect, this code can give funny results if feed with multibyte content.
         text 
         |> String.replace(~r/\s+/, " ")
+        |> String.replace(~r/^[\s\.]+/, "")
         |> String.replace(~r/[^0-9;=@A-Z_a-z !#$%&\(\)\{\}\+\.,\-~`^]/ , "") 
         |> String.slice(0..max_chars) 
-        |> String.strip(?.)
+        |> String.replace(~r/[\s\.]+$/, "")
       end
    end
 

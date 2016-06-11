@@ -14,13 +14,14 @@ defmodule Pop3mail.Base64Decoder do
      @moduledoc "Standard Elixir base64 decoder"
 
      @doc "Decode base64 encoded text. Returns binary."
-     def decode!(encoded_text) do
-        Base.decode64!(encoded_text, ignore: :whitespace)
+     def decode_lines!(lines) do
+        encoded_text = Enum.join(lines)
+        Base.decode64!(encoded_text)
      end
 
    end
 
    @doc "Decode base64 encoded text. Returns binary."
-   defdelegate decode!(encoded_text), to: @base64_decoder
+   defdelegate decode_lines!(lines), to: @base64_decoder
 
 end

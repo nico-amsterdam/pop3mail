@@ -59,7 +59,7 @@ defmodule Pop3mail.WordDecoder do
    """
    def decode_word(text, encoding) when encoding in ["B", "b"] do
       try do
-         Base64Decoder.decode!(text)
+         Base64Decoder.decode_lines!([text])
       rescue
          _ -> text
       end

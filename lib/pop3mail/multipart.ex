@@ -111,7 +111,12 @@ defmodule Pop3mail.Multipart do
    `encoding` - For example: base64, quoted-printable, 7bit, 8bit, etc.
    """
    def decode_lines(encoding, lines) do
-     decode(encoding, Enum.join(lines, "\r\n"))
+     if String.downcase(encoding) == "base64" do
+        # line by line decoder to reduce memory usage
+        decode_base64_lines(lines)
+     else
+        decode(encoding, Enum.join(lines, "\r\n"))
+     end
    end
 
    @doc """
@@ -378,7 +383,7 @@ defmodule Pop3mail.Multipart do
          "quoted-printable" -> text 
                                |> QuotedPrintable.decode 
                                |> :erlang.list_to_binary
-         "base64" -> decode_base64(text)
+         "base64" -> text |> String.split(~r/\r\n/) |> decode_base64_lines
          # others: for example: 7bit
          _ -> text
        end
@@ -387,13 +392,13 @@ defmodule Pop3mail.Multipart do
    @doc """
    Return decoded text as binary.
 
-   `text` - base64 encoded text.
+   `lines` - base64 encoded lines.
    """
-   def decode_base64(text) do
+   def decode_base64_lines(lines) do
      try do
-        Base64Decoder.decode!(text)
+        Base64Decoder.decode_lines!(lines)
      rescue
-        _ -> Logger.warn "    Invalid encoded base64 content. Please check."; "ERROR: invalid base64 encoded text:\n" <> text 
+        _ -> text = Enum.join(lines, "\r\n"); Logger.warn "    Invalid encoded base64 content. Please check."; "ERROR: invalid base64 encoded text:\n" <> text 
      end
    end
 
