@@ -10,7 +10,7 @@
 - Big attachments requires BIG memory. Decoding an attachment of 12 MB can consume 300 MB of RAM.
   Elixir programmers can replace the default base64_decoder with their own.
 - On linux when there is not enough memory, the program will end as 'Killed.'
-  It's killed OOM Killer. Run dmesg to see the log message.
+  It's killed by the OOM Killer. Run dmesg to see the log message.
 - On windows when there is not enough memory the program get stuck, or worse windows get stuck. 
 - Do NOT run the script as root.
 - Downloaded attachments can contain viruses, addware or malicious scripts.
