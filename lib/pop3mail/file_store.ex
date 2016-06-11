@@ -119,7 +119,7 @@ defmodule Pop3mail.FileStore do
 
    # characters we don't want in filenames can be filtered out with this function.
    @doc """
-   Remove characters which are undesirable for filesystems (like \ / : * ? " < > | [ ] and control characters)
+   Remove characters which are undesirable for filesystems (like \\ / : * ? " < > | [ ] and control characters)
    """
    def remove_unwanted_chars(text, max_chars) do
       # Remove all control characters. Windows doesn't like: \ / : * ? " < > | and dots or spaces add the start/end.
