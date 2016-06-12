@@ -117,7 +117,7 @@ defmodule Pop3mail do
 
      Russian subject
 
-       iex> Pop3mail.decode_word("=?koi8-r?Q?Fwd:_=E4=CF=CD=C1=DB=CE=C5=C5_=DA=C1=C4=C1=CE=C9=C5_?=")
+       iex> Pop3mail.decode_words("=?koi8-r?Q?Fwd:_=E4=CF=CD=C1=DB=CE=C5=C5_=DA=C1=C4=C1=CE=C9=C5_?=")
        [{"koi8-r",
              <<70, 119, 100, 58, 32, 228, 207, 205, 193, 219, 206, 197, 197, 32, 218, 193, 196, 193, 206, 201, 197, 32>>}]
 
