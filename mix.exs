@@ -32,7 +32,7 @@ defmodule Pop3mail.Mixfile do
     [ {:erlpop, github: "trifork/erlpop"},
       {:earmark,  "~> 0.1", only: :dev},
       {:ex_doc,  "~> 0.11", only: :dev},
-      {:credo, "~> 0.3.13", only: :dev}
+      {:credo,  "~> 0.4.3", only: :dev}
     ]
   end
 
