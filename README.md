@@ -1,4 +1,4 @@
-# Pop3mail
+# Pop3mail [![Inline docs](http://inch-ci.org/github/nico-amsterdam/pop3mail.svg)](http://inch-ci.org/github/nico-amsterdam/pop3mail)
 
     Pop3 client to download email (including attachments) from the inbox via the commandline or Elixir API.
     Written in Elixir, using an Erlang pop3 client with SSL support derived from the epop package.
