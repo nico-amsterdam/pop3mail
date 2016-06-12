@@ -7,6 +7,11 @@
 ## Before you start
 
 - This program reads from a POP3 mail server, which means that it can only download mail from the inbox folder. If you want to access other folders you will need an IMAP client.
+- Big attachments requires BIG memory. Decoding an attachment of 12 MB can consume 300 MB of RAM.
+  Elixir programmers can replace the default Pop3mail.Base64Decoder with their own.
+- On linux when there is not enough memory, the program will end as 'Killed.'
+  It's killed by the OOM Killer. Run dmesg to see the log message.
+- On windows when there is not enough memory the program get stuck, or worse windows get stuck. 
 - Do NOT run the script as root.
 - Downloaded attachments can contain viruses, addware or malicious scripts.
 - This program does NOT convert charsets and neither does it add a [BOM](https://en.wikipedia.org/wiki/Byte_order_mark). 
@@ -49,7 +54,7 @@ For usage, see usage chapter below.
 [available in Hex](https://hex.pm/packages/pop3mail), add pop3mail and the erlang epop client to your list of dependencies in `mix.exs`:
 
         def deps do
-          [{:pop3mail, "~> 0.1.5"}, 
+          [{:pop3mail, "~> 0.1.6"}, 
            {:erlpop, github: "trifork/erlpop"}]
         end
 
