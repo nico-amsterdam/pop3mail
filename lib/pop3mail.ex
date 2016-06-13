@@ -153,7 +153,7 @@ defmodule Pop3mail do
        iex(6)> Pop3mail.decode_body_char_list(header_list, body_char_list)                 
        [%Pop3mail.Part{boundary: "--_com.android.email_1191110031918720",
          charset: "utf-8",
-         content: "\nPlease give me write access for the forum and possibly the wiki.\n\nTIA\n",
+         content: "\\nPlease give me write access for the forum and possibly the wiki.\\n\\nTIA\\n",
          content_id: "", filename: "", filename_charset: "us-ascii", index: 1,
          inline: nil, media_type: "text/plain", path: "alternative"},
         %Pop3mail.Part{boundary: "--_com.android.email_1191110031918720",
