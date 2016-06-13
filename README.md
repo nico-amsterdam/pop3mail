@@ -87,6 +87,8 @@ The script defaults to Gmail, but you can specify other POP3 server and port set
 
 ### Use in Elixir
 
+[Documentation is available online][docs]
+
 Example:
 
 ```sh
@@ -139,8 +141,10 @@ https://accounts.google.com/DisplayUnlockCaptcha
 
 ## License
 
-MIT
+[MIT](LICENSE)
 
 ## Acknowledgment
 
 Thanks Erik Søe Sørensen for upgrading the Epop client to the latest Erlang version.
+
+[docs]: https://hexdocs.pm/pop3mail/Pop3mail.html
