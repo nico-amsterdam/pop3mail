@@ -127,19 +127,19 @@ defmodule Pop3mail.FileStore do
         # for utf-8 compatible text we accept more than just the 7bit ascii range.
         # It's not perfect, this code can give funny results if the text isn't utf-8 compatible
         text
+        |> String.replace(~r/[\x00-\x1F\x7F:\?\[\]\<\>\|\*\"\/\\]/u, "")
         |> String.replace(~r/\s+/u, " ")
         |> String.replace(~r/^[\s\.]+/u, "")
-        |> String.replace(~r/[\x00-\x1F\x7F:\?\[\]\<\>\|\*\"\/\\]/u, "")
-        |> String.slice(0..max_chars)
+        |> String.slice(0, max_chars)
         |> String.replace(~r/[\s\.]+$/u, "")
       else
         # only return 7bit ascii characters.
         # It's not perfect, this code can give funny results if feed with multibyte content.
         text 
+        |> String.replace(~r/[^0-9;=@A-Z_a-z !#$%&\(\)\{\}\+\.,\-~`^]/ , "") 
         |> String.replace(~r/\s+/, " ")
         |> String.replace(~r/^[\s\.]+/, "")
-        |> String.replace(~r/[^0-9;=@A-Z_a-z !#$%&\(\)\{\}\+\.,\-~`^]/ , "") 
-        |> String.slice(0..max_chars) 
+        |> String.slice(0, max_chars) 
         |> String.replace(~r/[\s\.]+$/, "")
       end
    end
