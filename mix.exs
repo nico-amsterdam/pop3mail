@@ -4,7 +4,7 @@ defmodule Pop3mail.Mixfile do
   def project do
     [app: :pop3mail,
      version: "0.1.7",
-     elixir: "~> 1.3",
+     elixir: "~> 1.2",
      description: description,
      package: package,
      build_embedded: Mix.env == :prod,
@@ -32,7 +32,7 @@ defmodule Pop3mail.Mixfile do
     [ {:erlpop, github: "trifork/erlpop"},
       {:earmark,  "~> 0.1", only: :dev},
       {:ex_doc,  "~> 0.11", only: :dev},
-      {:credo,  "~> 0.4.5", only: :dev}
+      {:credo,  "~> 0.4"  , only: :dev}
     ]
   end
 
