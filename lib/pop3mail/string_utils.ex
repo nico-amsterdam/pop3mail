@@ -12,20 +12,26 @@ defmodule Pop3mail.StringUtils do
    def remove_balanced(text, remove) do
       # strip balanced
       if String.starts_with?(text, remove) and String.ends_with?(text, remove) do
-         text = text 
-                |> String.replace_suffix(remove, "") 
-                |> String.replace_prefix(remove, "")
+         text 
+         |> String.replace_suffix(remove, "") 
+         |> String.replace_prefix(remove, "")
+      else
+         text
       end
-      text
    end
 
    @doc "Print text if it valid utf-8 encoded. If not, print the alternative text."
    def printable(str, printable_alternative \\ "") do
-      if String.printable?(str) do
-        str
-      else
-        printable_alternative
+      case String.printable?(str) do
+        true  -> str
+        false -> printable_alternative
       end
    end
+
+   @doc "test if string is nil or has empty length"
+   def is_empty?(str), do: is_nil(str) or String.length(str) == 0
+
+   @doc "true if search is found in content"
+   def contains?(content, search), do: !is_nil(content) and String.contains?(content, search)
 
 end

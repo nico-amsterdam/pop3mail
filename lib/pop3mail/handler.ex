@@ -162,7 +162,6 @@ defmodule Pop3mail.Handler do
 
    @doc "Extract the sender name from the email 'From' header."
    def get_sender_name(from) do
-     sender_name = from
      from_splitted = String.split(from, ~r/[<>]/)
      # if the format was:  name <email adres> you should have a array of 2
      if length(from_splitted) >= 2 do
@@ -172,14 +171,15 @@ defmodule Pop3mail.Handler do
                     |> StringUtils.unquoted
         if String.length(from_name) == 0 do
            # can only pick up the email between the < > brackets
-           sender_name = from_splitted 
-                         |> Enum.at(1)
-                         |> String.strip
+           from_splitted 
+           |> Enum.at(1)
+           |> String.strip
         else
-           sender_name = remove_encodings(from_name)
+           remove_encodings(from_name)
         end
+     else
+       from
      end
-     sender_name
    end
 
    @doc """

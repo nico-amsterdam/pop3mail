@@ -40,12 +40,12 @@ defmodule Pop3mail.WordDecoder do
 
         found_word = Regex.run(~r/=\?([\w-]+)\?([BQbq])\?([^\s]*)\?=/, text)
 
-        if found_word == nil do
-           {"us-ascii", text}
-        else
-           [_, charset, encoding, encoded_text] = found_word
-           decoded_text = decode_word(encoded_text, encoding)
-           {charset, decoded_text}
+        case found_word do
+           nil -> {"us-ascii", text}
+           _ ->
+              [_, charset, encoding, encoded_text] = found_word
+              decoded_text = decode_word(encoded_text, encoding)
+              {charset, decoded_text}
         end
      else
        {"us-ascii", text}
@@ -95,9 +95,23 @@ defmodule Pop3mail.WordDecoder do
    `decoded_text_list` - list with tuples {charset, text}. 
    """
    def decoded_text_list_to_string(decoded_text, add_charset_name \\ false) do
+      map_text_fun = if add_charset_name, do: &with_charset/1, else: &without_charset/1
       decoded_text
-      |> Enum.map(fn({charset, text}) -> if add_charset_name and charset != "us-ascii" and String.length(text) > 0, do: text = "#{text} (#{charset})"; text; end) 
+      |> Enum.map(map_text_fun)
       |> Enum.join
    end
+
+   # return just the text
+   defp without_charset({_charset, text}), do: text
+
+   # return text with name of charset if it isn't just ascii
+   defp with_charset({charset, text}) do
+      case charset != "us-ascii" and String.length(text) > 0 do
+         true -> "#{text} (#{charset})"
+         _    -> text
+      end
+   end
+
+
 
 end

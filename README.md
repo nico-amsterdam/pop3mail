@@ -54,7 +54,7 @@ For usage, see usage chapter below.
 [available in Hex](https://hex.pm/packages/pop3mail), add pop3mail and the erlang epop client to your list of dependencies in `mix.exs`:
 
         def deps do
-          [{:pop3mail, "~> 0.1.6"}, 
+          [{:pop3mail, "~> 0.1.7"}, 
            {:erlpop, github: "trifork/erlpop"}]
         end
 

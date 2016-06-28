@@ -128,12 +128,15 @@ defmodule Pop3mail.Multipart do
    """
    def parse_part_finish(multipart_part, encoding, [line | otherlines]) do
      # there should be an empty line after the headers
-     if String.length(String.strip(line)) > 0 do
-        # this is not always the case or we have an unknown header here.
-        Logger.warn "    Missing newline or unknown header in body" <> StringUtils.printable(" at line: " <> line)
-        # fix; don't skip line
-        otherlines = [line | otherlines]
-     end
+     otherlines = 
+        if String.length(String.strip(line)) > 0 do
+           # this is not always the case or we have an unknown header here.
+           Logger.warn "    Missing newline or unknown header in body" <> StringUtils.printable(" at line: " <> line)
+           # fix; don't skip line
+           [line | otherlines]
+        else
+           otherlines
+        end
      parse_part_decode(multipart_part, encoding, otherlines)
    end
 
@@ -217,11 +220,12 @@ defmodule Pop3mail.Multipart do
    `multipart_part` - Pop3mail.Part input
    """
    def parse_content_type(multipart_part, content_type) do
-       if String.length(content_type) > 0 do
-          content_type_parameters = String.split(content_type, ~r/\s*;\s*/)
-          multipart_part = parse_content_type_parameters(multipart_part, content_type_parameters)
-       end
-       multipart_part
+      if String.length(content_type) > 0 do
+         content_type_parameters = String.split(content_type, ~r/\s*;\s*/)
+         parse_content_type_parameters(multipart_part, content_type_parameters)
+      else
+         multipart_part
+      end
    end
 
    @doc """
@@ -237,25 +241,43 @@ defmodule Pop3mail.Multipart do
                     |> StringUtils.unquoted
                     |> String.downcase
 
-       if String.length(media_type) > 0 do
-         multipart_part = %{multipart_part | media_type: media_type}
-       end
+       multipart_part =
+          case String.length(media_type) > 0 do
+             true  -> %{multipart_part | media_type: media_type}
+             false -> multipart_part
+          end
 
-       boundary_keyval = Enum.find(content_type_parameters, fn(param) -> param |> String.downcase |> String.starts_with?("boundary") end)
-       if !is_nil(boundary_keyval) and String.contains?(boundary_keyval, "=") do
-         value = get_value(boundary_keyval)
-         boundary_name = value |> String.strip |> StringUtils.unquoted
-         multipart_part = %{multipart_part | boundary: boundary_name}
-       end
+       boundary_keyval = Enum.find(content_type_parameters,
+          fn(param) -> param |> String.downcase |> String.starts_with?("boundary") end)
+       multipart_part = set_boundary(multipart_part, boundary_keyval)
 
-       charset_keyval = Enum.find(content_type_parameters, fn(param) -> param |> String.downcase |> String.starts_with?("charset") end)
-       if !is_nil(charset_keyval) and String.contains?(charset_keyval, "=") do
-         value = get_value(charset_keyval)
-         charset = value |> String.strip |> StringUtils.unquoted |> String.downcase
-         multipart_part = %{multipart_part | charset: charset}
-       end
+       charset_keyval = Enum.find(content_type_parameters, 
+          fn(param) -> param |> String.downcase |> String.starts_with?("charset") end)
+       multipart_part = set_charset(multipart_part, charset_keyval)
 
        extract_and_set_filename(multipart_part, content_type_parameters, "name")
+   end
+
+   # set multipart_part.boundary if available
+   defp set_boundary(multipart_part, boundary_keyval) do
+      case StringUtils.contains?(boundary_keyval, "=") do
+        true  -> 
+           value = get_value(boundary_keyval)
+           boundary_name = value |> String.strip |> StringUtils.unquoted
+           %{multipart_part | boundary: boundary_name}
+        false -> multipart_part
+      end
+   end
+
+   # set multipart_part.charset if available
+   defp set_charset(multipart_part, charset_keyval) do
+      case StringUtils.contains?(charset_keyval, "=") do
+        true  -> 
+           value = get_value(charset_keyval)
+           charset = value |> String.strip |> StringUtils.unquoted |> String.downcase
+           %{multipart_part | charset: charset}
+        false -> multipart_part
+      end
    end
 
    @doc "Get value of key_value. `key_value` - format must be: key=value or key*<number>*=value or key*=value."
@@ -345,14 +367,16 @@ defmodule Pop3mail.Multipart do
    `multipart_part` - Pop3mail.Part input
    """
    def parse_disposition(multipart_part, disposition) do
-       if !is_nil(disposition) and String.length(disposition) > 0 do
+       if StringUtils.is_empty?(disposition) do
+          multipart_part
+       else
           # split on ;
           disposition_parameters = String.split(disposition, ~r/\s*;\s*/)
-          if length(disposition_parameters) > 0 do
-             multipart_part = parse_disposition_parameters(multipart_part, disposition_parameters)
+          case length(disposition_parameters) > 0 do
+             true  -> parse_disposition_parameters(multipart_part, disposition_parameters)
+             false -> multipart_part
           end
        end
-       multipart_part
    end
 
    @doc """
@@ -366,10 +390,13 @@ defmodule Pop3mail.Multipart do
              |> Enum.at(0) 
              |> String.strip 
              |> String.downcase
-      if String.length(type) > 0 do
-         is_inline = (type == "inline")
-         multipart_part = %{multipart_part | inline: is_inline}
-      end
+      multipart_part = 
+         if String.length(type) > 0 do
+            is_inline = (type == "inline")
+            multipart_part = %{multipart_part | inline: is_inline}
+         else
+            multipart_part
+         end
       extract_and_set_filename(multipart_part, disposition_parameters, "filename")
    end
 
@@ -421,10 +448,10 @@ defmodule Pop3mail.Multipart do
        name_parts = Enum.filter_map(content_parameters, 
                         fn(param)     -> String.contains?(param, "=") and String.starts_with?(String.downcase(param), parametername) end,
                         &map_parameter(&1))
-       if length(name_parts) > 0 do
-          multipart_part = extract_and_set_filename_from_name_parts(multipart_part, name_parts)
+       case length(name_parts) > 0 do
+          true  -> extract_and_set_filename_from_name_parts(multipart_part, name_parts)
+          false -> multipart_part
        end
-       multipart_part
    end
 
    # return {parameter number if any, with charset true/false, unquoted value}
@@ -446,37 +473,51 @@ defmodule Pop3mail.Multipart do
    # Extract (file-)name from (file-)name list (together one value). Returns Pop3mail.Part with filled-in filename and filename_charset.
    defp extract_and_set_filename_from_name_parts(multipart_part, name_parts) do
       charset = ""
-      if length(name_parts) > 1 do
-         # Parameter continuation: In theory the parameters can be in the wrong order. Never seen it though.
-         # Sort them anyway.
-         name_parts = Enum.sort(name_parts, fn({a,_,_},{b,_,_}) -> a <= b end)
-      end
+      name_parts = sort_name_parts(name_parts)
       # RFC 2231
       # When the regex above ~r/^[^=]*\*=/ matches filename*= or filename*0*= it indicates that there should be encoding 
       {_,with_charset,_} = Enum.at(name_parts, 0)
       filename = name_parts 
                  |> Enum.map(fn({_,_,val}) -> val end) 
                  |> Enum.join
-      if with_charset do
-         {decoded_filename, decoded_charset} = decoded_extended_filename_and_charset(filename)
-         if String.length(decoded_filename) > 0 do
-            filename = decoded_filename
-            charset  = decoded_charset
-         end
-      else
-        # RFC 2047 can also be used to encode, for example:
-        # Content-Type: IMAGE/png; NAME="=?UTF-8?B?cjAucG5n?="
-        if String.contains?(filename, "=?") do
-           {filename, charset} = decoded_word_filename_and_charset(filename)
-        end
-      end
+      {filename, charset} = decode_filename_and_charset(filename, charset, with_charset)
       if String.length(filename) > 0 do
          multipart_part = %{multipart_part | filename: filename}
-         if String.length(charset) > 0 do
-            multipart_part = %{multipart_part | filename_charset: charset}
+         case String.length(charset) > 0 do
+           true  -> %{multipart_part | filename_charset: charset}
+           false -> multipart_part
          end
+      else
+        multipart_part
       end
-      multipart_part
+   end
+
+   # Sort numbered parameter continuation.
+   # In theory the parameters can be in the wrong order. Never seen it though.
+   # Sort them anyway.
+   defp sort_name_parts(name_parts) do
+      case length(name_parts) > 1 do
+         true  -> Enum.sort(name_parts, fn({a,_,_},{b,_,_}) -> a <= b end)
+         false -> name_parts
+      end
+   end
+
+   # return decoded filename and charset if available
+   defp decode_filename_and_charset(filename, charset, with_charset) do
+     if with_charset do
+        {decoded_filename, decoded_charset} = decoded_extended_filename_and_charset(filename)
+        case String.length(decoded_filename) > 0 do
+           true  -> {decoded_filename, decoded_charset}
+           false -> {filename, charset}
+        end
+     else
+       # RFC 2047 can also be used to encode, for example:
+       # Content-Type: IMAGE/png; NAME="=?UTF-8?B?cjAucG5n?="
+       case String.contains?(filename, "=?") do
+          true  -> decoded_word_filename_and_charset(filename)
+          false -> {filename, charset}
+       end
+     end
    end
    
    # content-type name can be an encoded-word. A bit unusual nowadays.

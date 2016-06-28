@@ -37,9 +37,11 @@ defmodule Pop3mail.EpopDownloader do
      password = to_char_list(options.password)
      server = to_char_list(options.server)
      connect_options = [{:addr, server}, {:port, options.port}]
-     if is_nil(options.ssl) or options.ssl do
-       connect_options = connect_options ++ [:ssl]
-     end
+     connect_options = 
+       case is_nil(options.ssl) or options.ssl do
+         true  -> connect_options ++ [:ssl]
+         false -> connect_options
+       end
      case :epop_client.connect(username, password, connect_options) do
        {:ok,    client} -> retrieve_and_store_all(client, options)
        {:error, reason} -> Logger.error reason; {:error, reason}

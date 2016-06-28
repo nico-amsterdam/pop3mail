@@ -47,20 +47,20 @@ defmodule Pop3mail.FileStore do
       if String.length(unsafe_addition) > 0 do
           shortened_unsafe_addition = remove_unwanted_chars(unsafe_addition, 45)
           dirname = Path.join(base_dir, name <> "-" <> shortened_unsafe_addition)
-          if !File.dir?(dirname) do
-              # check if the operating system is able to create this directory, if not, try without unsafe addition
-              dirname = 
-                  case File.mkdir(dirname) do
-                    :ok -> dirname
-                    {:error, _} -> mkdir(base_dir, name, "")  # drop the unsafe addition and re-try
-                  end
+          if File.dir?(dirname) do
+             dirname
+          else
+             # check if the operating system is able to create this directory, if not, try without unsafe addition
+             case File.mkdir(dirname) do
+               :ok -> dirname
+               {:error, _} -> mkdir(base_dir, name, "")  # drop the unsafe addition and re-try
+             end
           end
-          dirname
-       else
-          dirname = Path.join(base_dir , name)
+      else
+          dirname = Path.join(base_dir, name)
           unless File.dir?(dirname), do: File.mkdir!(dirname)      
           dirname
-       end
+      end
    end
    
    # store body content
@@ -77,13 +77,11 @@ defmodule Pop3mail.FileStore do
      
      # this is also protection against filenames like: /etc/passwd
      safe_filename = remove_unwanted_chars(multipart_part.filename, 50)
-     if safe_filename == "", do: safe_filename = "unknown"
+     safe_filename = if safe_filename == "", do: "unknown", else: safe_filename
      path = Path.join(dirname, safe_filename)
-     
-     if String.starts_with?(multipart_part.media_type, "text/") and get_line_separator() != '\r\n' do
-        # store text file in unix format
-        multipart_part = dos2unix(multipart_part)
-     end
+     text_on_unix = String.starts_with?(multipart_part.media_type, "text/") and get_line_separator() != '\r\n' 
+     # if unix, store text file in unix format
+     multipart_part = if text_on_unix, do: dos2unix(multipart_part), else: multipart_part 
      write_file(path, multipart_part.content)
    end
 
@@ -156,9 +154,7 @@ defmodule Pop3mail.FileStore do
         file_extension = @content_type2file_extension[media_type] || (media_type |> String.split("/") |> List.last)
         filename = "message" <> to_string(index)
         lc_charset = String.downcase(charset)
-        if lc_charset != "us-ascii" do
-           filename = filename <> "." <> lc_charset
-        end
+        filename = if lc_charset != "us-ascii", do: filename <> "." <> lc_charset, else: filename
         filename <> "." <> file_extension
    end
 

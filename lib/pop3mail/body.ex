@@ -29,10 +29,12 @@ defmodule Pop3mail.Body do
    @doc "Store one part on filesystem"
    def store_part(multipart_part, base_dir) do
       # make sure we have a filename
-      if String.length(multipart_part.filename) == 0 do
-         # currently there is no filename, set default
-         multipart_part = FileStore.set_default_filename(multipart_part)
-      end
+      multipart_part =
+        case String.length(multipart_part.filename) == 0 do
+          # currently there is no filename, set default
+          true  -> FileStore.set_default_filename(multipart_part)
+          false -> multipart_part
+        end
       Logger.info "    " <> StringUtils.printable(multipart_part.filename, "file")
 
       result = FileStore.store_part(multipart_part, base_dir)
