@@ -25,8 +25,8 @@ defmodule Pop3mail.Header do
 
    filename is `filename_prefix` . `unsafe_addition` . txt 
 
-   `header_list` - list with tuples {:header, header name as character list, value as character list} 
-   `unsafe_addition` - append this to the filename if the filesytem allows it. 
+   * `header_list` - list with tuples {:header, header name as character list, value as character list} 
+   * `unsafe_addition` - append this to the filename if the filesytem allows it. 
    """
    def store(header_list, filename_prefix, filename_addition, dirname) do
       date    = lookup(header_list, "Date")

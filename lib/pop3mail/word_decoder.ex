@@ -91,8 +91,8 @@ defmodule Pop3mail.WordDecoder do
    @doc """
    Concat the text from the decoded list. Does NOT convert to a common character set like utf-8.
 
-   `add_charset_name` - put the name of the charset after the decoded text parts (when it isn't us-ascii). A hint for the reader if a text contains multiple charsets.
-   `decoded_text_list` - list with tuples {charset, text}. 
+   * `add_charset_name` - put the name of the charset after the decoded text parts (when it isn't us-ascii). A hint for the reader if a text contains multiple charsets.
+   * `decoded_text_list` - list with tuples {charset, text}. 
    """
    def decoded_text_list_to_string(decoded_text, add_charset_name \\ false) do
       map_text_fun = if add_charset_name, do: &with_charset/1, else: &without_charset/1
@@ -111,7 +111,5 @@ defmodule Pop3mail.WordDecoder do
          _    -> text
       end
    end
-
-
 
 end

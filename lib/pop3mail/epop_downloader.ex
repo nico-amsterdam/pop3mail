@@ -9,7 +9,7 @@ defmodule Pop3mail.EpopDownloader do
    defmodule Options do
 
       @moduledoc """
-      A struct that holds pop3maili parameter options.
+      A struct that holds pop3mail parameter options.
 
       It's fields are:
       * `delete`     - delete email after downloading. Default: false.
@@ -52,8 +52,8 @@ defmodule Pop3mail.EpopDownloader do
    @doc """
    Read all emails and save them to disk.
 
-   `epop_client` - client returned by :epop_client.connect function.
-   `options` - EpopDownloader.Options
+   * `epop_client` - client returned by :epop_client.connect function.
+   * `options` - EpopDownloader.Options
    """
    def retrieve_and_store_all(epop_client, options) do
         # This information returned by the server is not always reliable
@@ -86,9 +86,9 @@ defmodule Pop3mail.EpopDownloader do
    @doc """
    Retrieve, parse and store an email.
 
-   `epop_client` - client returned by :epop_client.connect function.
-   `mail_loop_counter` - number of the email in the current session.
-   `options` - EpopDownloader.Options
+   * `epop_client` - client returned by :epop_client.connect function.
+   * `mail_loop_counter` - number of the email in the current session.
+   * `options` - EpopDownloader.Options
    """
    def retrieve_and_store(epop_client, mail_loop_counter, options) do
       case :epop_client.retrieve(epop_client, mail_loop_counter) do
@@ -106,11 +106,11 @@ defmodule Pop3mail.EpopDownloader do
    @doc """
    Parse headers, decode body and store everything.
 
-   `mail_content` - character list with the complete raw email message.
-   `mail_loop_count` - number of the email in the current session.
-   `delivered` - true/false/nil. Presence, absence or don't care of the 'Delivered-To' email header.
-   `save_raw` - true/false. Save or don't save the raw email message.
-   `output_dir` - directory where all emails are stored.
+   * `mail_content` - character list with the complete raw email message.
+   * `mail_loop_count` - number of the email in the current session.
+   * `delivered` - true/false/nil. Presence, absence or don't care of the 'Delivered-To' email header.
+   * `save_raw` - true/false. Save or don't save the raw email message.
+   * `output_dir` - directory where all emails are stored.
    """
    def parse_process_and_store(mail_content, mail_loop_counter, delivered, save_raw, output_dir) do
       options = %Handler.Options{

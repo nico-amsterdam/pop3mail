@@ -9,7 +9,7 @@ defmodule Pop3mail do
    giving you the choice to do retrieval and storage with your own functions.
    """
 
-   @doc """
+   @doc ~S"""
    Commandline interface for downloading email and storing them on disk.
    
    ## Examples
@@ -45,7 +45,7 @@ defmodule Pop3mail do
       Pop3mail.CLI.main(args)
    end
 
-   @doc """
+   @doc ~S"""
    Download emails from the inbox and store them (including attachments) in a subdirectory per email.
 
    Parameters must be supplied in a string-keyed map:
@@ -83,7 +83,7 @@ defmodule Pop3mail do
      Pop3mail.EpopDownloader.download(epop_options)
    end
 
-   @doc """
+   @doc ~S"""
    Lookup header in header list retrieved via epop.
 
    ## Example
@@ -108,7 +108,7 @@ defmodule Pop3mail do
       Pop3mail.Header.lookup(header_list, header_name)
    end
 
-   @doc """
+   @doc ~S"""
    Decode a text with encoded words as defined in RFC 2047. Returns a list with tuples of charset name and binary content.
 
    Encoded words can occur in email headers (Subject, From, To) and for filenames in multipart content.
@@ -138,7 +138,7 @@ defmodule Pop3mail do
       Pop3mail.WordDecoder.decode_text(text)
    end
 
-   @doc """
+   @doc ~S"""
    Decode multipart, base64 and quoted-printable text. Returned is a list of Pop3mail.Part structs.
 
    ## Example
@@ -153,7 +153,7 @@ defmodule Pop3mail do
        iex(6)> Pop3mail.decode_body_char_list(header_list, body_char_list)                 
        [%Pop3mail.Part{boundary: "--_com.android.email_1191110031918720",
          charset: "utf-8",
-         content: "\\nPlease give me write access for the forum and possibly the wiki.\\n\\nTIA\\n",
+         content: "\nPlease give me write access for the forum and possibly the wiki.\n\nTIA\n",
          content_id: "", filename: "", filename_charset: "us-ascii", index: 1,
          inline: nil, media_type: "text/plain", path: "alternative"},
         %Pop3mail.Part{boundary: "--_com.android.email_1191110031918720",
@@ -250,7 +250,7 @@ defmodule Pop3mail do
      Pop3mail.Body.decode_body(body_text, content_type, encoding, disposition)
    end
 
-   @doc """
+   @doc ~S"""
    Decode raw message file (mostly an .eml file) and store result on disk.
 
    Returns a list with file storage results.

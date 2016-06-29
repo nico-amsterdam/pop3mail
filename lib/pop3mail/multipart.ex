@@ -54,9 +54,9 @@ defmodule Pop3mail.Multipart do
    @doc """
    Parse the boundary in the multipart content.
 
-   `raw_content` - multipart content
-   `boundary_name` - multipart boundary to search for
-   `path` - path in the multipart hierarchy. For example: relative/alternative
+   * `raw_content` - multipart content
+   * `boundary_name` - multipart boundary to search for
+   * `path` - path in the multipart hierarchy. For example: relative/alternative
    """
    def parse_multipart(boundary_name, raw_content, path) do
      # get text till end boundary
@@ -78,9 +78,9 @@ defmodule Pop3mail.Multipart do
    @doc """
    Parse a part of the multipart content.
 
-   `{part, index}` - Numbered Pop3mail.Part. Index starts at 1 for part 1 in a multipart.
-   `boundary_name` - multipart boundary name
-   `path` - path in the multipart hierarchy. For example: relative/alternative
+   * `{part, index}` - Numbered Pop3mail.Part. Index starts at 1 for part 1 in a multipart.
+   * `boundary_name` - multipart boundary name
+   * `path` - path in the multipart hierarchy. For example: relative/alternative
    """
    def parse_part({part, index}, boundary_name, path) do
      # bare carriage returns or bare linefeeds are not allowed in email.
@@ -96,9 +96,9 @@ defmodule Pop3mail.Multipart do
 
    Is called after all multipart header lines are parsed.
 
-   `multipart_part` - Pop3mail.Part input
-   `encoding` - For example: base64, quoted-printable, 7bit, 8bit, etc.
-   `lines` - part content splitted in lines
+   * `multipart_part` - Pop3mail.Part input
+   * `encoding` - For example: base64, quoted-printable, 7bit, 8bit, etc.
+   * `lines` - part content splitted in lines
    """
    def parse_part_decode(multipart_part, encoding, lines) do
      content = decode_lines(encoding, lines)
@@ -122,9 +122,9 @@ defmodule Pop3mail.Multipart do
    @doc """
    Finish parsing multipart header lines and start decode of the part content. Returns a Pop3mail.Part
 
-   `multipart_part` - Pop3mail.Part input
-   `encoding` - For example: base64, quoted-printable, 7bit, 8bit, etc.
-   `list` - lines
+   * `multipart_part` - Pop3mail.Part input
+   * `encoding` - For example: base64, quoted-printable, 7bit, 8bit, etc.
+   * `list` - lines
    """
    def parse_part_finish(multipart_part, encoding, [line | otherlines]) do
      # there should be an empty line after the headers
@@ -143,9 +143,9 @@ defmodule Pop3mail.Multipart do
    @doc """
    Parse multipart header lines. Returns a Pop3mail.Part
 
-   `multipart_part` - Pop3mail.Part input
-   `encoding` - For example: base64, quoted-printable, 7bit, 8bit, etc.
-   `list` - lines
+   * `multipart_part` - Pop3mail.Part input
+   * `encoding` - For example: base64, quoted-printable, 7bit, 8bit, etc.
+   * `list` - lines
    """
    def parse_part_lines(multipart_part, encoding, []) do
        # [] when all header lines are read and there are no more lines. There is no part content!
@@ -200,9 +200,9 @@ defmodule Pop3mail.Multipart do
    @doc """
    Parse multipart Content-Type header line. It can contain media_type, charset, (file-)name and boundary. Returns a Pop3mail.Part
 
-   `multipart_part` - Pop3mail.Part input
-   `encoding` - For example: base64, quoted-printable, 7bit, 8bit, etc.
-   `list` - lines
+   * `multipart_part` - Pop3mail.Part input
+   * `encoding` - For example: base64, quoted-printable, 7bit, 8bit, etc.
+   * `list` - lines
    """
    def parse_part_content_type(multipart_part, encoding, [line | otherlines]) do
        content_type = String.slice(line, String.length("content-type:")..-1)
@@ -231,8 +231,8 @@ defmodule Pop3mail.Multipart do
    @doc """
    Parse value of content-type header line. It can contain media_type, charset, (file-)name and boundary. Returns a Pop3mail.Part
 
-   `multipart_part` - Pop3mail.Part input
-   `content_type_parameters` - list of parameters in the format key=value
+   * `multipart_part` - Pop3mail.Part input
+   * `content_type_parameters` - list of parameters in the format key=value
    """
    def parse_content_type_parameters(multipart_part, content_type_parameters) do
        first_content_type_parameter =  List.first(content_type_parameters) || ""
@@ -288,9 +288,9 @@ defmodule Pop3mail.Multipart do
    @doc """
    Parse multipart Content-ID header line. Returns a Pop3mail.Part
 
-   `multipart_part` - Pop3mail.Part input
-   `encoding` - For example: base64, quoted-printable, 7bit, 8bit, etc.
-   `list` - lines
+   * `multipart_part` - Pop3mail.Part input
+   * `encoding` - For example: base64, quoted-printable, 7bit, 8bit, etc.
+   * `list` - lines
    """
    def parse_part_content_id(multipart_part, encoding, [line | otherlines]) do
        content_id = line 
@@ -306,9 +306,9 @@ defmodule Pop3mail.Multipart do
    @doc """
    Parse multipart Content-Transfer-Encoding header line. Returns a Pop3mail.Part
 
-   `multipart_part` - Pop3mail.Part input
-   `encoding` - For example: base64, quoted-printable, 7bit, 8bit, etc.
-   `list` - lines
+   * `multipart_part` - Pop3mail.Part input
+   * `encoding` - For example: base64, quoted-printable, 7bit, 8bit, etc.
+   * `list` - lines
    """
    def parse_part_transfer_encoding(multipart_part, _, [line | otherlines]) do
        encoding = line
@@ -323,9 +323,9 @@ defmodule Pop3mail.Multipart do
    @doc """
    Ignore a multipart header line. Returns a Pop3mail.Part
 
-   `multipart_part` - Pop3mail.Part input
-   `encoding` - For example: base64, quoted-printable, 7bit, 8bit, etc.
-   `list` - lines
+   * `multipart_part` - Pop3mail.Part input
+   * `encoding` - For example: base64, quoted-printable, 7bit, 8bit, etc.
+   * `list` - lines
    """
    def parse_part_skip(multipart_part, encoding, [line | otherlines]) do
        {_, otherlines} = lines_continued(line, otherlines)
@@ -336,9 +336,9 @@ defmodule Pop3mail.Multipart do
    @doc """
    Skip an unknown multipart header line. Logs a warning. Returns a Pop3mail.Part
 
-   `multipart_part` - Pop3mail.Part input
-   `encoding` - For example: base64, quoted-printable, 7bit, 8bit, etc.
-   `list` - lines
+   * `multipart_part` - Pop3mail.Part input
+   * `encoding` - For example: base64, quoted-printable, 7bit, 8bit, etc.
+   * `list` - lines
    """
    def parse_part_unknown_header(multipart_part, encoding, [line | otherlines]) do
      {line, otherlines} = lines_continued(line, otherlines)
@@ -349,9 +349,9 @@ defmodule Pop3mail.Multipart do
    @doc """
    Parse multipart Content-Disposition header line. Returns a Pop3mail.Part
 
-   `multipart_part` - Pop3mail.Part input
-   `encoding` - For example: base64, quoted-printable, 7bit, 8bit, etc.
-   `list` - lines
+   * `multipart_part` - Pop3mail.Part input
+   * `encoding` - For example: base64, quoted-printable, 7bit, 8bit, etc.
+   * `list` - lines
    """
    def parse_part_disposition(multipart_part, encoding, [line | otherlines]) do
        disposition = String.slice(line, String.length("content-disposition:")..-1)
@@ -382,8 +382,8 @@ defmodule Pop3mail.Multipart do
    @doc """
    Parse value of Content-Disposition header line. This is either inline or attachment, and it can contain a filename. Returns a Pop3mail.Part
 
-   `multipart_part` - Pop3mail.Part input
-   `disposition_parameters` - list of parameters in the format key=value
+   * `multipart_part` - Pop3mail.Part input
+   * `disposition_parameters` - list of parameters in the format key=value
    """
    def parse_disposition_parameters(multipart_part, disposition_parameters) do
       type = disposition_parameters 
@@ -429,7 +429,7 @@ defmodule Pop3mail.Multipart do
      end
    end
 
-   @doc """
+   @doc ~S"""
    Extract (file-)name from Content-Disposition value or Content-Type value. Returns Pop3mail.Part with filled-in filename and filename_charset.
 
    Example of Content-Disposition header line:
@@ -438,9 +438,9 @@ defmodule Pop3mail.Multipart do
 
    RFC 2231 example:
 
-      filename*0*=us-ascii'en'This%20is%20even%20more%20
-      filename*1*=%2A%2A%2Afun%2A%2A%2A%20
-      filename*2="isn't it!"
+     filename\*0\*=us-ascii'en'This%20is%20even%20more%20<br>
+     filename\*1\*=%2A%2A%2Afun%2A%2A%2A%20<br>
+     filename\*2="isn't it!"
    """
    def extract_and_set_filename(multipart_part, content_parameters, parametername) do
        # search for (file)name = value occurrences and concat them 
