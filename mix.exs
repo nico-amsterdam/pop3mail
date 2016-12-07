@@ -3,7 +3,7 @@ defmodule Pop3mail.Mixfile do
 
   def project do
     [app: :pop3mail,
-     version: "0.1.7",
+     version: "0.1.8",
      elixir: "~> 1.2",
      description: description,
      package: package,
@@ -29,7 +29,7 @@ defmodule Pop3mail.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [ {:erlpop, github: "trifork/erlpop"},
+    [ {:erlpop, github: "nico-amsterdam/erlpop"},
       {:ex_doc,  "~> 0.12", only: :dev},
       {:credo,  "~> 0.4"  , only: :dev}
     ]
@@ -40,15 +40,16 @@ defmodule Pop3mail.Mixfile do
     Pop3 client to download email (including attachments) from the inbox.
     Decodes multipart content, quoted-printables, base64 and encoded-words.
     Uses an Erlang pop3 client with SSL support derived from the epop package. Add this dependency in mix.exs: 
-    {:erlpop, github: "trifork/erlpop"}
+    {:erlpop, github: "nico-amsterdam/erlpop"}
     """
   end
 
   defp package do
-    [# These are the default files included in the package
+    [
      name: :pop3mail,
      maintainers: ["Nico Hoogervorst"],
      licenses: ["MIT"],
-     links: %{"GitHub" => "https://github.com/nico-amsterdam/pop3mail"}]
+     links: %{"GitHub" => "https://github.com/nico-amsterdam/pop3mail"}
+    ]
   end
 end
