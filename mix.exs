@@ -5,8 +5,17 @@ defmodule Pop3mail.Mixfile do
     [app: :pop3mail,
      version: "0.1.8",
      elixir: "~> 1.2",
-     description: description,
+
+     # Hex
      package: package,
+     description: description,
+
+     # Docs
+     docs: [source_ref: "master", main: "Pop3mail",
+            canonical: "http://hexdocs.pm/pop3mail",
+            source_url: "https://github.com/nico-amsterdam/pop3mail"
+           ],
+
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps]
@@ -30,8 +39,8 @@ defmodule Pop3mail.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [ {:erlpop, github: "nico-amsterdam/erlpop"},
-      {:ex_doc,  "~> 0.12", only: :dev},
-      {:credo,  "~> 0.4"  , only: :dev}
+      {:ex_doc,  "~> 0.14", only: :dev},
+      {:credo,  "~> 0.5"  , only: :dev}
     ]
   end
 
