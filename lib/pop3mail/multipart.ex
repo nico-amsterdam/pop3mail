@@ -393,7 +393,7 @@ defmodule Pop3mail.Multipart do
       multipart_part = 
          if String.length(type) > 0 do
             is_inline = (type == "inline")
-            multipart_part = %{multipart_part | inline: is_inline}
+            %{multipart_part | inline: is_inline}
          else
             multipart_part
          end
