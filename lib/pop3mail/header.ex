@@ -9,24 +9,24 @@ defmodule Pop3mail.Header do
 
    If the searched header name occurs multiple times in the list, the result will be the concatenated comma separated value.
 
-   `header_list` - list with tuples {:header, header name as character list, value as character list} 
+   `header_list` - list with tuples {:header, header name as character list, value as character list}
    """
    def lookup(header_list, header_name) do
      # filter list on name, return comma separated
      header_name = to_char_list(header_name)
-     header_list 
-     |> Enum.filter_map(fn({:header, name, _}) -> name == header_name end, 
-                        fn({:header, _,  val}) -> val end) 
+     header_list
+     |> Enum.filter_map(fn({:header, name, _}) -> name == header_name end,
+                        fn({:header, _,  val}) -> val end)
      |> Enum.join(", ")
    end
 
    @doc """
    Store email headers Date,From,To,Cc and Subject in a text file.
 
-   filename is `filename_prefix` . `unsafe_addition` . txt 
+   filename is `filename_prefix` . `unsafe_addition` . txt
 
-   * `header_list` - list with tuples {:header, header name as character list, value as character list} 
-   * `unsafe_addition` - append this to the filename if the filesytem allows it. 
+   * `header_list` - list with tuples {:header, header name as character list, value as character list}
+   * `unsafe_addition` - append this to the filename if the filesytem allows it.
    """
    def store(header_list, filename_prefix, filename_addition, dirname) do
       date    = lookup(header_list, "Date")
@@ -37,9 +37,9 @@ defmodule Pop3mail.Header do
       cc_decoded      = header_list |> lookup("Cc")      |> WordDecoder.decode_text
       charsets = WordDecoder.get_charsets_besides_ascii(subject_decoded ++ from_decoded ++ to_decoded ++ cc_decoded)
       # mention the charsets used in the filename:
-      filename_prefix = 
+      filename_prefix =
         case length(charsets) > 0 do
-           true  -> filename_prefix <> "." <> Enum.join(charsets, "_") 
+           true  -> filename_prefix <> "." <> Enum.join(charsets, "_")
            false -> filename_prefix
         end
 
@@ -47,13 +47,13 @@ defmodule Pop3mail.Header do
       mention_charset = length(charsets) > 1
       # create file content
       line_sep = FileStore.get_line_separator()
-      content = "Date: " <> date <> line_sep <> 
-                "From: " <> WordDecoder.decoded_text_list_to_string(from_decoded, mention_charset) <> line_sep <> 
-                "To: " <> WordDecoder.decoded_text_list_to_string(to_decoded, mention_charset) 
+      content = "Date: " <> date <> line_sep <>
+                "From: " <> WordDecoder.decoded_text_list_to_string(from_decoded, mention_charset) <> line_sep <>
+                "To: " <> WordDecoder.decoded_text_list_to_string(to_decoded, mention_charset)
 
       # optional content
       cc = WordDecoder.decoded_text_list_to_string(cc_decoded, mention_charset)
-      content = 
+      content =
         case String.length(cc) > 0 do
            true  -> content <> line_sep <> "Cc: " <> cc
            false -> content
@@ -61,7 +61,7 @@ defmodule Pop3mail.Header do
 
       # optional content
       subject = WordDecoder.decoded_text_list_to_string(subject_decoded, mention_charset)
-      content = 
+      content =
         case String.length(subject) > 0 do
            true  -> content <> line_sep <> "Subject: " <> subject
            false -> content

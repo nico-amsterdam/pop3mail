@@ -1,7 +1,7 @@
 # Functions to decode:
 # RFC 2047 encoded-words
-# 
-# 
+#
+#
 defmodule Pop3mail.WordDecoder do
   alias Pop3mail.QuotedPrintable
   alias Pop3mail.Base64Decoder
@@ -19,13 +19,13 @@ defmodule Pop3mail.WordDecoder do
         # without having to separate 'encoded-word's where spaces occur in the
         # unencoded text.)
 
-        # remove white space between encoded words (?= is forward lookahead, so the search pattern can be applied multiple times) 
+        # remove white space between encoded words (?= is forward lookahead, so the search pattern can be applied multiple times)
         # \\1 is group1, \\2 is group2 and \s+ is not in the replacement.
         input_text = Regex.replace(~r/(=\?[\w-]+\?[BQbq]\?[^\s]*\?=)\s+(?==\?[\w-]+\?[BQbq]\?[^\s]*\?=)/U, input_text, "\\1\\2")
 
         # make a list with us-ascii text and encoded-word's separated
         text_list = Regex.split(~r/()=\?[\w-]+\?[BQbq]\?[^\s]*\?=()/U, input_text, on: [1,2])
-        
+
         text_list
         |> Enum.filter(fn(x) -> x != "" end)
         |> Enum.map(&decode_word(&1))
@@ -67,24 +67,24 @@ defmodule Pop3mail.WordDecoder do
 
    def decode_word(text, encoding) when encoding in ["Q", "q"] do
       # RFC 2047: The 8-bit hexadecimal value 20 (e.g., ISO-8859-1 SPACE) may be represented as "_" (underscore, ASCII 95.).
-      text 
+      text
       |> String.replace("_", " ")
       |> QuotedPrintable.decode
       |> :erlang.list_to_binary
    end
 
    @doc """
-   returns sorted unique list of charsets. 
-   
+   returns sorted unique list of charsets.
+
    Because the non-encoded text has the us-ascii charset (a subset of utf-8 iso-8859-1 cp1251) we are particulary interested in the other charsets.
 
-   `decoded_text_list` - list with tuples {charset, text}. 
+   `decoded_text_list` - list with tuples {charset, text}.
    """
    def get_charsets_besides_ascii(decoded_text_list) do
      decoded_text_list
-     |> Enum.map(fn({charset, _}) -> charset end) 
+     |> Enum.map(fn({charset, _}) -> charset end)
      |> Enum.filter(fn(charset) -> charset != "us-ascii" end)
-     |> Enum.sort 
+     |> Enum.sort
      |> Enum.dedup
    end
 
@@ -92,7 +92,7 @@ defmodule Pop3mail.WordDecoder do
    Concat the text from the decoded list. Does NOT convert to a common character set like utf-8.
 
    * `add_charset_name` - put the name of the charset after the decoded text parts (when it isn't us-ascii). A hint for the reader if a text contains multiple charsets.
-   * `decoded_text_list` - list with tuples {charset, text}. 
+   * `decoded_text_list` - list with tuples {charset, text}.
    """
    def decoded_text_list_to_string(decoded_text, add_charset_name \\ false) do
       map_text_fun = if add_charset_name, do: &with_charset/1, else: &without_charset/1

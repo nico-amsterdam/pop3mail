@@ -37,7 +37,7 @@ defmodule Pop3mail.EpopDownloader do
      password = to_char_list(options.password)
      server = to_char_list(options.server)
      connect_options = [{:addr, server}, {:port, options.port}]
-     connect_options = 
+     connect_options =
        case is_nil(options.ssl) or options.ssl do
          true  -> connect_options ++ [:ssl]
          false -> connect_options
@@ -81,7 +81,7 @@ defmodule Pop3mail.EpopDownloader do
      |> String.replace(~r/(\d{3})/, "\\1.")
      |> String.replace_suffix(".", "")
      |> String.reverse
-   end 
+   end
 
    @doc """
    Retrieve, parse and store an email.
@@ -124,7 +124,7 @@ defmodule Pop3mail.EpopDownloader do
         {_, _} -> parsed_result
       end
    end
-   
+
    # call epop parser and catch parse exceptions
    defp epop_parse(mail_content) do
       try do
@@ -135,7 +135,7 @@ defmodule Pop3mail.EpopDownloader do
       end
    end
 
-   # Decode body, store headers and body content. 
+   # Decode body, store headers and body content.
    # `options` - Handler.Options
    defp process_and_store(mail_content, mail_loop_counter, header_list, body_char_list, options) do
       mail = %Handler.Mail{
@@ -146,5 +146,5 @@ defmodule Pop3mail.EpopDownloader do
       }
       Handler.check_process_and_store(mail, options)
    end
-    
+
 end

@@ -8,10 +8,10 @@ defmodule Pop3mail.FileStore do
    @doc """
    Store mail header.
 
-   filename is `filename_prefix` . `unsafe_addition` . txt 
+   filename is `filename_prefix` . `unsafe_addition` . txt
 
-   `unsafe_addition` - append this to the filename. 
-   It will be truncated at 35 characters. 
+   `unsafe_addition` - append this to the filename.
+   It will be truncated at 35 characters.
    Unusual characters for the filesystem will be filtered out. If storing with unsafe_addition fails, the file will be stored without it.
    """
    def store_mail_header(content, filename_prefix, unsafe_addition, dirname) do
@@ -27,7 +27,7 @@ defmodule Pop3mail.FileStore do
          write_file(path, content)
       end
    end
-   
+
    @doc "store raw email"
    def store_raw(mail_content, filename, dirname) do
      path = Path.join(dirname, filename)
@@ -36,11 +36,11 @@ defmodule Pop3mail.FileStore do
 
    @doc """
    make directory. Returns created directory name full path.
-   
+
    directory is `base_dir` / `name` - `unsafe_addition`
 
-   `unsafe_addition` - append this to the directory name. 
-   It will be truncated at 45 characters. 
+   `unsafe_addition` - append this to the directory name.
+   It will be truncated at 45 characters.
    Unusual characters for the filesystem will be filtered out. If creating the directory with unsafe_addition fails, the directory will be created without it.
    """
    def mkdir(base_dir, name, unsafe_addition) do
@@ -58,11 +58,11 @@ defmodule Pop3mail.FileStore do
           end
       else
           dirname = Path.join(base_dir, name)
-          unless File.dir?(dirname), do: File.mkdir!(dirname)      
+          unless File.dir?(dirname), do: File.mkdir!(dirname)
           dirname
       end
    end
-   
+
    # store body content
    @doc """
    store one part of the body.
@@ -73,15 +73,15 @@ defmodule Pop3mail.FileStore do
    """
    def store_part(multipart_part, base_dir) do
      dirname = Path.join(base_dir, multipart_part.path)
-     unless File.dir?(dirname), do: File.mkdir_p! dirname 
-     
+     unless File.dir?(dirname), do: File.mkdir_p! dirname
+
      # this is also protection against filenames like: /etc/passwd
      safe_filename = remove_unwanted_chars(multipart_part.filename, 50)
      safe_filename = if safe_filename == "", do: "unknown", else: safe_filename
      path = Path.join(dirname, safe_filename)
-     text_on_unix = String.starts_with?(multipart_part.media_type, "text/") and get_line_separator() != '\r\n' 
+     text_on_unix = String.starts_with?(multipart_part.media_type, "text/") and get_line_separator() != '\r\n'
      # if unix, store text file in unix format
-     multipart_part = if text_on_unix, do: dos2unix(multipart_part), else: multipart_part 
+     multipart_part = if text_on_unix, do: dos2unix(multipart_part), else: multipart_part
      write_file(path, multipart_part.content)
    end
 
@@ -94,7 +94,7 @@ defmodule Pop3mail.FileStore do
         {:error, reason} -> {:error, reason, path}
      end
    end
-   
+
    @doc "get line seperator for text files. On windows/dos this is carriage return + linefeed, on other platforms it is just the linefeed."
    def get_line_separator() do
       # in theory :io_lib.nl() should return '\r\n' on windows, but it's not.
@@ -133,11 +133,11 @@ defmodule Pop3mail.FileStore do
       else
         # only return 7bit ascii characters.
         # It's not perfect, this code can give funny results if feed with multibyte content.
-        text 
-        |> String.replace(~r/[^0-9;=@A-Z_a-z !#$%&\(\)\{\}\+\.,\-~`^]/ , "") 
+        text
+        |> String.replace(~r/[^0-9;=@A-Z_a-z !#$%&\(\)\{\}\+\.,\-~`^]/ , "")
         |> String.replace(~r/\s+/, " ")
         |> String.replace(~r/^[\s\.]+/, "")
-        |> String.slice(0, max_chars) 
+        |> String.slice(0, max_chars)
         |> String.replace(~r/[\s\.]+$/, "")
       end
    end
@@ -159,8 +159,8 @@ defmodule Pop3mail.FileStore do
    end
 
    @doc """
-   set default filename in the `multipart_part`. 
-   
+   set default filename in the `multipart_part`.
+
    Calls FileStore.get_default_filename to get the default filename.
 
    `multipart_part` - a Pop3mail.Part

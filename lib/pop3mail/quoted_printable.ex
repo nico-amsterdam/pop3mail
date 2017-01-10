@@ -3,8 +3,8 @@ defmodule Pop3mail.QuotedPrintable do
    @moduledoc "Decode quoted-printable text as in RFC 2045 # 6.7"
 
    @doc "Decode `arg1` string. Returns the result as a character list."
-   def decode(""), do: [] 
-   
+   def decode(""), do: []
+
    # remove trailing \r\n
    def decode(<< 13 :: size(8), 10 :: size(8) >>), do: []
 
@@ -13,9 +13,9 @@ defmodule Pop3mail.QuotedPrintable do
 
    # convert = hex values to characters
    def decode(<< "=", hex1 :: size(8), hex2 :: size(8), data :: binary >>) do
-       hex_value = to_string [hex1, hex2] 
+       hex_value = to_string [hex1, hex2]
        case Integer.parse(hex_value, 16) do
-         :error -> '=' ++ [hex1, hex2] ++ decode(data) 
+         :error -> '=' ++ [hex1, hex2] ++ decode(data)
          {char_as_int, ""} -> [char_as_int] ++ decode(data)
          {_, _} -> '=' ++ [hex1, hex2] ++ decode(data)  # wrongly encoded
        end

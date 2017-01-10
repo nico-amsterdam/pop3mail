@@ -12,8 +12,8 @@ defmodule Pop3mail.StringUtils do
    def remove_balanced(text, remove) do
       # strip balanced
       if String.starts_with?(text, remove) and String.ends_with?(text, remove) do
-         text 
-         |> String.replace_suffix(remove, "") 
+         text
+         |> String.replace_suffix(remove, "")
          |> String.replace_prefix(remove, "")
       else
          text

@@ -3,12 +3,12 @@ defmodule Pop3mail.Mixfile do
 
   def project do
     [app: :pop3mail,
-     version: "0.1.8",
+     version: "0.1.9",
      elixir: "~> 1.2",
 
      # Hex
-     package: package,
-     description: description,
+     package: package(),
+     description: description(),
 
      # Docs
      docs: [source_ref: "master", main: "Pop3mail",
@@ -18,7 +18,7 @@ defmodule Pop3mail.Mixfile do
 
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     deps: deps]
+     deps: deps()]
   end
 
   # Configuration for the OTP application

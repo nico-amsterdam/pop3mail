@@ -1,6 +1,6 @@
 defmodule Pop3mail.CLI do
   alias Pop3mail.EpopDownloader
-   
+
    @moduledoc "Commandline interface for downloading emails and storing them on disk."
 
    defp usage_text do
@@ -8,17 +8,17 @@ defmodule Pop3mail.CLI do
      usage: pop3mail_downloader [--username=[recent:]USERNAME]
             [--password=PASSWORD] [--max=INTEGER] [--delete] [--server=SERVER]
             [--port=INTEGER] [--ssl=false] [--delivered] [--raw] [--help]
-     Read emails from the inbox and save them including attachments on disk 
+     Read emails from the inbox and save them including attachments on disk
      in the 'inbox' subdirectory.
-     
+
      --delete     delete email after downloading. Default: false
-                  Notice that Gmail ignores the delete 
+                  Notice that Gmail ignores the delete
                   and instead uses the Gmail account settings.
-     --delivered  true/false. Skip emails with/without Delivered-To header. 
-                  If you moved an email from your sent box to your inbox it 
+     --delivered  true/false. Skip emails with/without Delivered-To header.
+                  If you moved an email from your sent box to your inbox it
                   will not have the Delivered-To header. Default: don't skip
      --help       show this information.
-     --max        maximum number of emails to download. Default: unlimited 
+     --max        maximum number of emails to download. Default: unlimited
      --output     output directory. Default: inbox
      --password   email account password.
      --port       pop3 server port. Default: 995
@@ -26,8 +26,8 @@ defmodule Pop3mail.CLI do
                   Usefull feature for error diagnostics.
      --server     pop3 server address. Default: pop.gmail.com
      --ssl        true/false. Turn on/off Secure Socket Layer. Default: true
-     --username   email account name.  Gmail users can precede the name with 
-                  'recent:' to get the last 30 days mail, even if it has 
+     --username   email account name.  Gmail users can precede the name with
+                  'recent:' to get the last 30 days mail, even if it has
                   already been downloaded elsewhere.
      """
    end
@@ -47,7 +47,7 @@ defmodule Pop3mail.CLI do
          raw:        :boolean,
          output:     :string])
      if options[:help] do
-        show_help
+        show_help()
      else
         process_options(options, illegal_args, failed_options)
      end
@@ -78,7 +78,7 @@ defmodule Pop3mail.CLI do
      EpopDownloader.download(epop_options)
    end
 
-   # there are incorrect commandline parameters 
+   # there are incorrect commandline parameters
    defp process_options(_,illegal_args,failed_options) do
      all_errors = illegal_args ++ failed_options
      show_error(all_errors)
@@ -102,7 +102,7 @@ defmodule Pop3mail.CLI do
 
    @doc "print usage line and a description for all parameters."
    def show_help do
-     IO.puts usage_text
+     IO.puts usage_text()
    end
 
 end

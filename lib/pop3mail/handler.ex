@@ -87,14 +87,14 @@ defmodule Pop3mail.Handler do
       filename_prefix = "header"
       # you get a sender name with removed encodings
       sender_name = get_sender_name(from)
-      
+
       # store header info in a header file
       header_result = store_header(mail.header_list, filename_prefix, sender_name, dirname)
 
       # body
       [header_result] ++ process_and_store_body(mail.header_list, mail.body_char_list, dirname)
    end
-   
+
    # Store the header and log any errors.
    defp store_header(header_list, filename_prefix, sender_name, dirname) do
       result = Header.store(header_list, filename_prefix, sender_name, dirname)
@@ -103,7 +103,7 @@ defmodule Pop3mail.Handler do
            {:error, reason, _} -> Logger.error reason; result
       end
    end
-   
+
    # Store the raw email content and log any errors.
    defp save_raw(mail_content, dirname) do
       # for debugging
@@ -131,7 +131,7 @@ defmodule Pop3mail.Handler do
 
    @doc """
    Decode body: multipart content, base64 and quoted-printable.
-   
+
    Returns a list of Pop3mail.Part's.
 
    `header_list` - list with tuples of {:header, header name, header value}. Name and value are character lists.
@@ -165,13 +165,13 @@ defmodule Pop3mail.Handler do
      from_splitted = String.split(from, ~r/[<>]/)
      # if the format was:  name <email adres> you should have a array of 2
      if length(from_splitted) >= 2 do
-        from_name = from_splitted 
-                    |> Enum.at(0) 
-                    |> String.strip 
+        from_name = from_splitted
+                    |> Enum.at(0)
+                    |> String.strip
                     |> StringUtils.unquoted
         if String.length(from_name) == 0 do
            # can only pick up the email between the < > brackets
-           from_splitted 
+           from_splitted
            |> Enum.at(1)
            |> String.strip
         else
@@ -190,8 +190,8 @@ defmodule Pop3mail.Handler do
    """
    def remove_encodings(text) do
       decoded_text_list = WordDecoder.decode_text(text)
-      decoded_text_list 
-      |> Enum.map(fn({_, val}) -> val end) 
+      decoded_text_list
+      |> Enum.map(fn({_, val}) -> val end)
       |> Enum.join
    end
 

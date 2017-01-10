@@ -16,7 +16,7 @@ defmodule Pop3mailTest do
     actual1  = Pop3mail.decode_body_char_list(header_list, body_char_list)
     assert length(actual1) == 1
     assert Enum.at(actual1, 0) == expected
-      
+
     # header lookup
     content_type = Pop3mail.header_lookup(header_list, "Content-Type")
     encoding     = Pop3mail.header_lookup(header_list, "Content-Transfer-Encoding")
@@ -39,11 +39,11 @@ defmodule Pop3mailTest do
     content_enum3 = <<71, 73, 70, 56, 57, 97, 1, 0, 1, 0, 128, 0, 0, 0, 0, 0, 255, 255, 255, 33, 249, 4, 1, 0, 0, 0, 0, 44, 0, 0, 0, 0, 1, 0, 1, 0, 0, 2, 1, 68, 0, 59>>
 
     expected_enum1 = %Pop3mail.Part{boundary: "----=_NextPart_001_0005_01D0C782.71A8D3F0", charset: "iso-8859-1",
-            content: content_enum1, 
+            content: content_enum1,
             content_id: "", filename: "", filename_charset: "us-ascii", index: 1, inline: nil, media_type: "text/plain", path: "related/alternative"}
 
     expected_enum2 = %Pop3mail.Part{boundary: "----=_NextPart_001_0005_01D0C782.71A8D3F0", charset: "iso-8859-1",
-            content: content_enum2, 
+            content: content_enum2,
             content_id: "", filename: "", filename_charset: "us-ascii", index: 2, inline: nil, media_type: "text/html", path: "related/alternative"}
 
     expected_enum3 = %Pop3mail.Part{boundary: "----=_NextPart_000_0004_01D0C782.71A41900", charset: "us-ascii",
@@ -61,7 +61,7 @@ defmodule Pop3mailTest do
     assert Enum.at(actual1, 0) == expected_enum1
     assert Enum.at(actual1, 1) == expected_enum2
     assert Enum.at(actual1, 2) == expected_enum3
-      
+
     # header lookup
     content_type = Pop3mail.header_lookup(header_list, "Content-Type")
     encoding     = Pop3mail.header_lookup(header_list, "Content-Transfer-Encoding")
@@ -86,7 +86,7 @@ defmodule Pop3mailTest do
                 content: "Qu'vatlh uses the Klingon Q; you should pronounce this sound as in petaQ.",
                 content_id: "", filename: "Invoice269082204400.pdf",
                 filename_charset: "ISO-8859-15", index: 1, inline: false,
-                media_type: "application/octet-stream", path: "mixed"} 
+                media_type: "application/octet-stream", path: "mixed"}
 
     {:ok, content} = :file.read_file("test/pop3mail/fixtures/encoded-word-in-filename.eml")
     mail_content = :erlang.binary_to_list(content)

@@ -8,7 +8,7 @@ defmodule Pop3mail.Body do
 
    @moduledoc "Decode and store mail body"
 
-   @doc "Decode multipart content, base64, quoted-printables" 
+   @doc "Decode multipart content, base64, quoted-printables"
    def decode_body(body_text, content_type, encoding, disposition) do
       decoded_binary = Multipart.decode(encoding, body_text)
 
@@ -21,11 +21,11 @@ defmodule Pop3mail.Body do
       Multipart.parse_content(mail_body_part)
    end
 
-   @doc "Store all found body parts on filesystem" 
+   @doc "Store all found body parts on filesystem"
    def store_multiparts(multipart_part_list, dirname) do
       Enum.map(multipart_part_list, &(store_part(&1, dirname)))
    end
-   
+
    @doc "Store one part on filesystem"
    def store_part(multipart_part, base_dir) do
       # make sure we have a filename

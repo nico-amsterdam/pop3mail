@@ -16,18 +16,18 @@ defmodule Pop3mail.DateConverter do
      # Example of correctly formatted date: Tue, 14 Oct 2014 19:59:31 +0200
      # Sometimes the day of the week is missing in the date. Fix that:
      # if date starts with digit, add the day first. We don't care which day it is, just add ???
-     date_str = 
+     date_str =
         case date_str =~ ~r/^\s?\d/ do
            true  -> "???, " <> date_str
            false -> date_str
         end
      # httpd_util requires that single digit days have a leading zero. This is not always the case.
      day_and_date = date_str
-                    |> String.slice(5..-1) 
+                    |> String.slice(5..-1)
                     |> String.lstrip
      # add leading zero
-     date_str = 
-       case day_and_date =~ ~r/^\d\s/ do 
+     date_str =
+       case day_and_date =~ ~r/^\d\s/ do
          true  -> String.slice(date_str, 0..4) <> "0" <> day_and_date
          false -> date_str
        end
