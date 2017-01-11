@@ -54,7 +54,7 @@ For usage, see usage chapter below.
   1. Add pop3mail and the erlang epop client to your list of dependencies in `mix.exs`:
 
         def deps do
-          [{:pop3mail, "~> 0.1"}, 
+          [{:pop3mail, "~> 1.0"}, 
            {:erlpop, github: "nico-amsterdam/erlpop"}]
         end
 
