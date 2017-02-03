@@ -36,18 +36,25 @@ defmodule Pop3mail.EpopDownloader do
      username = to_char_list(options.username)
      password = to_char_list(options.password)
      server = to_char_list(options.server)
-     connect_options = [{:addr, server}, {:port, options.port}]
+     connect_options = [{:addr, server}, {:port, options.port}, {:user, username}]
      connect_options =
        case is_nil(options.ssl) or options.ssl do
          true  -> connect_options ++ [:ssl]
          false -> connect_options
        end
-     case :epop_client.connect(username, password, connect_options) do
+     case :epop_client.connect(ensure_at_symbol(username, server), password, connect_options) do
        {:ok,    client} -> retrieve_and_store_all(client, options)
        {:error, reason} -> Logger.error reason; {:error, reason}
      end
    end
 
+   # if username does not contain the @ symbol, add it. Both parameters must be char-lists.
+   defp ensure_at_symbol(username, server) do
+     case :string.chr(username, ?@) > 0 do
+       true  -> username
+       false -> username ++ '@' ++ server
+     end
+   end
 
    @doc """
    Read all emails and save them to disk.

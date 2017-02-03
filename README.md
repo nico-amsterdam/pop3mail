@@ -54,7 +54,7 @@ For usage, see usage chapter below.
   1. Add pop3mail and the erlang epop client to your list of dependencies in `mix.exs`:
 
         def deps do
-          [{:pop3mail, "~> 1.0"}, 
+          [{:pop3mail, "~> 1.1"}, 
            {:erlpop, github: "nico-amsterdam/erlpop"}]
         end
 
@@ -74,13 +74,13 @@ or without shell/batch script:
 \*nix
 ```sh
 $ mix run -e 'Pop3mail.CLI.main(["--help"])'
-$ mix run -e 'Pop3mail.CLI.main(["--username=<user email username>", "--password=<your email password>", "--max=10", "--raw"])'
+$ mix run -e 'Pop3mail.CLI.main(["--username=<your email username>", "--password=<your email password>", "--max=10", "--raw"])'
 ```
 
 Windows
 ```dos
 C:\pop3mail\mix run -e "Pop3mail.CLI.main([""--help""])"
-C:\pop3mail\mix run -e "Pop3mail.CLI.main([""--username=<user email username>"", ""--password=<your email password>"", ""--max=10"", ""--raw""])"
+C:\pop3mail\mix run -e "Pop3mail.CLI.main([""--username=<your email username>"", ""--password=<your email password>"", ""--max=10"", ""--raw""])"
 ```
 
 The script defaults to Gmail, but you can specify other POP3 server and port settings.
@@ -95,7 +95,8 @@ Example:
 $ iex -S mix
 
 # notice that you must use single quotes here
-iex(1)> {:ok, client} = :epop_client.connect('user@gmail.com', 'password', [{:addr, 'pop.gmail.com'},{:port,995},:ssl])
+iex(1)> {:ok, client} = :epop_client.connect('user@gmail.com', 'password', 
+...(1)>   [:ssl, {:addr, 'pop.gmail.com'}, {:port, 995}, {:user, 'user@gmail.com'}])
 iex(2)> :epop_client.stat(client) 
 iex(3)> {:ok, mail_content} = :epop_client.retrieve(client, 1) 
 iex(4)> {:message, header_list, body_char_list } = :epop_message.parse(mail_content)
