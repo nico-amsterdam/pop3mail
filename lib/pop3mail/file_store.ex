@@ -111,7 +111,7 @@ defmodule Pop3mail.FileStore do
    """
    def dos2unix(multipart_part) do
       line_sep = get_line_separator()
-      unix_text = multipart_part.content |> String.split("\r\n") |> Enum.join(line_sep)
+      unix_text = multipart_part.content |> String.splitter("\r\n") |> Enum.join(line_sep)
       %{multipart_part | content: unix_text}
    end
 

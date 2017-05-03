@@ -17,7 +17,7 @@ defmodule Pop3mail.Base64Decoder do
      @doc "Decode base64 encoded text. The `lines` parameter is an array of strings. Returns binary."
      def decode_lines!(lines) do
         encoded_text = Enum.join(lines)
-        Base.decode64!(encoded_text)
+        Base.decode64!(encoded_text, ignore: :whitespace)
      end
 
    end

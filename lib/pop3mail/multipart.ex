@@ -74,19 +74,24 @@ defmodule Pop3mail.Multipart do
      end
    end
 
+   # We could split all the lines at once, but with large attachments this consumes a lot of memory 
+   # Instead, we only split a line when needed
+   defp lazy_line_split(lines) do
+      String.split(lines, "\r\n", parts: 2)
+   end
 
    @doc """
    Parse a part of the multipart content.
 
-   * `{part, index}` - Numbered Pop3mail.Part. Index starts at 1 for part 1 in a multipart.
+   * `{part, index}` - Numbered part content. Index starts at 1 for part 1 in a multipart.
    * `boundary_name` - multipart boundary name
    * `path` - path in the multipart hierarchy. For example: relative/alternative
    """
    def parse_part({part, index}, boundary_name, path) do
      # bare carriage returns or bare linefeeds are not allowed in email.
-     lines = String.split(part, ~r/\r\n/)
+     [line1 | otherlines] = lazy_line_split(part)
      new_part = %Part{boundary: boundary_name, path: path, index: index}
-     multipart_part = parse_part_lines(new_part, "raw", lines)
+     multipart_part = parse_part_lines(new_part, "raw", [line1 | otherlines])
      # return list of parts
      [multipart_part]
    end
@@ -181,7 +186,10 @@ defmodule Pop3mail.Multipart do
    end
 
    @doc "A multipart header line can continue on the next line. When next line starts with a tab-character or when there is a opening double quote not closed yet."
-   def lines_continued(line1, [line2 | otherlines]) do
+   def lines_continued(line1, []), do: {line1, []}
+
+   def lines_continued(line1, [more_lines | even_more]) do
+      [line2 | otherlines] = lazy_line_split(more_lines)
       # count number of double-quotes, and determine if we are now even or odd
       modules2 = line1
                  |> String.codepoints
@@ -189,13 +197,11 @@ defmodule Pop3mail.Multipart do
                  |> length
                  |> rem(2)
       if modules2 != 0 or line1 =~ ~r/;\s*$/ or line2 =~ ~r/^\t/ do
-         lines_continued(line1 <> line2, otherlines)
+         lines_continued(line1 <> line2, otherlines ++ even_more)
       else
-         {line1, [line2 | otherlines]}
+         {line1, [line2 | otherlines ++ even_more]}
       end
    end
-
-   def lines_continued(line, otherlines), do: {line, otherlines}
 
    @doc """
    Parse multipart Content-Type header line. It can contain media_type, charset, (file-)name and boundary. Returns a Pop3mail.Part
@@ -206,12 +212,12 @@ defmodule Pop3mail.Multipart do
    """
    def parse_part_content_type(multipart_part, encoding, [line | otherlines]) do
        content_type = String.slice(line, String.length("content-type:")..-1)
-       {content_type, otherlines} = lines_continued(content_type, otherlines)
+       {content_type, split_lines} = lines_continued(content_type, otherlines)
        # Logger.debug "      Content-type: " <> content_type
        content_type_parameters = String.split(content_type, ~r/\s*;\s*/)
        multipart_part = parse_content_type_parameters(multipart_part, content_type_parameters)
 
-       parse_part_lines(multipart_part, encoding, otherlines)
+       parse_part_lines(multipart_part, encoding, split_lines)
    end
 
    @doc """
@@ -297,10 +303,10 @@ defmodule Pop3mail.Multipart do
                     |> String.slice(String.length("content-id:")..-1)
                     |> String.strip
                     |> StringUtils.unquoted
-       {content_id, otherlines} = lines_continued(content_id, otherlines)
+       {content_id, split_lines} = lines_continued(content_id, otherlines)
        # Logger.debug "      Content-ID: " <> content_id
        multipart_part = %{multipart_part | content_id: content_id}
-       parse_part_lines(multipart_part, encoding, otherlines)
+       parse_part_lines(multipart_part, encoding, split_lines)
    end
 
    @doc """
@@ -315,9 +321,9 @@ defmodule Pop3mail.Multipart do
                   |> String.slice(String.length("content-transfer-encoding:")..-1)
                   |> String.strip
                   |> StringUtils.unquoted
-       {encoding, otherlines} = lines_continued(encoding, otherlines)
+       {encoding, split_lines} = lines_continued(encoding, otherlines)
        # Logger.debug "      Encoding: " <> encoding
-       parse_part_lines(multipart_part, encoding, otherlines)
+       parse_part_lines(multipart_part, encoding, split_lines)
    end
 
    @doc """
@@ -328,9 +334,9 @@ defmodule Pop3mail.Multipart do
    * `list` - lines
    """
    def parse_part_skip(multipart_part, encoding, [line | otherlines]) do
-       {_, otherlines} = lines_continued(line, otherlines)
+       {_, split_lines} = lines_continued(line, otherlines)
        # Logger.debug "      Skipped " <> line
-       parse_part_lines(multipart_part, encoding, otherlines)
+       parse_part_lines(multipart_part, encoding, split_lines)
    end
 
    @doc """
@@ -341,9 +347,9 @@ defmodule Pop3mail.Multipart do
    * `list` - lines
    """
    def parse_part_unknown_header(multipart_part, encoding, [line | otherlines]) do
-     {line, otherlines} = lines_continued(line, otherlines)
+     {line, split_lines} = lines_continued(line, otherlines)
      Logger.warn "    Unknown header line in body ignored" <> StringUtils.printable(": " <> line)
-     parse_part_lines(multipart_part, encoding, otherlines)
+     parse_part_lines(multipart_part, encoding, split_lines)
    end
 
    @doc """
@@ -355,10 +361,10 @@ defmodule Pop3mail.Multipart do
    """
    def parse_part_disposition(multipart_part, encoding, [line | otherlines]) do
        disposition = String.slice(line, String.length("content-disposition:")..-1)
-       {disposition, otherlines} = lines_continued(disposition, otherlines)
+       {disposition, split_lines} = lines_continued(disposition, otherlines)
        # Logger.debug "      Disposition: " <> disposition
        multipart_part = parse_disposition(multipart_part, disposition)
-       parse_part_lines(multipart_part, encoding, otherlines)
+       parse_part_lines(multipart_part, encoding, split_lines)
    end
 
    @doc """
