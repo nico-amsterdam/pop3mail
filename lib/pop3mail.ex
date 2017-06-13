@@ -94,7 +94,7 @@ defmodule Pop3mail do
        iex(2)> {:ok, client} = :epop_client.connect('user@gmail.com', 'password', [{:addr, 'pop.gmail.com'},{:port,995},:ssl])
        iex(3)> :epop_client.stat(client)
        iex(4)> {:ok, mail_content} = :epop_client.retrieve(client, 1)
-       iex(5)> {:message, header_list, body_char_list } = :epop_message.parse(mail_content)
+       iex(5)> {:message, header_list, body_content } = :epop_message.parse(mail_content)
        iex(6)> Pop3mail.header_lookup(header_list, "Subject")
        "Solution Skolem problem"
        iex(7)> Pop3mail.header_lookup(header_list, "From")
@@ -149,8 +149,8 @@ defmodule Pop3mail do
        iex(2)> {:ok, client} = :epop_client.connect('user@gmail.com', 'password', [{:addr, 'pop.gmail.com'},{:port,995},:ssl])
        iex(3)> :epop_client.stat(client)
        iex(4)> {:ok, mail_content} = :epop_client.retrieve(client, 1)
-       iex(5)> {:message, header_list, body_char_list } = :epop_message.parse(mail_content)
-       iex(6)> Pop3mail.decode_body_char_list(header_list, body_char_list)
+       iex(5)> {:message, header_list, body_content } = :epop_message.parse(mail_content)
+       iex(6)> Pop3mail.decode_body_content(header_list, body_content)
        [%Pop3mail.Part{boundary: "--_com.android.email_1191110031918720",
          charset: "utf-8",
          content: "\nPlease give me write access for the forum and possibly the wiki.\n\nTIA\n",
@@ -164,8 +164,8 @@ defmodule Pop3mail do
        iex(7)> :epop_client.quit(client)
 
    """
-   def decode_body_char_list(header_list, body_char_list) do
-      Pop3mail.Handler.decode_body_char_list(header_list, body_char_list)
+   def decode_body_content(header_list, body_content) do
+      Pop3mail.Handler.decode_body_content(header_list, body_content)
    end
 
    @doc ~S'''
@@ -269,7 +269,7 @@ defmodule Pop3mail do
    def decode_raw_file(filename, output_dir) do
       unless File.dir?(output_dir), do: File.mkdir! output_dir
       case :file.read_file(filename) do
-         {:ok, mail_content}  -> mail_content |> :erlang.binary_to_list |> Pop3mail.EpopDownloader.parse_process_and_store(1, nil, false, output_dir)
+         {:ok, mail_content}  -> mail_content |> Pop3mail.EpopDownloader.parse_process_and_store(1, nil, false, output_dir)
          {:error, :enoent}    -> IO.puts(:stderr, "File '" <> filename <> "' not found.")
          {:error, error_code} -> IO.puts(:stderr, "Error: #{error_code}")
       end

@@ -98,7 +98,7 @@ defmodule Pop3mail.EpopDownloader do
    * `options` - EpopDownloader.Options
    """
    def retrieve_and_store(epop_client, mail_loop_counter, options) do
-      case :epop_client.retrieve(epop_client, mail_loop_counter) do
+      case :epop_client.bin_retrieve(epop_client, mail_loop_counter) do
         {:ok, mail_content} -> result = parse_process_and_store(mail_content, mail_loop_counter, options.delivered ,options.save_raw , options.output_dir)
                                if options.delete do
                                  :ok = :epop_client.delete(epop_client, mail_loop_counter)
@@ -113,7 +113,7 @@ defmodule Pop3mail.EpopDownloader do
    @doc """
    Parse headers, decode body and store everything.
 
-   * `mail_content` - character list with the complete raw email message.
+   * `mail_content` - string with the complete raw email message.
    * `mail_loop_count` - number of the email in the current session.
    * `delivered` - true/false/nil. Presence, absence or don't care of the 'Delivered-To' email header.
    * `save_raw` - true/false. Save or don't save the raw email message.
@@ -127,7 +127,7 @@ defmodule Pop3mail.EpopDownloader do
       }
       parsed_result = epop_parse(mail_content)
       case parsed_result do
-        {:message, header_list, body_char_list} -> process_and_store(mail_content, mail_loop_counter, header_list, body_char_list, options)
+        {:message, header_list, body_content} -> process_and_store(mail_content, mail_loop_counter, header_list, body_content, options)
         {_, _} -> parsed_result
       end
    end
@@ -135,7 +135,7 @@ defmodule Pop3mail.EpopDownloader do
    # call epop parser and catch parse exceptions
    defp epop_parse(mail_content) do
       try do
-        :epop_message.parse(mail_content)
+        :epop_message.bin_parse(mail_content)
       rescue
         # parse error
         e in ErlangError -> {error, reason} = e.original; Logger.error "  #{error}: #{reason}"; {error, mail_content}
@@ -144,12 +144,12 @@ defmodule Pop3mail.EpopDownloader do
 
    # Decode body, store headers and body content.
    # `options` - Handler.Options
-   defp process_and_store(mail_content, mail_loop_counter, header_list, body_char_list, options) do
+   defp process_and_store(mail_content, mail_loop_counter, header_list, body_content, options) do
       mail = %Handler.Mail{
         mail_content: mail_content,
         mail_loop_counter: mail_loop_counter,
         header_list: header_list,
-        body_char_list: body_char_list
+        body_content: body_content
       }
       Handler.check_process_and_store(mail, options)
    end

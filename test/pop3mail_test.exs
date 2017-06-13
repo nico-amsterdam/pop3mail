@@ -8,12 +8,11 @@ defmodule Pop3mailTest do
       content_id: "", filename: "", filename_charset: "us-ascii", index: 1,
       inline: nil, media_type: "text/plain", path: ""}
 
-    {:ok, content} = :file.read_file("test/pop3mail/fixtures/simple.eml")
-    mail_content = :erlang.binary_to_list(content)
-    {:message, header_list, body_char_list} = :epop_message.parse(mail_content)
+    {:ok, mail_content} = :file.read_file("test/pop3mail/fixtures/simple.eml")
+    {:message, header_list, body_content} = :epop_message.bin_parse(mail_content)
 
     # decode method 1
-    actual1  = Pop3mail.decode_body_char_list(header_list, body_char_list)
+    actual1  = Pop3mail.decode_body_content(header_list, body_content)
     assert length(actual1) == 1
     assert Enum.at(actual1, 0) == expected
 
@@ -24,8 +23,7 @@ defmodule Pop3mailTest do
     assert encoding == "8bit"
 
     # decode method 2
-    body_text = :erlang.list_to_binary body_char_list
-    actual2  = Pop3mail.decode_body(body_text, content_type, encoding, "")
+    actual2  = Pop3mail.decode_body(body_content, content_type, encoding, "")
     assert length(actual2) == 1
     assert Enum.at(actual2, 0) == expected
 
@@ -51,12 +49,11 @@ defmodule Pop3mailTest do
             content_id: "<image001.gif@01D0C782.711C2450>", filename: "image001.gif", filename_charset: "us-ascii", index: 2, inline: nil, media_type: "image/gif", path: "related"}
 
 
-    {:ok, content} = :file.read_file("test/pop3mail/fixtures/encoded-word-in-from.eml")
-    mail_content = :erlang.binary_to_list(content)
-    {:message, header_list, body_char_list} = :epop_message.parse(mail_content)
+    {:ok, mail_content} = :file.read_file("test/pop3mail/fixtures/encoded-word-in-from.eml")
+    {:message, header_list, body_content} = :epop_message.bin_parse(mail_content)
 
     # decode method 1
-    actual1   = Pop3mail.decode_body_char_list(header_list, body_char_list)
+    actual1   = Pop3mail.decode_body_content(header_list, body_content)
     assert length(actual1) == 3
     assert Enum.at(actual1, 0) == expected_enum1
     assert Enum.at(actual1, 1) == expected_enum2
@@ -69,8 +66,7 @@ defmodule Pop3mailTest do
     assert encoding == ""
 
     # decode method 2
-    body_text = :erlang.list_to_binary body_char_list
-    actual2  = Pop3mail.decode_body(body_text, content_type, encoding, "")
+    actual2  = Pop3mail.decode_body(body_content, content_type, encoding, "")
     assert length(actual2) == 3
     assert Enum.at(actual2, 0) == expected_enum1
     assert Enum.at(actual2, 1) == expected_enum2
@@ -88,10 +84,9 @@ defmodule Pop3mailTest do
                 filename_charset: "ISO-8859-15", index: 1, inline: false,
                 media_type: "application/octet-stream", path: "mixed"}
 
-    {:ok, content} = :file.read_file("test/pop3mail/fixtures/encoded-word-in-filename.eml")
-    mail_content = :erlang.binary_to_list(content)
-    {:message, header_list, body_char_list} = :epop_message.parse(mail_content)
-    actual    = Pop3mail.decode_body_char_list(header_list, body_char_list)
+    {:ok, mail_content} = :file.read_file("test/pop3mail/fixtures/encoded-word-in-filename.eml")
+    {:message, header_list, body_content} = :epop_message.bin_parse(mail_content)
+    actual    = Pop3mail.decode_body_content(header_list, body_content)
 
     assert length(actual) == 1
     assert actual == [expected]

@@ -7,7 +7,7 @@
 ## Before you start
 
 - This program reads from a POP3 mail server, which means that it can only download mail from the inbox folder. If you want to access other folders you will need an IMAP client.
-- Big attachments requires BIG memory. Decoding an attachment of 12 MB can consume 300 MB of RAM.
+- Big attachments requires BIG memory. Decoding an attachment of 12 MB can consume 80 MB of RAM.
   Elixir programmers can replace the default Pop3mail.Base64Decoder with their own.
 - On linux when there is not enough memory, the program will end as 'Killed.'
   It's killed by the OOM Killer. Run dmesg to see the log message.
@@ -54,7 +54,7 @@ For usage, see usage chapter below.
   1. Add pop3mail and the erlang epop client to your list of dependencies in `mix.exs`:
 
         def deps do
-          [{:pop3mail, "~> 1.1"}, 
+          [{:pop3mail, "~> 1.2"}, 
            {:erlpop, github: "nico-amsterdam/erlpop"}]
         end
 
@@ -98,12 +98,12 @@ $ iex -S mix
 iex(1)> {:ok, client} = :epop_client.connect('user@gmail.com', 'password', 
 ...(1)>   [:ssl, {:addr, 'pop.gmail.com'}, {:port, 995}, {:user, 'user@gmail.com'}])
 iex(2)> :epop_client.stat(client) 
-iex(3)> {:ok, mail_content} = :epop_client.retrieve(client, 1) 
-iex(4)> {:message, header_list, body_char_list } = :epop_message.parse(mail_content)
+iex(3)> {:ok, mail_content} = :epop_client.bin_retrieve(client, 1) 
+iex(4)> {:message, header_list, body_content } = :epop_message.bin_parse(mail_content)
 iex(5)> Pop3mail.header_lookup(header_list, "Subject")
 iex(6)> Pop3mail.header_lookup(header_list, "From")
 iex(7)> Pop3mail.header_lookup(header_list, "Date")
-iex(8)> part_list = Pop3mail.decode_body_char_list(header_list, body_char_list)
+iex(8)> part_list = Pop3mail.decode_body_content(header_list, body_content)
 iex(9)> length(part_list)
 iex(10)> part = Enum.at(part_list, 0)
 iex(11)> part.media_type
@@ -111,8 +111,8 @@ iex(12)> part.filename
 iex(13)> part.charset
 iex(14)> part.content
 iex(15)> :epop_client.delete(client, 1)
-iex(16)> {:ok, mail_content} = :epop_client.retrieve(client, 2) 
-iex(17)> {:message, header_list, body_char_list } = :epop_message.parse(mail_content)
+iex(16)> {:ok, mail_content} = :epop_client.bin_retrieve(client, 2) 
+iex(17)> {:message, header_list, body_content } = :epop_message.bin_parse(mail_content)
 iex(18)> Pop3mail.header_lookup(header_list, "Subject")
 iex(19)> :epop_client.quit(client)
 ```

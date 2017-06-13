@@ -9,11 +9,9 @@ defmodule Pop3mail.Header do
 
    If the searched header name occurs multiple times in the list, the result will be the concatenated comma separated value.
 
-   `header_list` - list with tuples {:header, header name as character list, value as character list}
+   `header_list` - list with tuples {:header, header name, value}
    """
    def lookup(header_list, header_name) do
-     # filter list on name, return comma separated
-     header_name = to_char_list(header_name)
      header_list
      |> Enum.filter_map(fn({:header, name, _}) -> name == header_name end,
                         fn({:header, _,  val}) -> val end)
@@ -25,8 +23,8 @@ defmodule Pop3mail.Header do
 
    filename is `filename_prefix` . `unsafe_addition` . txt
 
-   * `header_list` - list with tuples {:header, header name as character list, value as character list}
-   * `unsafe_addition` - append this to the filename if the filesytem allows it.
+   * `header_list` - list with tuples {:header, header name, value}
+   * `unsafe_addition` - append this to the filename if the filesystem allows it.
    """
    def store(header_list, filename_prefix, filename_addition, dirname) do
       date    = lookup(header_list, "Date")

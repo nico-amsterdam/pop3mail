@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.2.0 (2017-06-13)
+
+* Bug fixes
+  * [issue/2](https://github.com/nico-amsterdam/pop3mail/issues/2) Reduce memory consumption
+
 ## v1.1.0 (2017-02-01)
 
 * Bug fixes

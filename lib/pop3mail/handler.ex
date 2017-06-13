@@ -16,13 +16,13 @@ defmodule Pop3mail.Handler do
       A struct that holds mail content.
 
       It's fields are:
-        * `mail_content` - char list with the complete raw email content
+        * `mail_content` - string with the complete raw email content
         * `mail_loop_counter` - Current number of the email in the retrieval loop. In an POP3 connection each email is numbered, starting at 1.
-        * `header_list` - list with tuples of {:header, header name, header value}. Name and value are character lists.
-        * `body_char_list` - email body. character list.
+        * `header_list` - list with tuples of {:header, header name, header value}.
+        * `body_content` - email body.
       """
 
-      defstruct mail_content: '', mail_loop_counter: 0, header_list: [], body_char_list: ''
+      defstruct mail_content: "", mail_loop_counter: 0, header_list: [], body_content: ""
    end
 
    defmodule Options do
@@ -92,7 +92,7 @@ defmodule Pop3mail.Handler do
       header_result = store_header(mail.header_list, filename_prefix, sender_name, dirname)
 
       # body
-      [header_result] ++ process_and_store_body(mail.header_list, mail.body_char_list, dirname)
+      [header_result] ++ process_and_store_body(mail.header_list, mail.body_content, dirname)
    end
 
    # Store the header and log any errors.
@@ -117,10 +117,10 @@ defmodule Pop3mail.Handler do
    @doc """
    Decode and store body.
 
-   `header_list` - list with tuples of {:header, header name, header value}. Name and value are character lists.
+   `header_list` - list with tuples of {:header, header name, header value}.
    """
-   def process_and_store_body(header_list, body_char_list, dirname) do
-      multipart_part_list = decode_body_char_list(header_list, body_char_list)
+   def process_and_store_body(header_list, body_content, dirname) do
+      multipart_part_list = decode_body_content(header_list, body_content)
 
       # It's worthwhile to free some memory here if there is a big list of attachments
       :erlang.garbage_collect()
@@ -134,16 +134,15 @@ defmodule Pop3mail.Handler do
 
    Returns a list of Pop3mail.Part's.
 
-   `header_list` - list with tuples of {:header, header name, header value}. Name and value are character lists.
+   `header_list` - list with tuples of {:header, header name, header value}.
    """
-   def decode_body_char_list(header_list, body_char_list) do
+   def decode_body_content(header_list, body_content) do
       content_type = Header.lookup(header_list, "Content-Type")
       encoding = Header.lookup(header_list, "Content-Transfer-Encoding")
       # disposition in the header indicates inline or attachment. Can contain a filename
       disposition = Header.lookup(header_list, "Content-Disposition")
 
-      body_binary = :erlang.list_to_binary(body_char_list)
-      Body.decode_body(body_binary, content_type, encoding, disposition)
+      Body.decode_body(body_content, content_type, encoding, disposition)
    end
 
    @doc """
