@@ -7,8 +7,8 @@
 ## Before you start
 
 - This program reads from a POP3 mail server, which means that it can only download mail from the inbox folder. If you want to access other folders you will need an IMAP client.
-- Big attachments requires BIG memory. Decoding an attachment of 12 MB can consume 80 MB of RAM.
-  Elixir programmers can replace the default Pop3mail.Base64Decoder with their own.
+- Handling big attachments requires some processing memory. Normally the program needs about 30Mb RAM, but to process an email with attachments it temporary needs 3 till 4 times of the total size of the email attachments as additional memory.
+- Elixir programmers can replace the default Pop3mail.Base64Decoder with their own.
 - On linux when there is not enough memory, the program will end as 'Killed.'
   It's killed by the OOM Killer. Run dmesg to see the log message.
 - On windows when there is not enough memory the program get stuck, or worse windows get stuck. 
@@ -22,6 +22,23 @@
 Gmail users:
 - Whether the read mail is permanently deleted or not, depends on your Gmail settings, and not on the delete parameter of this program. 
 - Gmail returns chunks of maximum 250-350 emails. Repeatedly run this program to get all emails.
+
+## Upgrade instructions 1.1.0 to 1.2.0
+
+Version 1.2.0 of Pop3mail consumes far less memory as 1.1.0 when handling big attachments.
+Erlpop now has additional functions epop_client.bin_retrieve and epop_message.bin_parse. Erlpop is backwards compatible.
+
+Pop3mail requires the latest Erlpop. Run these commands to upgrade:
+
+```sh
+$ mix deps.update  erlpop
+$ mix deps.compile erlpop
+```
+
+Pop3mail biggest changes:
+- The function decode_body_char_list is replaced with decode_body_content.
+- Pop3mail functions which previously used char list parameters and return values, now use strings.
+- The base64 decoder now must ignore whitespace.
 
 
 ## Installation from scratch
