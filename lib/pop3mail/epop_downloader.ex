@@ -103,8 +103,8 @@ defmodule Pop3mail.EpopDownloader do
                                if options.delete do
                                  :ok = :epop_client.delete(epop_client, mail_loop_counter)
                                end
-                               # It's really time now to clean things up
-                               :erlang.garbage_collect()
+                               # It might be time now to clean things up:
+                               # :erlang.garbage_collect()
                                result
         {:error, reason} -> Logger.error reason; {:error, reason}
       end
