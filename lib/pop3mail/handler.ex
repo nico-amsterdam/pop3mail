@@ -122,9 +122,6 @@ defmodule Pop3mail.Handler do
    def process_and_store_body(header_list, body_content, dirname) do
       multipart_part_list = decode_body_content(header_list, body_content)
 
-      # It's worthwhile to free some memory here if there is a big list of attachments
-      :erlang.garbage_collect()
-
       # store mail body, the multipart parts
       Body.store_multiparts(multipart_part_list, dirname)
    end
