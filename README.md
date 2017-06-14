@@ -38,7 +38,8 @@ $ mix deps.compile erlpop
 Pop3mail biggest changes:
 - The function decode_body_char_list is replaced with decode_body_content.
 - Pop3mail functions which previously used char list parameters and return values, now use strings.
-- The base64 decoder now must ignore whitespace.
+- Base64Decoder.decodes_lines! is replaced with Base64Decode.decode!
+  It decodes the encoded text and ignores carriage returns and linefeeds.
 
 
 ## Installation from scratch
