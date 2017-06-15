@@ -23,25 +23,6 @@ Gmail users:
 - Whether the read mail is permanently deleted or not, depends on your Gmail settings, and not on the delete parameter of this program. 
 - Gmail returns chunks of maximum 250-350 emails. Repeatedly run this program to get all emails.
 
-## Upgrade instructions 1.1.0 to 1.2.0
-
-Version 1.2.0 of Pop3mail consumes far less memory as 1.1.0 when handling big attachments.
-Erlpop now has additional functions epop_client.bin_retrieve and epop_message.bin_parse. Erlpop is backwards compatible.
-
-Pop3mail requires the latest Erlpop. Run these commands to upgrade:
-
-```sh
-$ mix deps.update  erlpop
-$ mix deps.compile erlpop
-```
-
-Pop3mail biggest changes:
-- The function decode_body_char_list is replaced with decode_body_content.
-- Pop3mail functions which previously used char list parameters and return values, now use strings.
-- Base64Decoder.decodes_lines! is replaced with Base64Decode.decode!
-  It decodes the encoded text and ignores carriage returns and linefeeds.
-
-
 ## Installation from scratch
 
 ### Install Elixir
@@ -75,6 +56,25 @@ For usage, see usage chapter below.
           [{:pop3mail, "~> 1.2"}, 
            {:erlpop, github: "nico-amsterdam/erlpop"}]
         end
+
+
+### Upgrade instructions 1.1.0 to 1.2.0
+
+Version 1.2.0 of Pop3mail consumes far less memory as 1.1.0 when handling big attachments.
+Erlpop now has additional functions epop_client.bin_retrieve and epop_message.bin_parse. Erlpop is backwards compatible.
+
+Pop3mail requires the latest Erlpop. Run these commands to upgrade:
+
+```sh
+$ mix deps.update  erlpop
+$ mix deps.compile erlpop
+```
+
+Pop3mail biggest changes:
+- The function decode_body_char_list is replaced with decode_body_content.
+- Pop3mail functions which previously used character list parameters, now use strings.
+- Base64Decoder.decodes_lines! is replaced with Base64Decode.decode!
+  It decodes the encoded text and ignores carriage returns and linefeeds.
 
 ## Usage
 
