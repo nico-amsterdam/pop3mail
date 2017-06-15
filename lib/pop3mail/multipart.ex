@@ -411,7 +411,7 @@ defmodule Pop3mail.Multipart do
          "quoted-printable" -> text
                                |> QuotedPrintable.decode
                                |> :erlang.list_to_binary
-         "base64" -> text |> decode_base64!
+         "base64" -> decode_base64!(text)
          # others: for example: 7bit
          _ -> text
        end
