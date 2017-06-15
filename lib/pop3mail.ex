@@ -24,7 +24,7 @@ defmodule Pop3mail do
        info:  297 emails, 57.643.477 bytes total.
        info:    Process mail 1: Mon, 13 Oct 2015 18:34:07 +0200
        info:      message1.txt
-       info:      message1.html
+       info:      message2.html
        info:      Solution Skolem problem.docx
        info:    Process mail 2: Mon, 13 Oct 2015 19:38:14 +0200
        info:      message1.iso-8859-1.txt
@@ -91,10 +91,10 @@ defmodule Pop3mail do
      Retrieve email via epop_client and lookup headers 'Data', 'Subject' and 'From' and close the connection.
 
        iex(1)> # notice that you must use single quotes here
-       iex(2)> {:ok, client} = :epop_client.connect('user@gmail.com', 'password', [{:addr, 'pop.gmail.com'},{:port,995},:ssl])
+       iex(2)> {:ok, client} = :epop_client.connect('user@gmail.com', 'password', [{:addr, 'pop.gmail.com'},{:port,995},{:user, 'user@gmail.com'},:ssl])
        iex(3)> :epop_client.stat(client)
-       iex(4)> {:ok, mail_content} = :epop_client.retrieve(client, 1)
-       iex(5)> {:message, header_list, body_content } = :epop_message.parse(mail_content)
+       iex(4)> {:ok, mail_content} = :epop_client.bin_retrieve(client, 1)
+       iex(5)> {:message, header_list, body_content } = :epop_message.bin_parse(mail_content)
        iex(6)> Pop3mail.header_lookup(header_list, "Subject")
        "Solution Skolem problem"
        iex(7)> Pop3mail.header_lookup(header_list, "From")
@@ -148,8 +148,8 @@ defmodule Pop3mail do
        iex(1)> # notice that you must use single quotes here
        iex(2)> {:ok, client} = :epop_client.connect('user@gmail.com', 'password', [{:addr, 'pop.gmail.com'},{:port,995},:ssl])
        iex(3)> :epop_client.stat(client)
-       iex(4)> {:ok, mail_content} = :epop_client.retrieve(client, 1)
-       iex(5)> {:message, header_list, body_content } = :epop_message.parse(mail_content)
+       iex(4)> {:ok, mail_content} = :epop_client.bin_retrieve(client, 1)
+       iex(5)> {:message, header_list, body_content } = :epop_message.bin_parse(mail_content)
        iex(6)> Pop3mail.decode_body_content(header_list, body_content)
        [%Pop3mail.Part{boundary: "--_com.android.email_1191110031918720",
          charset: "utf-8",

@@ -22,6 +22,6 @@ defmodule Pop3mail.Base64Decoder do
    end
 
    @doc "Decode base64 encoded text, ignoring carriage returns and linefeeds. Returns binary."
-   defdelegate decode!(lines), to: @base64_decoder
+   defdelegate decode!(encoded_text), to: @base64_decoder
 
 end
