@@ -146,7 +146,7 @@ defmodule Pop3mail do
      Retrieve email via epop_client and decode body and close the connection.
 
        iex(1)> # notice that you must use single quotes here
-       iex(2)> {:ok, client} = :epop_client.connect('user@gmail.com', 'password', [{:addr, 'pop.gmail.com'},{:port,995},:ssl])
+       iex(2)> {:ok, client} = :epop_client.connect('user@gmail.com', 'password', [{:addr, 'pop.gmail.com'},{:port,995},{:user, 'user@gmail.com'},:ssl])
        iex(3)> :epop_client.stat(client)
        iex(4)> {:ok, mail_content} = :epop_client.bin_retrieve(client, 1)
        iex(5)> {:message, header_list, body_content } = :epop_message.bin_parse(mail_content)
