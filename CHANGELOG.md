@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.2.1 (2017-06-16)
+
+* Bug fixes
+  * Support RFC 2557 Content-Location header.
+
 ## v1.2.0 (2017-06-13)
 
 * Bug fixes

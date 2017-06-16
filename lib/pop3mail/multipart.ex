@@ -160,6 +160,7 @@ defmodule Pop3mail.Multipart do
          String.starts_with?(lc_line, "content-transfer-encoding:") -> parse_part_transfer_encoding(multipart_part, encoding, all_lines)
          String.starts_with?(lc_line, "content-disposition:")       -> parse_part_disposition(multipart_part, encoding, all_lines)
          String.starts_with?(lc_line, "content-id:")                -> parse_part_content_id(multipart_part, encoding, all_lines)
+         String.starts_with?(lc_line, "content-location:")          -> parse_part_content_location(multipart_part, encoding, all_lines)
          is_skip_header(lc_line)                                    -> parse_part_skip(multipart_part, encoding, all_lines)
          is_unknown_header(lc_line)                                 -> parse_part_unknown_header(multipart_part, encoding, all_lines)
          true -> parse_part_finish(multipart_part, encoding, all_lines)
@@ -301,6 +302,24 @@ defmodule Pop3mail.Multipart do
        {content_id, split_lines} = lines_continued(content_id, otherlines)
        # Logger.debug "      Content-ID: " <> content_id
        multipart_part = %{multipart_part | content_id: content_id}
+       parse_part_lines(multipart_part, encoding, split_lines)
+   end
+
+   @doc """
+   Parse multipart Content-Location header line as defined in RFC 2557. Returns a Pop3mail.Part
+
+   * `multipart_part` - Pop3mail.Part input
+   * `encoding` - For example: base64, quoted-printable, 7bit, 8bit, etc.
+   * `list` - lines
+   """
+   def parse_part_content_location(multipart_part, encoding, [line | otherlines]) do
+       content_location = line
+                          |> String.slice(String.length("content-location:")..-1)
+                          |> String.strip
+                          |> StringUtils.unquoted
+       {content_location, split_lines} = lines_continued(content_location, otherlines)
+       # Logger.debug "      Content-Location: " <> content_location
+       multipart_part = %{multipart_part | content_location: content_location}
        parse_part_lines(multipart_part, encoding, split_lines)
    end
 
