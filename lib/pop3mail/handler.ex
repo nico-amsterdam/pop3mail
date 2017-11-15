@@ -163,13 +163,13 @@ defmodule Pop3mail.Handler do
      if length(from_splitted) >= 2 do
         from_name = from_splitted
                     |> Enum.at(0)
-                    |> String.strip
+                    |> String.trim
                     |> StringUtils.unquoted
         if String.length(from_name) == 0 do
            # can only pick up the email between the < > brackets
            from_splitted
            |> Enum.at(1)
-           |> String.strip
+           |> String.trim
         else
            remove_encodings(from_name)
         end

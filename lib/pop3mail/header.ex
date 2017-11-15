@@ -13,8 +13,8 @@ defmodule Pop3mail.Header do
    """
    def lookup(header_list, header_name) do
      header_list
-     |> Enum.filter_map(fn({:header, name, _}) -> name == header_name end,
-                        fn({:header, _,  val}) -> val end)
+     |> Enum.filter(fn({:header, name, _}) -> name == header_name end)
+     |> Enum.map(   fn({:header, _,  val}) -> val end)
      |> Enum.join(", ")
    end
 

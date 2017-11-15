@@ -33,9 +33,9 @@ defmodule Pop3mail.EpopDownloader do
    `options` - EpopDownloader.Options
    """
    def download(options) do
-     username = to_char_list(options.username)
-     password = to_char_list(options.password)
-     server = to_char_list(options.server)
+     username = to_charlist(options.username)
+     password = to_charlist(options.password)
+     server = to_charlist(options.server)
      connect_options = [{:addr, server}, {:port, options.port}, {:user, username}]
      connect_options =
        case is_nil(options.ssl) or options.ssl do

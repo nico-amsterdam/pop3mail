@@ -129,7 +129,7 @@ defmodule Pop3mail.Multipart do
    def parse_part_finish(multipart_part, encoding, [line | otherlines]) do
      # there should be an empty line after the headers
      otherlines =
-        if String.length(String.strip(line)) > 0 do
+        if String.length(String.trim(line)) > 0 do
            # this is not always the case or we have an unknown header here.
            Logger.warn "    Missing newline or unknown header in body" <> StringUtils.printable(" at line: " <> line)
            # fix; don't skip line
@@ -239,7 +239,7 @@ defmodule Pop3mail.Multipart do
    def parse_content_type_parameters(multipart_part, content_type_parameters) do
        first_content_type_parameter =  List.first(content_type_parameters) || ""
        media_type = first_content_type_parameter
-                    |> String.strip
+                    |> String.trim
                     |> StringUtils.unquoted
                     |> String.downcase
 
@@ -265,7 +265,7 @@ defmodule Pop3mail.Multipart do
       case StringUtils.contains?(boundary_keyval, "=") do
         true  ->
            value = get_value(boundary_keyval)
-           boundary_name = value |> String.strip |> StringUtils.unquoted
+           boundary_name = value |> String.trim |> StringUtils.unquoted
            %{multipart_part | boundary: boundary_name}
         false -> multipart_part
       end
@@ -276,7 +276,7 @@ defmodule Pop3mail.Multipart do
       case StringUtils.contains?(charset_keyval, "=") do
         true  ->
            value = get_value(charset_keyval)
-           charset = value |> String.strip |> StringUtils.unquoted |> String.downcase
+           charset = value |> String.trim |> StringUtils.unquoted |> String.downcase
            %{multipart_part | charset: charset}
         false -> multipart_part
       end
@@ -297,7 +297,7 @@ defmodule Pop3mail.Multipart do
    def parse_part_content_id(multipart_part, encoding, [line | otherlines]) do
        content_id = line
                     |> String.slice(String.length("content-id:")..-1)
-                    |> String.strip
+                    |> String.trim
                     |> StringUtils.unquoted
        {content_id, split_lines} = lines_continued(content_id, otherlines)
        # Logger.debug "      Content-ID: " <> content_id
@@ -315,7 +315,7 @@ defmodule Pop3mail.Multipart do
    def parse_part_content_location(multipart_part, encoding, [line | otherlines]) do
        content_location = line
                           |> String.slice(String.length("content-location:")..-1)
-                          |> String.strip
+                          |> String.trim
                           |> StringUtils.unquoted
        {content_location, split_lines} = lines_continued(content_location, otherlines)
        # Logger.debug "      Content-Location: " <> content_location
@@ -333,7 +333,7 @@ defmodule Pop3mail.Multipart do
    def parse_part_transfer_encoding(multipart_part, _, [line | otherlines]) do
        encoding = line
                   |> String.slice(String.length("content-transfer-encoding:")..-1)
-                  |> String.strip
+                  |> String.trim
                   |> StringUtils.unquoted
        {encoding, split_lines} = lines_continued(encoding, otherlines)
        # Logger.debug "      Encoding: " <> encoding
@@ -408,7 +408,7 @@ defmodule Pop3mail.Multipart do
    def parse_disposition_parameters(multipart_part, disposition_parameters) do
       type = disposition_parameters
              |> Enum.at(0)
-             |> String.strip
+             |> String.trim
              |> String.downcase
       multipart_part =
          if String.length(type) > 0 do
@@ -465,9 +465,10 @@ defmodule Pop3mail.Multipart do
    def extract_and_set_filename(multipart_part, content_parameters, parametername) do
        # search for (file)name = value occurrences and concat them
 
-       name_parts = Enum.filter_map(content_parameters,
-                        fn(param)     -> String.contains?(param, "=") and String.starts_with?(String.downcase(param), parametername) end,
-                        &map_parameter(&1))
+       name_parts = content_parameters
+                  |> Enum.filter(fn(param) -> String.contains?(param, "=") and 
+                                              String.starts_with?(String.downcase(param), parametername) end)
+                  |> Enum.map(&map_parameter(&1))
        case length(name_parts) > 0 do
           true  -> extract_and_set_filename_from_name_parts(multipart_part, name_parts)
           false -> multipart_part
@@ -480,7 +481,7 @@ defmodule Pop3mail.Multipart do
       with_charset = (key_value =~ ~r/^[^=]*\*=/)
       value = get_value(key_value)
       unquoted_value = value
-                       |> String.strip
+                       |> String.trim
                        |> StringUtils.unquoted
       {param_number, with_charset, unquoted_value}
    end
