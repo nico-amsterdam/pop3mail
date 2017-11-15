@@ -60,7 +60,7 @@ defmodule Pop3mail.CLI do
    end
 
    # All parameters are parsed succesful, so take the options, apply defaults and call the download function.
-   defp process_options(options,[],[]) do
+   defp process_options(options, [], []) do
      username = options[:username] || ask("Please enter your email account name: ")
      password = options[:password] || ask("Please enter your password: ")
      epop_options = %EpopDownloader.Options{
@@ -79,7 +79,7 @@ defmodule Pop3mail.CLI do
    end
 
    # there are incorrect commandline parameters
-   defp process_options(_,illegal_args,failed_options) do
+   defp process_options(_, illegal_args, failed_options) do
      all_errors = illegal_args ++ failed_options
      show_error(all_errors)
      {:error, all_errors}

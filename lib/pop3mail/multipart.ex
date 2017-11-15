@@ -497,9 +497,9 @@ defmodule Pop3mail.Multipart do
       name_parts = sort_name_parts(name_parts)
       # RFC 2231
       # When the regex above ~r/^[^=]*\*=/ matches filename*= or filename*0*= it indicates that there should be encoding
-      {_,with_charset,_} = Enum.at(name_parts, 0)
+      {_, with_charset, _} = Enum.at(name_parts, 0)
       filename = name_parts
-                 |> Enum.map(fn({_,_,val}) -> val end)
+                 |> Enum.map(fn({_, _, val}) -> val end)
                  |> Enum.join
       {filename, charset} = decode_filename_and_charset(filename, charset, with_charset)
       if String.length(filename) > 0 do
@@ -518,7 +518,7 @@ defmodule Pop3mail.Multipart do
    # Sort them anyway.
    defp sort_name_parts(name_parts) do
       case length(name_parts) > 1 do
-         true  -> Enum.sort(name_parts, fn({a,_,_},{b,_,_}) -> a <= b end)
+         true  -> Enum.sort(name_parts, fn({a, _, _}, {b, _, _}) -> a <= b end)
          false -> name_parts
       end
    end

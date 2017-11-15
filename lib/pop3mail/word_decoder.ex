@@ -24,7 +24,7 @@ defmodule Pop3mail.WordDecoder do
         input_text = Regex.replace(~r/(=\?[\w-]+\?[BQbq]\?[^\s]*\?=)\s+(?==\?[\w-]+\?[BQbq]\?[^\s]*\?=)/U, input_text, "\\1\\2")
 
         # make a list with us-ascii text and encoded-word's separated
-        text_list = Regex.split(~r/()=\?[\w-]+\?[BQbq]\?[^\s]*\?=()/U, input_text, on: [1,2])
+        text_list = Regex.split(~r/()=\?[\w-]+\?[BQbq]\?[^\s]*\?=()/U, input_text, on: [1, 2])
 
         text_list
         |> Enum.filter(fn(x) -> x != "" end)

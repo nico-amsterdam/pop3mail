@@ -99,7 +99,7 @@ defmodule Pop3mail.EpopDownloader do
    """
    def retrieve_and_store(epop_client, mail_loop_counter, options) do
       case :epop_client.bin_retrieve(epop_client, mail_loop_counter) do
-        {:ok, mail_content} -> result = parse_process_and_store(mail_content, mail_loop_counter, options.delivered ,options.save_raw , options.output_dir)
+        {:ok, mail_content} -> result = parse_process_and_store(mail_content, mail_loop_counter, options.delivered, options.save_raw , options.output_dir)
                                if options.delete do
                                  :ok = :epop_client.delete(epop_client, mail_loop_counter)
                                end
