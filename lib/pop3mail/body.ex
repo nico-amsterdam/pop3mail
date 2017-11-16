@@ -40,7 +40,8 @@ defmodule Pop3mail.Body do
       result = FileStore.store_part(multipart_part, base_dir)
       case result do
         {:ok, _} -> result
-        {:error, reason, _} -> Logger.error reason; result
+        {:error, reason, _} -> Logger.error(reason)
+                               result
       end
    end
 

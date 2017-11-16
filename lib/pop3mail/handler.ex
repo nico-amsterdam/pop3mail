@@ -100,7 +100,8 @@ defmodule Pop3mail.Handler do
       result = Header.store(header_list, filename_prefix, sender_name, dirname)
       case result do
            {:ok, _} -> result
-           {:error, reason, _} -> Logger.error reason; result
+           {:error, reason, _} -> Logger.error(reason)
+                                  result
       end
    end
 
@@ -110,7 +111,8 @@ defmodule Pop3mail.Handler do
       result = FileStore.store_raw(mail_content, "raw.eml", dirname)
       case result do
            {:ok, _} -> result
-           {:error, reason, _} -> Logger.error reason; result
+           {:error, reason, _} -> Logger.error(reason)
+                                  result
       end
    end
 

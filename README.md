@@ -53,7 +53,7 @@ For usage, see usage chapter below.
   1. Add pop3mail and the erlang epop client to your list of dependencies in `mix.exs`:
 
         def deps do
-          [{:pop3mail, "~> 1.2"}, 
+          [{:pop3mail, "~> 1.3"}, 
            {:erlpop, github: "nico-amsterdam/erlpop"}]
         end
 
@@ -156,6 +156,10 @@ Now your email client should download all mail again.
 If you get an error 'web login required', push the 'Continue' button in the browser:
 
 https://accounts.google.com/DisplayUnlockCaptcha
+
+Also check these settings:
+
+https://myaccount.google.com/lesssecureapps
 
 
 ## License

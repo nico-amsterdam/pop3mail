@@ -445,7 +445,8 @@ defmodule Pop3mail.Multipart do
      try do
         Base64Decoder.decode!(text)
      rescue
-        _ -> Logger.warn "    Invalid encoded base64 content. Please check."; "ERROR: invalid base64 encoded text:\n" <> text
+        _ -> Logger.warn("    Invalid encoded base64 content. Please check.")
+             "ERROR: invalid base64 encoded text:\n" <> text
      end
    end
 

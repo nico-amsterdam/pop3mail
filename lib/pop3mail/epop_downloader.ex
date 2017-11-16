@@ -44,7 +44,8 @@ defmodule Pop3mail.EpopDownloader do
        end
      case :epop_client.connect(ensure_at_symbol(username, server), password, connect_options) do
        {:ok,    client} -> retrieve_and_store_all(client, options)
-       {:error, reason} -> Logger.error reason; {:error, reason}
+       {:error, reason} -> Logger.error(reason)
+                           {:error, reason}
      end
    end
 
@@ -106,7 +107,8 @@ defmodule Pop3mail.EpopDownloader do
                                # It might be time now to clean things up:
                                # :erlang.garbage_collect()
                                result
-        {:error, reason} -> Logger.error reason; {:error, reason}
+        {:error, reason} -> Logger.error(reason)
+                            {:error, reason}
       end
    end
 
@@ -138,7 +140,9 @@ defmodule Pop3mail.EpopDownloader do
         :epop_message.bin_parse(mail_content)
       rescue
         # parse error
-        e in ErlangError -> {error, reason} = e.original; Logger.error "  #{error}: #{reason}"; {error, mail_content}
+        e in ErlangError -> {error, reason} = e.original
+                            Logger.error("  #{error}: #{reason}")
+                            {error, mail_content}
       end
    end
 
