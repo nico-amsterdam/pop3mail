@@ -51,12 +51,12 @@ For usage, see usage chapter below.
 ## Install in an Elixir project
 
   1. Add pop3mail and the erlang epop client to your list of dependencies in `mix.exs`:
-
+```
         def deps do
           [{:pop3mail, "~> 1.3"}, 
            {:erlpop, github: "nico-amsterdam/erlpop"}]
         end
-
+```
 
 ### Upgrade instructions 1.1.0 to 1.2.0
 
