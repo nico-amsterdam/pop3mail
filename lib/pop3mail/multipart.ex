@@ -64,7 +64,7 @@ defmodule Pop3mail.Multipart do
      multipart = Enum.at(multipart_list, 0)
      # split at --boundary
      [_ | parts] = String.split(multipart, "--" <> boundary_name <> "\r\n")
-     if length(parts) == 0 do
+     if parts == [] do
         Logger.warn "    Boundary #{boundary_name} not found."
         []
      else
