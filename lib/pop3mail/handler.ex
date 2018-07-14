@@ -22,6 +22,7 @@ defmodule Pop3mail.Handler do
         * `body_content` - email body.
       """
 
+      @type t :: %Mail{mail_content: String.t, mail_loop_counter: integer, header_list: list({:header, String.t, String.t}), body_content: String.t}
       defstruct mail_content: "", mail_loop_counter: 0, header_list: [], body_content: ""
    end
 
@@ -36,10 +37,12 @@ defmodule Pop3mail.Handler do
         * `base_dir` - directory where the emails must be stored.
       """
 
+      @type t :: %Options{delivered: boolean | nil, save_raw: boolean, base_dir: String.t}
       defstruct delivered: nil, save_raw: false, base_dir: ""
    end
 
 
+   @spec check_process_and_store(Mail.t, Options.t) :: list({:ok, String.t} | {:error, String.t, String.t}) | {:skip, list({:header, String.t, String.t})}
    @doc """
    Check if the mail must be skipped, if not process and store the email.
 
@@ -66,6 +69,7 @@ defmodule Pop3mail.Handler do
       String.length(delivered_to) > 2
    end
 
+   @spec process_and_store(Mail.t, Options.t) :: list({:ok, String.t} | {:error, String.t, String.t})
    @doc """
    Create directory for the email based on date andd subject, save raw email, store header summary and store everything from the body.
 
@@ -82,7 +86,7 @@ defmodule Pop3mail.Handler do
       # create directory based on date received
       dirname = FileStore.mkdir(options.base_dir, date_dirname, remove_encodings(subject))
 
-      if options.save_raw, do: save_raw(mail.mail_content, dirname)
+      _ = if options.save_raw, do: save_raw(mail.mail_content, dirname)
 
       filename_prefix = "header"
       # you get a sender name with removed encodings

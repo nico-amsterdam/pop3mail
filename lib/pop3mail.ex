@@ -41,6 +41,7 @@ defmodule Pop3mail do
        usage: ...
 
    """
+   @spec cli(list(String.t)) :: :ok | {:ok, integer} | {:error, String.t}
    def cli(args) do
       Pop3mail.CLI.main(args)
    end
@@ -67,6 +68,7 @@ defmodule Pop3mail do
        iex(1)> Pop3mail.download(%{"max" => 2, "raw" => true, "username" => "hendrik.lorentz@gmail.com", "password" => "secret", "output" => "mailbox"})
 
    """
+   @spec download(keyword) :: {:ok, integer} | {:error, String.t}
    def download(params) do
      epop_options = %Pop3mail.EpopDownloader.Options{
        username:   params["username"],
@@ -104,6 +106,7 @@ defmodule Pop3mail do
        iex(9)> :epop_client.quit(client)
 
    """
+   @spec header_lookup(list({:header, String.t, String.t}), String.t) :: String.t
    def header_lookup(header_list, header_name) do
       Pop3mail.Header.lookup(header_list, header_name)
    end
@@ -134,6 +137,7 @@ defmodule Pop3mail do
        [{"us-ascii", "chinese"}]
 
    """
+   @spec decode_words(String.t) :: list({String.t, binary})
    def decode_words(text) do
       Pop3mail.WordDecoder.decode_text(text)
    end
@@ -164,6 +168,7 @@ defmodule Pop3mail do
        iex(7)> :epop_client.quit(client)
 
    """
+   @spec decode_body_content(list({:header, String.t, String.t}), String.t) :: list(%Pop3mail.Part{})
    def decode_body_content(header_list, body_content) do
       Pop3mail.Handler.decode_body_content(header_list, body_content)
    end
@@ -246,6 +251,7 @@ defmodule Pop3mail do
          path: "related"}]
 
    '''
+   @spec decode_body(binary, String.t) :: list(%Pop3mail.Part{})
    def decode_body(body_text, content_type \\ "text/plain; charset=us-ascii", encoding \\ "7bit", disposition \\ "inline") do
      Pop3mail.Body.decode_body(body_text, content_type, encoding, disposition)
    end
@@ -266,12 +272,17 @@ defmodule Pop3mail do
         ok: "testoutput/20140904_192315_Re_appointment/message1.iso-8859-1.txt"]
 
    """
+   @spec decode_raw_file(String.t, String.t) :: {:error, String.t} | {String.t | atom, binary}
    def decode_raw_file(filename, output_dir) do
       unless File.dir?(output_dir), do: File.mkdir! output_dir
       case :file.read_file(filename) do
          {:ok, mail_content}  -> mail_content |> Pop3mail.EpopDownloader.parse_process_and_store(1, nil, false, output_dir)
-         {:error, :enoent}    -> IO.puts(:stderr, "File '" <> filename <> "' not found.")
-         {:error, error_code} -> IO.puts(:stderr, "Error: #{error_code}")
+         {:error, :enoent}    -> reason = "File '" <> filename <> "' not found."
+                                 IO.puts(:stderr, reason)
+                                 {:error, reason}
+         {:error, error_code} -> reason = "Error: #{error_code}"
+                                 IO.puts(:stderr, reason)
+                                 {:error, reason}
       end
    end
 
