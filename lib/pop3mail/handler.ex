@@ -42,7 +42,7 @@ defmodule Pop3mail.Handler do
    end
 
 
-   @spec check_process_and_store(Mail.t, Options.t) :: list({:ok, String.t} | {:error, String.t, String.t}) | {:skip, list({:header, String.t, String.t})}
+   # @spec check_process_and_store(Mail.t, Options.t) :: list({:ok, String.t} | {:error, String.t, String.t}) | {:skip, list({:header, String.t, String.t})}
    @doc """
    Check if the mail must be skipped, if not process and store the email.
 
@@ -125,6 +125,7 @@ defmodule Pop3mail.Handler do
 
    `header_list` - list with tuples of {:header, header name, header value}.
    """
+   @spec process_and_store_body(list({:header, String.t, String.t}), String.t, String.t) :: list({:ok, String.t} | {:error, String.t, String.t})
    def process_and_store_body(header_list, body_content, dirname) do
       multipart_part_list = decode_body_content(header_list, body_content)
 
@@ -139,6 +140,7 @@ defmodule Pop3mail.Handler do
 
    `header_list` - list with tuples of {:header, header name, header value}.
    """
+   @spec decode_body_content(list({:header, String.t, String.t}), String.t) :: list(Pop3mail.Part.t)
    def decode_body_content(header_list, body_content) do
       content_type = Header.lookup(header_list, "Content-Type")
       encoding = Header.lookup(header_list, "Content-Transfer-Encoding")
@@ -163,6 +165,7 @@ defmodule Pop3mail.Handler do
    end
 
    @doc "Extract the sender name from the email 'From' header."
+   @spec get_sender_name(String.t) :: String.t
    def get_sender_name(from) do
      from_splitted = String.split(from, ~r/[<>]/)
      # if the format was:  name <email adres> you should have a array of 2

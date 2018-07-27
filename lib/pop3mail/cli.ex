@@ -33,6 +33,7 @@ defmodule Pop3mail.CLI do
    end
 
    @doc "Call main with parameters. E.g. main([\"--username=a.b@gmail.com\", \"--password=secret\"]). Call with --help to get a list of all parameters."
+   @spec main(list(String.t)) :: {:ok, integer} | {:error, String.t}
    def main(args) do
      {options, illegal_args, failed_options} = OptionParser.parse(args, strict: [
          password:   :string,
@@ -101,8 +102,10 @@ defmodule Pop3mail.CLI do
    end
 
    @doc "print usage line and a description for all parameters."
+   @spec show_help() :: {:ok, 0}
    def show_help do
      IO.puts usage_text()
+     {:ok, 0}
    end
 
 end

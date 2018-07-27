@@ -41,7 +41,7 @@ defmodule Pop3mail do
        usage: ...
 
    """
-   @spec cli(list(String.t)) :: :ok | {:ok, integer} | {:error, String.t}
+   @spec cli(list(String.t)) :: {:ok, integer} | {:error, String.t}
    def cli(args) do
       Pop3mail.CLI.main(args)
    end
@@ -168,7 +168,7 @@ defmodule Pop3mail do
        iex(7)> :epop_client.quit(client)
 
    """
-   @spec decode_body_content(list({:header, String.t, String.t}), String.t) :: list(%Pop3mail.Part{})
+   @spec decode_body_content(list({:header, String.t, String.t}), String.t) :: list(Pop3mail.Part.t)
    def decode_body_content(header_list, body_content) do
       Pop3mail.Handler.decode_body_content(header_list, body_content)
    end
@@ -251,7 +251,7 @@ defmodule Pop3mail do
          path: "related"}]
 
    '''
-   @spec decode_body(binary, String.t) :: list(%Pop3mail.Part{})
+   @spec decode_body(binary, String.t) :: list(Pop3mail.Part.t)
    def decode_body(body_text, content_type \\ "text/plain; charset=us-ascii", encoding \\ "7bit", disposition \\ "inline") do
      Pop3mail.Body.decode_body(body_text, content_type, encoding, disposition)
    end

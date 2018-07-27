@@ -23,6 +23,7 @@ defmodule Pop3mail.Multipart do
 
    `multipart_part` - Pop3mail.Part input.
    """
+   # @spec parse_content(Pop3mail.Part.t) :: list(Pop3mail.Part.t) 
    def parse_content(multipart_part) do
       if is_multipart?(multipart_part) do
          extra_path  = multipart_part.media_type |> String.split("/") |> List.last
@@ -31,7 +32,8 @@ defmodule Pop3mail.Multipart do
          top_level_multipart_part_list = parse_multipart(multipart_part.boundary, multipart_part.content, new_path)
 
          # multiparts can contain other multiparts, go deeper
-         Enum.flat_map(top_level_multipart_part_list, &(parse_content(&1)))
+         l = Enum.flat_map(top_level_multipart_part_list, &(parse_content(&1)))
+         l
       else
          # ready
          [multipart_part]
@@ -45,6 +47,7 @@ defmodule Pop3mail.Multipart do
 
    `multipart_part` - Pop3mail.Part
    """
+   # @spec is_multipart?(Pop3mail.Part.t) :: boolean
    def is_multipart?(multipart_part) do
       multipart_part.media_type
       |> String.downcase
@@ -58,6 +61,7 @@ defmodule Pop3mail.Multipart do
    * `boundary_name` - multipart boundary to search for
    * `path` - path in the multipart hierarchy. For example: relative/alternative
    """
+   @spec parse_multipart(String.t, String.t, String.t) :: list(Pop3mail.Part.t)
    def parse_multipart(boundary_name, raw_content, path) do
      # get text till end boundary
      multipart_list = String.split(raw_content, "--" <> boundary_name <> "--")
@@ -221,6 +225,7 @@ defmodule Pop3mail.Multipart do
 
    `multipart_part` - Pop3mail.Part input
    """
+   @spec parse_content_type(Pop3mail.Part.t, String.t) :: Pop3mail.Part.t 
    def parse_content_type(multipart_part, content_type) do
       if String.length(content_type) > 0 do
          content_type_parameters = String.split(content_type, ~r/\s*;\s*/)
@@ -236,6 +241,7 @@ defmodule Pop3mail.Multipart do
    * `multipart_part` - Pop3mail.Part input
    * `content_type_parameters` - list of parameters in the format key=value
    """
+   @spec parse_content_type(Pop3mail.Part.t, list(String.t)) :: Pop3mail.Part.t
    def parse_content_type_parameters(multipart_part, content_type_parameters) do
        first_content_type_parameter =  List.first(content_type_parameters) || ""
        media_type = first_content_type_parameter
@@ -463,6 +469,7 @@ defmodule Pop3mail.Multipart do
      filename\*1\*=%2A%2A%2Afun%2A%2A%2A%20<br>
      filename\*2="isn't it!"
    """
+   @spec extract_and_set_filename(Pop3mail.Part.t, list(String.t), String.t) :: Pop3mail.Part.t
    def extract_and_set_filename(multipart_part, content_parameters, parametername) do
        # search for (file)name = value occurrences and concat them
 
@@ -488,6 +495,7 @@ defmodule Pop3mail.Multipart do
    end
 
    @doc "Get parameter number of key_value. `key_value` - format must be: key=value or key*<parameter number>*=value or key*=value. Returns string. Can be empty."
+   @spec get_param_number(String.t) :: String.t
    def get_param_number(key_value) do
       String.replace(key_value, ~r/^[^=\d]*(\d*)\*?=.*/, "\\1")
    end

@@ -19,6 +19,8 @@ defmodule Pop3mail.Part do
 
    # a body part, or a single part of a multipart
    # content is binary, filename also
+   @type t :: %Pop3mail.Part{index: integer, media_type: String.t, charset: String.t, path: String.t, filename: String.t, filename_charset: String.t, boundary: String.t, content: String.t, content_id: String.t, content_location: String.t, inline: boolean | nil}
+   # @type t :: %Pop3mail.Part{index: integer, media_type: Term, charset: Term, path: Term, filename: Term, filename_charset: Term, boundary: Term, content: Term, content_id: Term, content_location: Term, inline: Term | nil}
    defstruct index: 0, media_type: "text/plain", charset: "us-ascii", path: "", filename: "", filename_charset: "us-ascii", boundary: "", content: "", content_id: "", content_location: "", inline: nil
 
 end

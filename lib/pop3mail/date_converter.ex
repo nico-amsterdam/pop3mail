@@ -3,6 +3,7 @@ defmodule Pop3mail.DateConverter do
    @moduledoc "Date conversions and date utilities"
 
    @doc "add zero's at left side of the number"
+   @spec zero_pad(integer, integer) :: String.t
    def zero_pad(number, len \\ 2) do
      String.pad_leading(to_string(number), len, ["0"])
    end
@@ -12,6 +13,7 @@ defmodule Pop3mail.DateConverter do
 
    `datestr` - must be conform RFC 2822 date format
    """
+   @spec convert_date(String.t) :: String.t
    def convert_date(date_str) do
      # Example of correctly formatted date: Tue, 14 Oct 2014 19:59:31 +0200
      # Sometimes the day of the week is missing in the date. Fix that:

@@ -9,18 +9,32 @@ defmodule Pop3mail.Body do
    @moduledoc "Decode and store mail body"
 
    @doc "Decode multipart content, base64, quoted-printables"
+   @spec decode_body(String.t, String.t, String.t, String.t) :: list(Pop3mail.Part.t)
    def decode_body(body_text, content_type, encoding, disposition) do
       decoded_binary = Multipart.decode(encoding, body_text)
 
       # pretend that the mail body is a multipart part, so it can be handled by the same code that handles multipart content
       mail_body_part = %Part{index: 1, content: decoded_binary}
+         |> soep
          |> Multipart.parse_content_type(content_type) # extract from content_type the media_type, charset, boundary and put them in the mail_body_part
+         |> soep2
          |> Multipart.parse_disposition(disposition)   # disposition may contain filename
 
       # get multipart parts. Multipart will check if it is really a multipart, otherwise you get this part back.
       Multipart.parse_content(mail_body_part)
    end
 
+   @spec soep(Pop3mail.Part.t) :: Pop3mail.Part.t 
+   def soep(part) do
+      part
+   end 
+
+   @spec soep2(Pop3mail.Part.t) :: Pop3mail.Part.t 
+   def soep2(part) do
+      part
+   end 
+
+   @doc "Store all found body parts on filesystem"
    @doc "Store all found body parts on filesystem"
    def store_multiparts(multipart_part_list, dirname) do
       Enum.map(multipart_part_list, &(store_part(&1, dirname)))
