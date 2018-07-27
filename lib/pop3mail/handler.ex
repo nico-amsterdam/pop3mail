@@ -42,7 +42,7 @@ defmodule Pop3mail.Handler do
    end
 
 
-   # @spec check_process_and_store(Mail.t, Options.t) :: list({:ok, String.t} | {:error, String.t, String.t}) | {:skip, list({:header, String.t, String.t})}
+   @spec check_process_and_store(Mail.t, Options.t) :: list({:ok, String.t} | {:error, String.t, String.t}) | {:skip, list({:header, String.t, String.t})}
    @doc """
    Check if the mail must be skipped, if not process and store the email.
 

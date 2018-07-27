@@ -23,7 +23,7 @@ defmodule Pop3mail.Multipart do
 
    `multipart_part` - Pop3mail.Part input.
    """
-   # @spec parse_content(Pop3mail.Part.t) :: list(Pop3mail.Part.t) 
+   @spec parse_content(Pop3mail.Part.t) :: list(Pop3mail.Part.t) 
    def parse_content(multipart_part) do
       if is_multipart?(multipart_part) do
          extra_path  = multipart_part.media_type |> String.split("/") |> List.last
@@ -47,7 +47,7 @@ defmodule Pop3mail.Multipart do
 
    `multipart_part` - Pop3mail.Part
    """
-   # @spec is_multipart?(Pop3mail.Part.t) :: boolean
+   @spec is_multipart?(Pop3mail.Part.t) :: boolean
    def is_multipart?(multipart_part) do
       multipart_part.media_type
       |> String.downcase
