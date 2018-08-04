@@ -23,7 +23,7 @@ defmodule Pop3mail.StringUtils do
    end
 
    @doc "Print text if it valid utf-8 encoded. If not, print the alternative text."
-   @spec printable(String.t, String.t) :: String.t
+   @spec printable(binary, String.t) :: String.t
    def printable(str, printable_alternative \\ "") do
       case String.printable?(str) do
         true  -> str
@@ -32,11 +32,11 @@ defmodule Pop3mail.StringUtils do
    end
 
    @doc "test if string is nil or has empty length"
-   @spec is_empty?(String.t) :: boolean
+   @spec is_empty?(String.t | nil) :: boolean
    def is_empty?(str), do: is_nil(str) or String.length(str) == 0
 
    @doc "true if search is found in content"
-   @spec contains?(String.t, String.t) :: boolean
+   @spec contains?(String.t | nil, String.t) :: boolean
    def contains?(content, search), do: !is_nil(content) and String.contains?(content, search)
 
 end

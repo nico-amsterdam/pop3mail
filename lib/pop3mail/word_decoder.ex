@@ -9,7 +9,7 @@ defmodule Pop3mail.WordDecoder do
    @moduledoc "Decode words as defined in RFC 2047."
 
    @doc "Decode a text with possibly encoded-words. Returns a list with tuples {charset, text}. Not encoded text is returned with us-ascii charset."
-   @spec decode_text(String.t) :: list({String.t, String.t})
+   @spec decode_text(String.t) :: list({String.t, binary})
    def decode_text(input_text) do
      if String.contains?(input_text, "=?") do
         # RFC 2045:
@@ -36,7 +36,7 @@ defmodule Pop3mail.WordDecoder do
    end
 
    @doc "Decode a word. text with possibly encoded-words. Returns a list with tuples {charset, text}. Not encoded text is returned with us-ascii charset."
-   @spec decode_word(String.t) :: {String.t, String.t}
+   @spec decode_word(String.t) :: {String.t, binary}
    def decode_word(text) do
      if String.starts_with?(text, "=?") do
 
@@ -59,7 +59,7 @@ defmodule Pop3mail.WordDecoder do
 
    `encoding` - B/Q B=base64 encoded, Q=Quoted-printable
    """
-   @spec decode_word(String.t, <<_::8>>) :: String.t
+   @spec decode_word(String.t, <<_::8>>) :: binary
    def decode_word(text, encoding) when encoding in ["B", "b"] do
       try do
          Base64Decoder.decode!(text)
@@ -83,7 +83,7 @@ defmodule Pop3mail.WordDecoder do
 
    `decoded_text_list` - list with tuples {charset, text}.
    """
-   @spec get_charsets_besides_ascii(list({String.t, String.t})) :: list({String.t, String.t}) 
+   @spec get_charsets_besides_ascii(list({String.t, String.t})) :: list({String.t}) 
    def get_charsets_besides_ascii(decoded_text_list) do
      decoded_text_list
      |> Enum.map(fn({charset, _}) -> charset end)

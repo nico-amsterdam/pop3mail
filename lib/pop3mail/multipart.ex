@@ -447,7 +447,7 @@ defmodule Pop3mail.Multipart do
 
    `encoding` - For example: base64, quoted-printable, 7bit, 8bit, etc.
    """
-   @spec decode(String.t, String.t) :: String.t
+   @spec decode(String.t, String.t) :: binary
    def decode(encoding, text) do
        case String.downcase(encoding) do
          "quoted-printable" -> text
@@ -464,7 +464,7 @@ defmodule Pop3mail.Multipart do
 
    `text` - base64 encoded text.
    """
-   @spec decode_base64!(String.t) :: String.t
+   @spec decode_base64!(String.t) :: binary
    def decode_base64!(text) do
      try do
         Base64Decoder.decode!(text)

@@ -14,7 +14,7 @@ defmodule Pop3mail.FileStore do
    It will be truncated at 35 characters.
    Unusual characters for the filesystem will be filtered out. If storing with unsafe_addition fails, the file will be stored without it.
    """
-   @spec store_mail_header(String.t, String.t, String.t, String.t) :: {:ok, String.t} | {:error, String.t, String.t}
+   @spec store_mail_header(String.t, String.t, binary, String.t) :: {:ok, String.t} | {:error, String.t, String.t}
    def store_mail_header(content, filename_prefix, unsafe_addition, dirname) do
       if String.length(unsafe_addition) > 0 do
          filename = filename_prefix <> "." <> remove_unwanted_chars(unsafe_addition, 35) <> ".txt"
@@ -45,7 +45,7 @@ defmodule Pop3mail.FileStore do
    It will be truncated at 45 characters.
    Unusual characters for the filesystem will be filtered out. If creating the directory with unsafe_addition fails, the directory will be created without it.
    """
-   @spec mkdir(String.t, String.t, String.t) :: String.t
+   @spec mkdir(String.t, String.t, binary) :: String.t
    def mkdir(base_dir, name, unsafe_addition) do
       if String.length(unsafe_addition) > 0 do
           shortened_unsafe_addition = remove_unwanted_chars(unsafe_addition, 45)
@@ -125,7 +125,7 @@ defmodule Pop3mail.FileStore do
    @doc """
    Remove characters which are undesirable for filesystems (like \\ / : * ? " < > | [ ] and control characters)
    """
-   @spec remove_unwanted_chars(String.t, integer) :: String.t
+   @spec remove_unwanted_chars(binary, integer) :: String.t
    def remove_unwanted_chars(text, max_chars) do
       # Remove all control characters. Windows doesn't like: \ / : * ? " < > | and dots or spaces add the start/end.
       if String.printable?(text) do
