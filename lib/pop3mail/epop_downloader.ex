@@ -143,7 +143,6 @@ defmodule Pop3mail.EpopDownloader do
    end
 
    # call epop parser and catch parse exceptions
-   @spec epop_parse(String.t) :: {:message, list({:header, String.t, String.t}), String.t} | {atom, String.t}
    defp epop_parse(mail_content) do
       try do
         :epop_message.bin_parse(mail_content)
@@ -157,7 +156,6 @@ defmodule Pop3mail.EpopDownloader do
 
    # Decode body, store headers and body content.
    # `options` - Handler.Options
-   @spec process_and_store(String.t, integer, list({:header, String.t, String.t}), String.t, Handler.Options.t) :: list({:ok, String.t} | {:error, String.t, String.t}) | {:skip, list({:header, String.t, String.t})}
    defp process_and_store(mail_content, mail_loop_counter, header_list, body_content, options) do
       mail = %Handler.Mail{
         mail_content: mail_content,

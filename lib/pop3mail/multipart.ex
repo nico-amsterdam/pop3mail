@@ -248,7 +248,7 @@ defmodule Pop3mail.Multipart do
    * `multipart_part` - Pop3mail.Part input
    * `content_type_parameters` - list of parameters in the format key=value
    """
-   @spec parse_content_type(Pop3mail.Part.t, list(String.t)) :: Pop3mail.Part.t
+   @spec parse_content_type_parameters(Pop3mail.Part.t, list(String.t)) :: Pop3mail.Part.t
    def parse_content_type_parameters(multipart_part, content_type_parameters) do
        first_content_type_parameter =  List.first(content_type_parameters) || ""
        media_type = first_content_type_parameter
