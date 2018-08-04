@@ -14,6 +14,7 @@ defmodule Pop3mail.FileStore do
    It will be truncated at 35 characters.
    Unusual characters for the filesystem will be filtered out. If storing with unsafe_addition fails, the file will be stored without it.
    """
+   @spec store_mail_header(String.t, String.t, String.t, String.t) :: {:ok, String.t} | {:error, String.t, String.t}
    def store_mail_header(content, filename_prefix, unsafe_addition, dirname) do
       if String.length(unsafe_addition) > 0 do
          filename = filename_prefix <> "." <> remove_unwanted_chars(unsafe_addition, 35) <> ".txt"
@@ -29,6 +30,7 @@ defmodule Pop3mail.FileStore do
    end
 
    @doc "store raw email"
+   @spec store_raw(String.t, String.t, String.t) :: {:ok, String.t} | {:error, String.t, String.t}
    def store_raw(mail_content, filename, dirname) do
      path = Path.join(dirname, filename)
      write_file(path, mail_content)
@@ -43,6 +45,7 @@ defmodule Pop3mail.FileStore do
    It will be truncated at 45 characters.
    Unusual characters for the filesystem will be filtered out. If creating the directory with unsafe_addition fails, the directory will be created without it.
    """
+   @spec mkdir(String.t, String.t, String.t) :: String.t
    def mkdir(base_dir, name, unsafe_addition) do
       if String.length(unsafe_addition) > 0 do
           shortened_unsafe_addition = remove_unwanted_chars(unsafe_addition, 45)
@@ -71,6 +74,7 @@ defmodule Pop3mail.FileStore do
 
    `multipart_part` - a Pop3mail.Part
    """
+   @spec store_part(Pop3mail.Part.t, String.t) :: {:ok, String.t} | {:error, String.t, String.t}
    def store_part(multipart_part, base_dir) do
      dirname = Path.join(base_dir, multipart_part.path)
      unless File.dir?(dirname), do: File.mkdir_p! dirname
@@ -96,6 +100,7 @@ defmodule Pop3mail.FileStore do
    end
 
    @doc "get line seperator for text files. On windows/dos this is carriage return + linefeed, on other platforms it is just the linefeed."
+   @spec get_line_separator() :: String.t
    def get_line_separator() do
       # in theory :io_lib.nl() should return '\r\n' on windows, but it's not.
       case :os.type() do
@@ -119,6 +124,7 @@ defmodule Pop3mail.FileStore do
    @doc """
    Remove characters which are undesirable for filesystems (like \\ / : * ? " < > | [ ] and control characters)
    """
+   @spec remove_unwanted_chars(String.t, integer) :: String.t
    def remove_unwanted_chars(text, max_chars) do
       # Remove all control characters. Windows doesn't like: \ / : * ? " < > | and dots or spaces add the start/end.
       if String.printable?(text) do
@@ -150,6 +156,7 @@ defmodule Pop3mail.FileStore do
    The default file extenstion for text/plain is .txt
    In other cases the last part of the `media_type` wil be used as extension.
    """
+   @spec get_default_filename(String.t, String.t, integer) :: String.t
    def get_default_filename(media_type, charset, index) do
         file_extension = @content_type2file_extension[media_type] || (media_type |> String.split("/") |> List.last)
         filename = "message" <> to_string(index)
@@ -165,6 +172,7 @@ defmodule Pop3mail.FileStore do
 
    `multipart_part` - a Pop3mail.Part
    """
+   @spec set_default_filename(Pop3mail.Part.t) :: Pop3mail.Part.t
    def set_default_filename(multipart_part) do
         filename = get_default_filename(multipart_part.media_type, multipart_part.charset, multipart_part.index)
         %{multipart_part | filename: filename}

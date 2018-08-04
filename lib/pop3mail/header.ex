@@ -11,6 +11,7 @@ defmodule Pop3mail.Header do
 
    `header_list` - list with tuples {:header, header name, value}
    """
+   @spec lookup(list({:header, String.t, String.t}), String.t) :: String.t
    def lookup(header_list, header_name) do
      header_list
      |> Enum.filter(fn({:header, name, _}) -> name == header_name end)
@@ -26,6 +27,7 @@ defmodule Pop3mail.Header do
    * `header_list` - list with tuples {:header, header name, value}
    * `unsafe_addition` - append this to the filename if the filesystem allows it.
    """
+   @spec store(list({:header, String.t, String.t}), String.t, String.t, String.t) :: {:ok, String.t} | {:error, String.t, String.t}
    def store(header_list, filename_prefix, filename_addition, dirname) do
       date    = lookup(header_list, "Date")
       # RFC 2047, search for encoded words and put these in decoded text list, like  [{charset1,content1},{charset2,content2}]

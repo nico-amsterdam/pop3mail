@@ -9,6 +9,7 @@ defmodule Pop3mail.WordDecoder do
    @moduledoc "Decode words as defined in RFC 2047."
 
    @doc "Decode a text with possibly encoded-words. Returns a list with tuples {charset, text}. Not encoded text is returned with us-ascii charset."
+   @spec decode_text(String.t) :: list({String.t, String.t})
    def decode_text(input_text) do
      if String.contains?(input_text, "=?") do
         # RFC 2045:
@@ -35,6 +36,7 @@ defmodule Pop3mail.WordDecoder do
    end
 
    @doc "Decode a word. text with possibly encoded-words. Returns a list with tuples {charset, text}. Not encoded text is returned with us-ascii charset."
+   @spec decode_word(String.t) :: {String.t, String.t}
    def decode_word(text) do
      if String.starts_with?(text, "=?") do
 
@@ -57,6 +59,7 @@ defmodule Pop3mail.WordDecoder do
 
    `encoding` - B/Q B=base64 encoded, Q=Quoted-printable
    """
+   @spec decode_word(String.t, <<_::8>>) :: String.t
    def decode_word(text, encoding) when encoding in ["B", "b"] do
       try do
          Base64Decoder.decode!(text)
@@ -80,6 +83,7 @@ defmodule Pop3mail.WordDecoder do
 
    `decoded_text_list` - list with tuples {charset, text}.
    """
+   @spec get_charsets_besides_ascii(list({String.t, String.t})) :: list({String.t, String.t}) 
    def get_charsets_besides_ascii(decoded_text_list) do
      decoded_text_list
      |> Enum.map(fn({charset, _}) -> charset end)
@@ -91,12 +95,13 @@ defmodule Pop3mail.WordDecoder do
    @doc """
    Concat the text from the decoded list. Does NOT convert to a common character set like utf-8.
 
-   * `add_charset_name` - put the name of the charset after the decoded text parts (when it isn't us-ascii). A hint for the reader if a text contains multiple charsets.
    * `decoded_text_list` - list with tuples {charset, text}.
+   * `add_charset_name` - put the name of the charset after the decoded text parts (when it isn't us-ascii). A hint for the reader if a text contains multiple charsets.
    """
-   def decoded_text_list_to_string(decoded_text, add_charset_name \\ false) do
+   @spec decoded_text_list_to_string(list({String.t, String.t}), boolean) :: String.t
+   def decoded_text_list_to_string(decoded_text_list, add_charset_name \\ false) do
       map_text_fun = if add_charset_name, do: &with_charset/1, else: &without_charset/1
-      decoded_text
+      decoded_text_list
       |> Enum.map(map_text_fun)
       |> Enum.join
    end

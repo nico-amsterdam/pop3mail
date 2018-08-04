@@ -42,7 +42,6 @@ defmodule Pop3mail.Handler do
    end
 
 
-   @spec check_process_and_store(Mail.t, Options.t) :: list({:ok, String.t} | {:error, String.t, String.t}) | {:skip, list({:header, String.t, String.t})}
    @doc """
    Check if the mail must be skipped, if not process and store the email.
 
@@ -51,6 +50,7 @@ defmodule Pop3mail.Handler do
    `mail`    - Handler.Mail
    `options` - Handler.Options
    """
+   @spec check_process_and_store(Mail.t, Options.t) :: list({:ok, String.t} | {:error, String.t, String.t}) | {:skip, list({:header, String.t, String.t})}
    def check_process_and_store(mail, options) do
      # skip or not. don't skip if delivered=nil or delivered is true/false and there is/isn't a Delivered-To header.
       run = is_nil(options.delivered) or (options.delivered == has_delivered_to_header(mail.header_list))
@@ -69,13 +69,13 @@ defmodule Pop3mail.Handler do
       String.length(delivered_to) > 2
    end
 
-   @spec process_and_store(Mail.t, Options.t) :: list({:ok, String.t} | {:error, String.t, String.t})
    @doc """
    Create directory for the email based on date andd subject, save raw email, store header summary and store everything from the body.
 
    `mail`    - Handler.Mail
    `options` - Handler.Options
    """
+   @spec process_and_store(Mail.t, Options.t) :: list({:ok, String.t} | {:error, String.t, String.t})
    def process_and_store(mail, options) do
       date    = Header.lookup(mail.header_list, "Date")
       subject = Header.lookup(mail.header_list, "Subject")
@@ -155,6 +155,7 @@ defmodule Pop3mail.Handler do
 
    `date_str` - string with the date. Must be conform RFC 2822 date format.
    """
+   @spec convert_date_to_dirname(String.t) :: String.t
    def convert_date_to_dirname(date_str) do
       try do
         DateConverter.convert_date(date_str)
@@ -193,6 +194,7 @@ defmodule Pop3mail.Handler do
    However, it does not convert to a standard encoding like utf-8 and it also doesn't mention the encoding types used.
    What you get is a binary which you might be able to read depending on the character encoding set in your terminal/device/program.
    """
+   @spec remove_encodings(String.t) :: String.t
    def remove_encodings(text) do
       decoded_text_list = WordDecoder.decode_text(text)
       decoded_text_list

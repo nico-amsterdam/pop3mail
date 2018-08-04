@@ -23,12 +23,13 @@ defmodule Pop3mail.Body do
    end
 
    @doc "Store all found body parts on filesystem"
-   @doc "Store all found body parts on filesystem"
+   @spec store_multiparts(list(Pop3mail.Part.t), String.t) :: list({:ok, String.t} | {:error, String.t, String.t})
    def store_multiparts(multipart_part_list, dirname) do
       Enum.map(multipart_part_list, &(store_part(&1, dirname)))
    end
 
    @doc "Store one part on filesystem"
+   @spec store_part(Pop3mail.Part.t, String.t) :: {:ok, String.t} | {:error, String.t, String.t} 
    def store_part(multipart_part, base_dir) do
       # make sure we have a filename
       multipart_part =

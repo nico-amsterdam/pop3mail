@@ -3,6 +3,7 @@ defmodule Pop3mail.QuotedPrintable do
    @moduledoc "Decode quoted-printable text as in RFC 2045 # 6.7"
 
    @doc "Decode `arg1` string. Returns the result as a character list."
+   @spec decode(String.t) :: list(char)
    def decode(""), do: []
 
    # remove trailing \r\n
