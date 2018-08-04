@@ -23,7 +23,7 @@ defmodule Pop3mail.Multipart do
 
    `multipart_part` - Pop3mail.Part input.
    """
-   @spec parse_content(Pop3mail.Part.t) :: list(Pop3mail.Part.t) 
+   @spec parse_content(Part.t) :: list(Part.t) 
    def parse_content(multipart_part) do
       if is_multipart?(multipart_part) do
          extra_path  = multipart_part.media_type |> String.split("/") |> List.last
@@ -47,7 +47,7 @@ defmodule Pop3mail.Multipart do
 
    `multipart_part` - Pop3mail.Part
    """
-   @spec is_multipart?(Pop3mail.Part.t) :: boolean
+   @spec is_multipart?(Part.t) :: boolean
    def is_multipart?(multipart_part) do
       multipart_part.media_type
       |> String.downcase
@@ -61,7 +61,7 @@ defmodule Pop3mail.Multipart do
    * `boundary_name` - multipart boundary to search for
    * `path` - path in the multipart hierarchy. For example: relative/alternative
    """
-   @spec parse_multipart(String.t, String.t, String.t) :: list(Pop3mail.Part.t)
+   @spec parse_multipart(String.t, String.t, String.t) :: list(Part.t)
    def parse_multipart(boundary_name, raw_content, path) do
      # get text till end boundary
      multipart_list = String.split(raw_content, "--" <> boundary_name <> "--")
@@ -91,7 +91,7 @@ defmodule Pop3mail.Multipart do
    * `boundary_name` - multipart boundary name
    * `path` - path in the multipart hierarchy. For example: relative/alternative
    """
-   @spec parse_part({String.t, integer}, String.t, String.t) :: list(Pop3mail.Part.t)
+   @spec parse_part({String.t, integer}, String.t, String.t) :: list(Part.t)
    def parse_part({part, index}, boundary_name, path) do
      # bare carriage returns or bare linefeeds are not allowed in email.
      [line1 | otherlines] = lazy_line_split(part)
@@ -110,7 +110,7 @@ defmodule Pop3mail.Multipart do
    * `encoding` - For example: base64, quoted-printable, 7bit, 8bit, etc.
    * `lines` - part content splitted in lines
    """
-   @spec parse_part_decode(Pop3mail.Part.t, String.t, list(String.t)) :: Pop3mail.Part.t
+   @spec parse_part_decode(Part.t, String.t, list(String.t)) :: Part.t
    def parse_part_decode(multipart_part, encoding, lines) do
      content = decode_lines(encoding, lines)
      %{multipart_part | content: content}
@@ -133,7 +133,7 @@ defmodule Pop3mail.Multipart do
    * `encoding` - For example: base64, quoted-printable, 7bit, 8bit, etc.
    * `list` - lines
    """
-   @spec parse_part_finish(Pop3mail.Part.t, String.t, list(String.t)) :: Pop3mail.Part.t
+   @spec parse_part_finish(Part.t, String.t, list(String.t)) :: Part.t
    def parse_part_finish(multipart_part, encoding, [line | otherlines]) do
      # there should be an empty line after the headers
      otherlines =
@@ -155,7 +155,7 @@ defmodule Pop3mail.Multipart do
    * `encoding` - For example: base64, quoted-printable, 7bit, 8bit, etc.
    * `list` - lines
    """
-   @spec parse_part_lines(Pop3mail.Part.t, String.t, list(String.t)) :: Pop3mail.Part.t
+   @spec parse_part_lines(Part.t, String.t, list(String.t)) :: Part.t
    def parse_part_lines(multipart_part, encoding, []) do
        # [] when all header lines are read and there are no more lines. There is no part content!
        parse_part_decode(multipart_part, encoding, [])
@@ -216,7 +216,7 @@ defmodule Pop3mail.Multipart do
    * `encoding` - For example: base64, quoted-printable, 7bit, 8bit, etc.
    * `list` - lines
    """
-   @spec parse_part_content_type(Pop3mail.Part.t, String.t, list(String.t)) :: Pop3mail.Part.t
+   @spec parse_part_content_type(Part.t, String.t, list(String.t)) :: Part.t
    def parse_part_content_type(multipart_part, encoding, [line | otherlines]) do
        content_type = String.slice(line, String.length("content-type:")..-1)
        {content_type, split_lines} = lines_continued(content_type, otherlines)
@@ -232,7 +232,7 @@ defmodule Pop3mail.Multipart do
 
    `multipart_part` - Pop3mail.Part input
    """
-   @spec parse_content_type(Pop3mail.Part.t, String.t) :: Pop3mail.Part.t 
+   @spec parse_content_type(Part.t, String.t) :: Part.t 
    def parse_content_type(multipart_part, content_type) do
       if String.length(content_type) > 0 do
          content_type_parameters = String.split(content_type, ~r/\s*;\s*/)
@@ -248,7 +248,7 @@ defmodule Pop3mail.Multipart do
    * `multipart_part` - Pop3mail.Part input
    * `content_type_parameters` - list of parameters in the format key=value
    """
-   @spec parse_content_type_parameters(Pop3mail.Part.t, list(String.t)) :: Pop3mail.Part.t
+   @spec parse_content_type_parameters(Part.t, list(String.t)) :: Part.t
    def parse_content_type_parameters(multipart_part, content_type_parameters) do
        first_content_type_parameter =  List.first(content_type_parameters) || ""
        media_type = first_content_type_parameter
@@ -308,7 +308,7 @@ defmodule Pop3mail.Multipart do
    * `encoding` - For example: base64, quoted-printable, 7bit, 8bit, etc.
    * `list` - lines
    """
-   @spec parse_part_content_id(Pop3mail.Part.t, String.t, list(String.t)) :: Pop3mail.Part.t
+   @spec parse_part_content_id(Part.t, String.t, list(String.t)) :: Part.t
    def parse_part_content_id(multipart_part, encoding, [line | otherlines]) do
        content_id = line
                     |> String.slice(String.length("content-id:")..-1)
@@ -327,7 +327,7 @@ defmodule Pop3mail.Multipart do
    * `encoding` - For example: base64, quoted-printable, 7bit, 8bit, etc.
    * `list` - lines
    """
-   @spec parse_part_content_location(Pop3mail.Part.t, String.t, list(String.t)) :: Pop3mail.Part.t
+   @spec parse_part_content_location(Part.t, String.t, list(String.t)) :: Part.t
    def parse_part_content_location(multipart_part, encoding, [line | otherlines]) do
        content_location = line
                           |> String.slice(String.length("content-location:")..-1)
@@ -346,7 +346,7 @@ defmodule Pop3mail.Multipart do
    * `encoding` - For example: base64, quoted-printable, 7bit, 8bit, etc.
    * `list` - lines
    """
-   @spec parse_part_transfer_encoding(Pop3mail.Part.t, String.t, list(String.t)) :: Pop3mail.Part.t
+   @spec parse_part_transfer_encoding(Part.t, String.t, list(String.t)) :: Part.t
    def parse_part_transfer_encoding(multipart_part, _, [line | otherlines]) do
        encoding = line
                   |> String.slice(String.length("content-transfer-encoding:")..-1)
@@ -364,7 +364,7 @@ defmodule Pop3mail.Multipart do
    * `encoding` - For example: base64, quoted-printable, 7bit, 8bit, etc.
    * `list` - lines
    """
-   @spec parse_part_skip(Pop3mail.Part.t, String.t, list(String.t)) :: Pop3mail.Part.t
+   @spec parse_part_skip(Part.t, String.t, list(String.t)) :: Part.t
    def parse_part_skip(multipart_part, encoding, [line | otherlines]) do
        {_, split_lines} = lines_continued(line, otherlines)
        # Logger.debug "      Skipped " <> line
@@ -378,7 +378,7 @@ defmodule Pop3mail.Multipart do
    * `encoding` - For example: base64, quoted-printable, 7bit, 8bit, etc.
    * `list` - lines
    """
-   @spec parse_part_unknown_header(Pop3mail.Part.t, String.t, list(String.t)) :: Pop3mail.Part.t
+   @spec parse_part_unknown_header(Part.t, String.t, list(String.t)) :: Part.t
    def parse_part_unknown_header(multipart_part, encoding, [line | otherlines]) do
      {line, split_lines} = lines_continued(line, otherlines)
      Logger.warn "    Unknown header line in body ignored" <> StringUtils.printable(": " <> line)
@@ -392,7 +392,7 @@ defmodule Pop3mail.Multipart do
    * `encoding` - For example: base64, quoted-printable, 7bit, 8bit, etc.
    * `list` - lines
    """
-   @spec parse_part_disposition(Pop3mail.Part.t, String.t, list(String.t)) :: Pop3mail.Part.t
+   @spec parse_part_disposition(Part.t, String.t, list(String.t)) :: Part.t
    def parse_part_disposition(multipart_part, encoding, [line | otherlines]) do
        disposition = String.slice(line, String.length("content-disposition:")..-1)
        {disposition, split_lines} = lines_continued(disposition, otherlines)
@@ -406,7 +406,7 @@ defmodule Pop3mail.Multipart do
 
    `multipart_part` - Pop3mail.Part input
    """
-   @spec parse_disposition(Pop3mail.Part.t, String.t) :: Pop3mail.Part.t
+   @spec parse_disposition(Part.t, String.t) :: Part.t
    def parse_disposition(multipart_part, disposition) do
        if StringUtils.is_empty?(disposition) do
           multipart_part
@@ -426,7 +426,7 @@ defmodule Pop3mail.Multipart do
    * `multipart_part` - Pop3mail.Part input
    * `disposition_parameters` - list of parameters in the format key=value
    """
-   @spec parse_disposition_parameters(Pop3mail.Part.t, list(String.t)) :: Pop3mail.Part.t
+   @spec parse_disposition_parameters(Part.t, list(String.t)) :: Part.t
    def parse_disposition_parameters(multipart_part, disposition_parameters) do
       type = disposition_parameters
              |> Enum.at(0)
@@ -487,7 +487,7 @@ defmodule Pop3mail.Multipart do
      filename\*1\*=%2A%2A%2Afun%2A%2A%2A%20<br>
      filename\*2="isn't it!"
    """
-   @spec extract_and_set_filename(Pop3mail.Part.t, list(String.t), String.t) :: Pop3mail.Part.t
+   @spec extract_and_set_filename(Part.t, list(String.t), String.t) :: Part.t
    def extract_and_set_filename(multipart_part, content_parameters, parametername) do
        # search for (file)name = value occurrences and concat them
 
