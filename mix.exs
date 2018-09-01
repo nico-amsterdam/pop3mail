@@ -43,7 +43,7 @@ defmodule Pop3mail.Mixfile do
   defp deps do
     [
       {:erlpop, github: "nico-amsterdam/erlpop"},
-      {:ex_doc, "~> 0.18.0", only: :dev},
+      {:ex_doc, "~> 0.19", only: :dev},
       {:credo, "~> 0.5", only: :dev}
     ]
   end
