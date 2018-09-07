@@ -7,7 +7,7 @@ defmodule Pop3mail.EpopDownloader do
    @moduledoc "Retrieve and parse POP3 mail via the Epop client."
 
    @typedoc "Epop client from erlpop"
-   @type epop_client :: {:sk,any,any,any,any,any,any,boolean}
+   @type epop_client :: {:sk, any, any, any, any, any, any, boolean}
 
    defmodule Options do
 
