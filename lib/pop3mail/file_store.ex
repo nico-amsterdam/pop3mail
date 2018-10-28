@@ -127,7 +127,7 @@ defmodule Pop3mail.FileStore do
    """
    @spec remove_unwanted_chars(binary, integer) :: String.t
    def remove_unwanted_chars(text, max_chars) do
-      # Remove all control characters. Windows doesn't like: \ / : * ? " < > | and dots or spaces add the start/end.
+      # Remove all control characters. Windows doesn't like: \ / : * ? " < > | and dots or spaces at the start/end.
       if String.printable?(text) do
         # for utf-8 compatible text we accept more than just the 7bit ascii range.
         # It's not perfect, this code can give funny results if the text isn't utf-8 compatible
