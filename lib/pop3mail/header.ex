@@ -13,8 +13,9 @@ defmodule Pop3mail.Header do
    """
    @spec lookup(list({:header, String.t, String.t}), String.t) :: String.t
    def lookup(header_list, header_name) do
+     lc_header_name = String.downcase(header_name)
      header_list
-     |> Enum.filter(fn({:header, name, _}) -> name == header_name end)
+     |> Enum.filter(fn({:header, name, _}) -> String.downcase(name) == lc_header_name end)
      |>    Enum.map(fn({:header, _,  val}) -> val end)
      |> Enum.join(", ")
    end
