@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.3.1 (2018-11-08)
+
+* Bug fixes
+  * [issue/3](https://github.com/nico-amsterdam/pop3mail/issues/3) Lookup headers case-insensitively
+
 ## v1.3.0 (2017-11-17)
 
 * Drop support for Elixir 1.2
