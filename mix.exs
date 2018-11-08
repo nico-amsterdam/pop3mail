@@ -5,7 +5,7 @@ defmodule Pop3mail.Mixfile do
     [
       app: :pop3mail,
       version: "1.3.1",
-      elixir: "~> 1.3",
+      elixir: "~> 1.4",
 
       # Hex
       package: package(),
