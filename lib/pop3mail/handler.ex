@@ -70,7 +70,7 @@ defmodule Pop3mail.Handler do
    end
 
    @doc """
-   Create directory for the email based on date andd subject, save raw email, store header summary and store everything from the body.
+   Create directory for the email based on date and subject, save raw email, store header summary and store everything from the body.
 
    `mail`    - Handler.Mail
    `options` - Handler.Options

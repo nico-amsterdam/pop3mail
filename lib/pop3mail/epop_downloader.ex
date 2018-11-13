@@ -128,7 +128,7 @@ defmodule Pop3mail.EpopDownloader do
    * `save_raw` - true/false. Save or don't save the raw email message.
    * `output_dir` - directory where all emails are stored.
    """
-   @spec parse_process_and_store(String.t, integer, boolean, boolean, String.t) :: {:skip, list({:header, String.t, String.t})} | {atom, String.t} | {:error, String.t, String.t}
+   @spec parse_process_and_store(String.t, integer, boolean | nil, boolean, String.t) :: {:skip, list({:header, String.t, String.t})} | {atom, String.t} | {:error, String.t, String.t}
    def parse_process_and_store(mail_content, mail_loop_counter, delivered, save_raw, output_dir) do
       options = %Handler.Options{
         delivered: delivered,
