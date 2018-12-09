@@ -50,13 +50,17 @@ For usage, see usage chapter below.
 
 ## Install in an Elixir project
 
-  1. Add pop3mail and the erlang epop client to your list of dependencies in `mix.exs`:
+  1. Add pop3mail to your list of dependencies in `mix.exs`:
 ```
         def deps do
-          [{:pop3mail, "~> 1.3"}, 
-           {:erlpop, github: "nico-amsterdam/erlpop"}]
+          [{:pop3mail, "~> 1.3"}]
         end
 ```
+### Upgrade instructions 1.3.0 to 1.3.1
+
+Version 1.3.1 doesn't require erlpop as github dependency anymore, because it is now available in hex.pm as 'pop3client'
+and added as dependency for pop3mail. Remove {:erlpop, github: "nico-amsterdam/erlpop"} in your mix.exs. 
+If you don't mix reports: 'Dependencies have diverged'
 
 ### Upgrade instructions 1.1.0 to 1.2.0
 
