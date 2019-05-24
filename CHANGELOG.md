@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.3.2 (2019-05-24)
+
+* Bug fixes
+  * [issue/4](https://github.com/nico-amsterdam/pop3mail/issues/4) Mix compile with pop3mail dependency fails on erlpop.app
+
 ## v1.3.1 (2018-11-08)
 
 * Bug fixes
