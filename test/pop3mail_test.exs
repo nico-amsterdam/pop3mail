@@ -81,7 +81,7 @@ defmodule Pop3mailTest do
                 charset: "us-ascii",
                 content: "Qu'vatlh uses the Klingon Q; you should pronounce this sound as in petaQ.",
                 content_id: "", filename: "Invoice269082204400.pdf",
-                filename_charset: "ISO-8859-15", index: 1, inline: false,
+                filename_charset: "iso-8859-15", index: 1, inline: false,
                 media_type: "application/octet-stream", path: "mixed"}
 
     {:ok, mail_content} = :file.read_file("test/pop3mail/fixtures/encoded-word-in-filename.eml")

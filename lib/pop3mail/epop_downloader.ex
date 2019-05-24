@@ -7,7 +7,7 @@ defmodule Pop3mail.EpopDownloader do
    @moduledoc "Retrieve and parse POP3 mail via the Epop client."
 
    @typedoc "Epop client from erlpop"
-   @type epop_client :: {:sk, any, any, any, any, any, any, boolean}
+   @type epop_client :: {:sk, any, any, any, integer, boolean, boolean, boolean}
 
    defmodule Options do
 
@@ -147,7 +147,6 @@ defmodule Pop3mail.EpopDownloader do
       try do
         :epop_message.bin_parse(mail_content)
       rescue
-        # parse error
         e in ErlangError -> {error, reason} = e.original
                             Logger.error("  #{error}: #{reason}")
                             {error, mail_content}

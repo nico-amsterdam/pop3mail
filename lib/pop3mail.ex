@@ -253,7 +253,7 @@ defmodule Pop3mail do
    '''
    @spec decode_body(String.t, String.t, String.t, String.t) :: list(Pop3mail.Part.t)
    def decode_body(body_text, content_type \\ "text/plain; charset=us-ascii", encoding \\ "7bit", disposition \\ "inline") do
-     Pop3mail.Body.decode_body(body_text, content_type, encoding, disposition)
+      Pop3mail.Body.decode_body(body_text, content_type, encoding, disposition)
    end
 
    @doc ~S"""

@@ -125,7 +125,7 @@ defmodule Pop3mail.FileStore do
    @doc """
    Remove characters which are undesirable for filesystems (like \\ / : * ? " < > | [ ] and control characters)
    """
-   @spec remove_unwanted_chars(binary, integer) :: String.t
+   @spec remove_unwanted_chars(binary, non_neg_integer) :: String.t
    def remove_unwanted_chars(text, max_chars) do
       # Remove all control characters. Windows doesn't like: \ / : * ? " < > | and dots or spaces at the start/end.
       if String.printable?(text) do

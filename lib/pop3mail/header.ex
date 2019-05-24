@@ -10,13 +10,15 @@ defmodule Pop3mail.Header do
    If the searched header name occurs multiple times in the list, the result will be the concatenated comma separated value.
 
    `header_list` - list with tuples {:header, header name, value}
+   `take`        - Optional parameter to specify maximum number of headers. Negative number takes last header values.
    """
-   @spec lookup(list({:header, String.t, String.t}), String.t) :: String.t
-   def lookup(header_list, header_name) do
+   @spec lookup(list({:header, String.t, String.t}), String.t, integer | nil) :: String.t
+   def lookup(header_list, header_name, take \\ nil) do
      lc_header_name = String.downcase(header_name)
      header_list
      |> Enum.filter(fn({:header, name, _}) -> String.downcase(name) == lc_header_name end)
      |>    Enum.map(fn({:header, _,  val}) -> val end)
+     |> Enum.take(take || length(header_list))
      |> Enum.join(", ")
    end
 

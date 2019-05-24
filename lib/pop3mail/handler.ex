@@ -142,10 +142,10 @@ defmodule Pop3mail.Handler do
    """
    @spec decode_body_content(list({:header, String.t, String.t}), String.t) :: list(Pop3mail.Part.t)
    def decode_body_content(header_list, body_content) do
-      content_type = Header.lookup(header_list, "Content-Type")
-      encoding = Header.lookup(header_list, "Content-Transfer-Encoding")
+      content_type = Header.lookup(header_list, "Content-Type", 1)
+      encoding = Header.lookup(header_list, "Content-Transfer-Encoding", 1)
       # disposition in the header indicates inline or attachment. Can contain a filename
-      disposition = Header.lookup(header_list, "Content-Disposition")
+      disposition = Header.lookup(header_list, "Content-Disposition", 1)
 
       Body.decode_body(body_content, content_type, encoding, disposition)
    end

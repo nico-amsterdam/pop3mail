@@ -86,7 +86,7 @@ defmodule Pop3mail.WordDecoder do
    @spec get_charsets_besides_ascii(list({String.t, String.t})) :: list({String.t}) 
    def get_charsets_besides_ascii(decoded_text_list) do
      decoded_text_list
-     |> Enum.map(fn({charset, _}) -> charset end)
+     |> Enum.map(fn({charset, _}) -> String.downcase(charset) end)
      |> Enum.filter(fn(charset) -> charset != "us-ascii" end)
      |> Enum.sort
      |> Enum.dedup
