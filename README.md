@@ -7,7 +7,7 @@
 ## Before you start
 
 - This program reads from a POP3 mail server, which means that it can only download mail from the inbox folder. If you want to access other folders you will need an IMAP client.
-- Handling big attachments requires some processing memory. Normally the program needs about 30Mb RAM, but to process an email with attachments it temporary needs 3 till 4 times of the total size of the email attachments as additional memory.
+- Handling big attachments requires some processing memory. Normally the program needs about 30Mb RAM (for the whole OS process), but to process an email with attachments it temporary needs 3 till 4 times of the total size of the email attachments as additional memory.
 - Elixir programmers can replace the default Pop3mail.Base64Decoder with their own.
 - On linux when there is not enough memory, the program will end as 'Killed.'
   It's killed by the OOM Killer. Run dmesg to see the log message.
@@ -56,6 +56,15 @@ For usage, see usage chapter below.
           [{:pop3mail, "~> 1.3"}]
         end
 ```
+### Upgrade instructions 1.3.1 to 1.3.2
+
+Run:
+```elixir
+mix deps.clean erlpop
+mix deps.update pop3mail
+```
+After the `mix deps.clean erlpop` command, the `deps/erlpop` directory should be gone, and also the `_build/dev/lib/erlpop` and `_build/test/lib/erlpop` should be vanished.
+
 ### Upgrade instructions 1.3.0 to 1.3.1
 
 Version 1.3.1 doesn't require erlpop as github dependency anymore, because it is now available in hex.pm as 'pop3client'
