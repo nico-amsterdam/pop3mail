@@ -181,6 +181,6 @@ https://myaccount.google.com/lesssecureapps
 
 ## Acknowledgment
 
-Thanks Erik Søe Sørensen for upgrading the Epop client to the latest Erlang version.
+Thanks Erik Søe Sørensen for upgrading the Epop client to the OTP 15 Erlang version.
 
 [docs]: https://hexdocs.pm/pop3mail/Pop3mail.html
