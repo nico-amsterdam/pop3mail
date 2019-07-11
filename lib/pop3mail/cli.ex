@@ -23,7 +23,7 @@ defmodule Pop3mail.CLI do
      --password   email account password.
      --port       pop3 server port. Default: 995
      --raw        also save the unprocessed mail in a file called 'raw.eml'.
-                  Usefull feature for error diagnostics.
+                  Useful feature for error diagnostics.
      --server     pop3 server address. Default: pop.gmail.com
      --ssl        true/false. Turn on/off Secure Socket Layer. Default: true
      --username   email account name.  Gmail users can precede the name with
