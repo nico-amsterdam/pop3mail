@@ -4,10 +4,19 @@
     Written in Elixir, using an Erlang pop3 client with SSL support derived from the epop package.
     Decodes multipart content, quoted-printables, base64 and encoded-words.
 
+## Implemented RFC's in Pop3mail to parse email structure
+
+- [RFC 5322](https://tools.ietf.org/html/rfc5322) previously RFC 822 and RFC 2822
+- [RFC 2045](https://tools.ietf.org/html/rfc2045)
+- [RFC 2046](https://tools.ietf.org/html/rfc2046)
+- [RFC 2047](https://tools.ietf.org/html/rfc2047)
+- [RFC 2231](https://tools.ietf.org/html/rfc2231)
+- [RFC 2557](https://tools.ietf.org/html/rfc2557)
+
 ## Before you start
 
 - This program reads from a POP3 mail server, which means that it can only download mail from the inbox folder. If you want to access other folders you will need an IMAP client.
-- Handling big attachments requires some processing memory. Normally the program needs about 30Mb RAM, but to process an email with attachments it temporary needs 3 till 4 times of the total size of the email attachments as additional memory.
+- Handling big attachments requires some processing memory. Normally the program needs about 30Mb RAM (for the whole OS process), but to process an email with attachments it temporary needs 3 times of the total size of the email attachments as additional memory.
 - Elixir programmers can replace the default Pop3mail.Base64Decoder with their own.
 - On linux when there is not enough memory, the program will end as 'Killed.'
   It's killed by the OOM Killer. Run dmesg to see the log message.
@@ -56,6 +65,15 @@ For usage, see usage chapter below.
           [{:pop3mail, "~> 1.3"}]
         end
 ```
+### Upgrade instructions 1.3.1 to 1.3.2
+
+Run:
+```elixir
+mix deps.clean erlpop
+mix deps.update pop3mail
+```
+After the `mix deps.clean erlpop` command, the `deps/erlpop` directory should be gone, and also the `_build/dev/lib/erlpop` and `_build/test/lib/erlpop` should be vanished.
+
 ### Upgrade instructions 1.3.0 to 1.3.1
 
 Version 1.3.1 doesn't require erlpop as github dependency anymore, because it is now available in hex.pm as 'pop3client'
@@ -172,6 +190,6 @@ https://myaccount.google.com/lesssecureapps
 
 ## Acknowledgment
 
-Thanks Erik Søe Sørensen for upgrading the Epop client to the latest Erlang version.
+Thanks Erik Søe Sørensen for upgrading the Epop client to the OTP 15 Erlang version.
 
 [docs]: https://hexdocs.pm/pop3mail/Pop3mail.html
