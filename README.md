@@ -80,24 +80,6 @@ Version 1.3.1 doesn't require erlpop as github dependency anymore, because it is
 and added as dependency for pop3mail. Remove {:erlpop, github: "nico-amsterdam/erlpop"} in your mix.exs. 
 If you don't mix reports: 'Dependencies have diverged'
 
-### Upgrade instructions 1.1.0 to 1.2.0
-
-Version 1.2.0 of Pop3mail consumes far less memory as 1.1.0 when handling big attachments.
-Erlpop now has additional functions epop_client.bin_retrieve and epop_message.bin_parse. Erlpop is backwards compatible.
-
-Pop3mail requires the latest Erlpop. Run these commands to upgrade:
-
-```sh
-$ mix deps.update  erlpop
-$ mix deps.compile erlpop
-```
-
-Pop3mail biggest changes:
-- The function decode_body_char_list is replaced with decode_body_content.
-- Pop3mail functions which previously used character list parameters, now use strings.
-- Base64Decoder.decodes_lines! is replaced with Base64Decode.decode!
-  It decodes the encoded text and ignores carriage returns and linefeeds.
-
 ## Usage
 
 ### Commandline script
@@ -178,18 +160,13 @@ Now your email client should download all mail again.
 Ironically, google only trust google apps. Gmail is trusted, but pop3mail not.
 You will notice that authentication fails, and google will sent you a security warning by e-mail.
 Access with less secure apps can be turned on for your google account at: 
-https://myaccount.google.com/security
+https://myaccount.google.com/lesssecureapps
 
 ## Google unlock captcha
 
 If you get an error 'web login required', push the 'Continue' button in the browser:
 
 https://accounts.google.com/DisplayUnlockCaptcha
-
-Also check these settings:
-
-https://myaccount.google.com/lesssecureapps
-
 
 ## License
 
