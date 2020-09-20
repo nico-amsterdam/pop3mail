@@ -173,6 +173,13 @@ Go back to settings and select Download all mail, Save change.
 
 Now your email client should download all mail again.
 
+## Access Gmail with less secure apps
+
+Ironically, google only trust google apps. Gmail is trusted, but pop3mail not.
+You will notice that authentication fails, and google will sent you a security warning by e-mail.
+Access with less secure apps can be turned on for your google account at: 
+https://myaccount.google.com/security
+
 ## Google unlock captcha
 
 If you get an error 'web login required', push the 'Continue' button in the browser:
