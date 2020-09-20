@@ -4,7 +4,7 @@
     Written in Elixir, using an Erlang pop3 client with SSL support derived from the epop package.
     Decodes multipart content, quoted-printables, base64 and encoded-words.
 
-## Implemented RFC's in Pop3mail to parse email structure
+## Implemented RFC's in Pop3mail to decode email
 
 - [RFC 5322](https://tools.ietf.org/html/rfc5322) previously RFC 822 and RFC 2822
 - [RFC 2045](https://tools.ietf.org/html/rfc2045)
@@ -158,7 +158,7 @@ Now your email client should download all mail again.
 ## Access Gmail with less secure apps
 
 Ironically, google only trust google apps. Gmail is trusted, but pop3mail not.
-You will notice that authentication fails, and google will sent you a security warning by e-mail.
+You will notice that authentication fails, and google will sent you a security warning by email.
 Access with less secure apps can be turned on for your google account at: 
 https://myaccount.google.com/lesssecureapps
 
