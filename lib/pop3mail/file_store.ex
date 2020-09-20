@@ -11,13 +11,13 @@ defmodule Pop3mail.FileStore do
    filename is `filename_prefix` . `unsafe_addition` . txt
 
    `unsafe_addition` - append this to the filename.
-   It will be truncated at 35 characters.
+   It will be truncated at 100 characters.
    Unusual characters for the filesystem will be filtered out. If storing with unsafe_addition fails, the file will be stored without it.
    """
    @spec store_mail_header(String.t, String.t, binary, String.t) :: {:ok, String.t} | {:error, String.t, String.t}
    def store_mail_header(content, filename_prefix, unsafe_addition, dirname) do
       if String.length(unsafe_addition) > 0 do
-         filename = filename_prefix <> "." <> remove_unwanted_chars(unsafe_addition, 35) <> ".txt"
+         filename = filename_prefix <> "." <> remove_unwanted_chars(unsafe_addition, 100) <> ".txt"
          path = Path.join(dirname, filename)
          case :file.write_file(path, content) do
             :ok -> {:ok, path}
@@ -72,15 +72,15 @@ defmodule Pop3mail.FileStore do
 
    Text files (media types text/plain, text/html for example) will be converted from dos to unix format on non-windows platforms.
 
-   `multipart_part` - a Pop3mail.Part
+   `multipart_part` - a Pop3mail.Part. Filenames are truncated at 100 characters.
    """
    @spec store_part(Pop3mail.Part.t, String.t) :: {:ok, String.t} | {:error, String.t, String.t}
    def store_part(multipart_part, base_dir) do
      dirname = Path.join(base_dir, multipart_part.path)
-     unless File.dir?(dirname), do: File.mkdir_p! dirname
+     unless File.dir?(dirname), do: File.mkdir_p!(dirname)
 
      # this is also protection against filenames like: /etc/passwd
-     safe_filename = remove_unwanted_chars(multipart_part.filename, 50)
+     safe_filename = remove_unwanted_chars(multipart_part.filename, 100)
      safe_filename = if safe_filename == "", do: "unknown", else: safe_filename
      path = Path.join(dirname, safe_filename)
      text_on_unix = String.starts_with?(multipart_part.media_type, "text/") and get_line_separator() != '\r\n'
@@ -125,7 +125,7 @@ defmodule Pop3mail.FileStore do
    @doc """
    Remove characters which are undesirable for filesystems (like \\ / : * ? " < > | [ ] and control characters)
    """
-   @spec remove_unwanted_chars(binary, non_neg_integer) :: String.t
+   @spec remove_unwanted_chars(binary, integer) :: String.t
    def remove_unwanted_chars(text, max_chars) do
       # Remove all control characters. Windows doesn't like: \ / : * ? " < > | and dots or spaces at the start/end.
       if String.printable?(text) do
