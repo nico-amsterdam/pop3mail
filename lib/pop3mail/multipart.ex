@@ -202,10 +202,16 @@ defmodule Pop3mail.Multipart do
                  |> Enum.filter(&(&1 == "\""))
                  |> length
                  |> rem(2)
+
       if modules2 != 0 or line1 =~ ~r/;\s*$/ or line2 =~ ~r/^\t/ do
          lines_continued(line1 <> line2, otherlines ++ even_more)
       else
-         {line1, [line2 | otherlines ++ even_more]}
+         if line2 =~ ~r/^\s+\S/ do
+            Logger.warn "    Non-standard header continuation" <> StringUtils.printable(" after line: " <> line1)
+            lines_continued(line1 <> line2, otherlines ++ even_more)
+         else
+            {line1, [line2 | otherlines ++ even_more]}
+         end
       end
    end
 
@@ -366,8 +372,8 @@ defmodule Pop3mail.Multipart do
    """
    @spec parse_part_skip(Part.t, String.t, list(String.t)) :: Part.t
    def parse_part_skip(multipart_part, encoding, [line | otherlines]) do
-       {_, split_lines} = lines_continued(line, otherlines)
-       # Logger.debug "      Skipped " <> line
+       {_skipped_line, split_lines} = lines_continued(line, otherlines)
+       # Logger.debug "      Skipped " <> skipped_line
        parse_part_lines(multipart_part, encoding, split_lines)
    end
 
