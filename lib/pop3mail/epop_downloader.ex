@@ -7,7 +7,7 @@ defmodule Pop3mail.EpopDownloader do
    @moduledoc "Retrieve and parse POP3 mail via the Epop client."
 
    @typedoc "Epop client from erlpop"
-   @type epop_client :: {:sk, any, any, any, integer, boolean, boolean, boolean}
+   @type epop_client :: :epop_client.connection()
 
    defmodule Options do
 
@@ -128,7 +128,7 @@ defmodule Pop3mail.EpopDownloader do
    * `save_raw` - true/false. Save or don't save the raw email message.
    * `output_dir` - directory where all emails are stored.
    """
-   @spec parse_process_and_store(String.t, integer, boolean | nil, boolean, String.t) :: {:skip, list({:header, String.t, String.t})} | {atom, String.t} | {:error, String.t, String.t}
+   @spec parse_process_and_store(String.t, integer, boolean | nil, boolean, String.t) :: {atom, String.t} | list({:ok, String.t} | {:error, String.t, String.t}) | {:skip, list({:header, String.t, String.t})}
    def parse_process_and_store(mail_content, mail_loop_counter, delivered, save_raw, output_dir) do
       options = %Handler.Options{
         delivered: delivered,
@@ -147,9 +147,9 @@ defmodule Pop3mail.EpopDownloader do
       try do
         :epop_message.bin_parse(mail_content)
       rescue
-        e in ErlangError -> {error, reason} = e.original
-                            Logger.error("  #{error}: #{reason}")
-                            {error, mail_content}
+        e in ErlangError -> {error_atom, reason} = e.original
+                            Logger.error("  #{error_atom}: #{reason}")
+                            {error_atom, mail_content}
       end
    end
 

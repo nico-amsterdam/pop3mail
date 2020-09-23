@@ -3,8 +3,8 @@ defmodule Pop3mail.Handler do
   alias Pop3mail.DateConverter
   alias Pop3mail.FileStore
   alias Pop3mail.Header
-  alias Pop3mail.WordDecoder
   alias Pop3mail.StringUtils
+  alias Pop3mail.WordDecoder
 
   require Logger
 
@@ -40,7 +40,6 @@ defmodule Pop3mail.Handler do
       @type t :: %Options{delivered: boolean | nil, save_raw: boolean, base_dir: String.t}
       defstruct delivered: nil, save_raw: false, base_dir: ""
    end
-
 
    @doc """
    Check if the mail must be skipped, if not process and store the email.

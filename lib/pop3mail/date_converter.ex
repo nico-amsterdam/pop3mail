@@ -3,7 +3,7 @@ defmodule Pop3mail.DateConverter do
    @moduledoc "Date conversions and date utilities"
 
    @doc "add zero's at left side of the number"
-   @spec zero_pad(integer, integer) :: String.t
+   @spec zero_pad(non_neg_integer, non_neg_integer) :: String.t
    def zero_pad(number, len \\ 2) do
      String.pad_leading(to_string(number), len, ["0"])
    end

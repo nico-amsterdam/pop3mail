@@ -1,7 +1,7 @@
 defmodule Pop3mail.Body do
   alias Pop3mail.FileStore
-  alias Pop3mail.Part
   alias Pop3mail.Multipart
+  alias Pop3mail.Part
   alias Pop3mail.StringUtils
 
   require Logger
@@ -29,7 +29,7 @@ defmodule Pop3mail.Body do
    end
 
    @doc "Store one part on filesystem"
-   @spec store_part(Part.t, String.t) :: {:ok, String.t} | {:error, String.t, String.t} 
+   @spec store_part(Part.t, String.t) :: {:ok, String.t} | {:error, String.t, String.t}
    def store_part(multipart_part, base_dir) do
       # make sure we have a filename
       multipart_part =

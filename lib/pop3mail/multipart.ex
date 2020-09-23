@@ -1,12 +1,11 @@
 defmodule Pop3mail.Multipart do
-  alias Pop3mail.Part
-  alias Pop3mail.StringUtils
-  alias Pop3mail.QuotedPrintable
-  alias Pop3mail.WordDecoder
   alias Pop3mail.Base64Decoder
+  alias Pop3mail.Part
+  alias Pop3mail.QuotedPrintable
+  alias Pop3mail.StringUtils
+  alias Pop3mail.WordDecoder
 
   require Logger
-
 
   @moduledoc """
   Parser for: RFC 2045 Multipart content type (previously RFC 1341).
@@ -23,7 +22,7 @@ defmodule Pop3mail.Multipart do
 
    `multipart_part` - Pop3mail.Part input.
    """
-   @spec parse_content(Part.t) :: list(Part.t) 
+   @spec parse_content(Part.t) :: list(Part.t)
    def parse_content(multipart_part) do
       if is_multipart?(multipart_part) do
          extra_path  = multipart_part.media_type |> String.split("/") |> List.last
@@ -78,7 +77,7 @@ defmodule Pop3mail.Multipart do
      end
    end
 
-   # We could split all the lines at once, but with large attachments this consumes a lot of memory 
+   # We could split all the lines at once, but with large attachments this consumes a lot of memory
    # Instead, we only split a line when needed
    defp lazy_line_split(lines) do
       String.split(lines, "\r\n", parts: 2)
@@ -238,7 +237,7 @@ defmodule Pop3mail.Multipart do
 
    `multipart_part` - Pop3mail.Part input
    """
-   @spec parse_content_type(Part.t, String.t) :: Part.t 
+   @spec parse_content_type(Part.t, String.t) :: Part.t
    def parse_content_type(multipart_part, content_type) do
       if String.length(content_type) > 0 do
          content_type_parameters = String.split(content_type, ~r/\s*;\s*/)
@@ -498,7 +497,7 @@ defmodule Pop3mail.Multipart do
        # search for (file)name = value occurrences and concat them
 
        name_parts = content_parameters
-                  |> Enum.filter(fn(param) -> String.contains?(param, "=") and 
+                  |> Enum.filter(fn(param) -> String.contains?(param, "=") and
                                               String.starts_with?(String.downcase(param), parametername) end)
                   |> Enum.map(&map_parameter(&1))
        case length(name_parts) > 0 do

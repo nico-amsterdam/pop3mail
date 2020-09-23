@@ -1,6 +1,6 @@
 defmodule Pop3mail.Header do
-  alias Pop3mail.WordDecoder
   alias Pop3mail.FileStore
+  alias Pop3mail.WordDecoder
 
    @moduledoc "Email header related functions."
 

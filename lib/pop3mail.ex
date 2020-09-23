@@ -272,7 +272,7 @@ defmodule Pop3mail do
         ok: "testoutput/20140904_192315_Re_appointment/message1.iso-8859-1.txt"]
 
    """
-   @spec decode_raw_file(String.t, String.t) :: {:error, String.t} | {String.t | atom, binary}
+   @spec decode_raw_file(String.t, String.t) :: {atom, String.t} | list({:ok, String.t} | {:error, String.t, String.t}) | {:skip, list({:header, String.t, String.t})}
    def decode_raw_file(filename, output_dir) do
       unless File.dir?(output_dir), do: File.mkdir! output_dir
       case :file.read_file(filename) do

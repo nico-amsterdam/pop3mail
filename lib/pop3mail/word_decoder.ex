@@ -3,8 +3,8 @@
 #
 #
 defmodule Pop3mail.WordDecoder do
-  alias Pop3mail.QuotedPrintable
   alias Pop3mail.Base64Decoder
+  alias Pop3mail.QuotedPrintable
 
    @moduledoc "Decode words as defined in RFC 2047."
 
@@ -83,7 +83,7 @@ defmodule Pop3mail.WordDecoder do
 
    `decoded_text_list` - list with tuples {charset, text}.
    """
-   @spec get_charsets_besides_ascii(list({String.t, String.t})) :: list({String.t}) 
+   @spec get_charsets_besides_ascii(list({String.t, String.t})) :: list({String.t})
    def get_charsets_besides_ascii(decoded_text_list) do
      decoded_text_list
      |> Enum.map(fn({charset, _}) -> String.downcase(charset) end)
