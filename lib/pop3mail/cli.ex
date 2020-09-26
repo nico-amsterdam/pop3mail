@@ -33,8 +33,8 @@ defmodule Pop3mail.CLI do
    end
 
    @doc "Call main with parameters. E.g. main([\"--username=a.b@gmail.com\", \"--password=secret\"]). Call with --help to get a list of all parameters."
-   @spec main(list(String.t)) :: {:ok, integer} | {:error, String.t}
-   def main(args) do
+   @spec main(any()) :: {:ok, integer} | {:error, any}
+   def main(args) when is_list(args) do
      {options, illegal_args, failed_options} = OptionParser.parse(args, strict: [
          password:   :string,
          username:   :string,
@@ -52,6 +52,10 @@ defmodule Pop3mail.CLI do
      else
         process_options(options, illegal_args, failed_options)
      end
+   end
+
+   def main(_) do
+     show_help()
    end
 
    # get user input. Used for username/password.

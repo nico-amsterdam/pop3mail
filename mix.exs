@@ -4,7 +4,7 @@ defmodule Pop3mail.Mixfile do
   def project do
     [
       app: :pop3mail,
-      version: "1.3.2",
+      version: "1.3.3",
       elixir: "~> 1.4",
 
       # Hex
@@ -43,8 +43,8 @@ defmodule Pop3mail.Mixfile do
   defp deps do
     [
       {:pop3client, "~> 1.3.1"},
-      {:ex_doc, "~> 0.19", only: :dev},
-      {:credo,  "~> 1.0" , only: :dev}
+      {:ex_doc, "~> 0.22.6", only: :dev},
+      {:credo,  "~> 1.4"   , only: :dev}
     ]
   end
 

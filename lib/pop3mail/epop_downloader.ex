@@ -1,4 +1,3 @@
-
 defmodule Pop3mail.EpopDownloader do
   alias Pop3mail.Handler
 
@@ -36,8 +35,8 @@ defmodule Pop3mail.EpopDownloader do
 
    `options` - EpopDownloader.Options
    """
-   @spec download(Options.t) :: {:ok, integer} | {:error, String.t}
-   def download(options) do
+   @spec download(Options.t) :: {:ok, integer} | {:error, any}
+   def download(%Options{} = options) do
      username = to_charlist(options.username)
      password = to_charlist(options.password)
      server = to_charlist(options.server)
@@ -69,7 +68,7 @@ defmodule Pop3mail.EpopDownloader do
    * `options` - EpopDownloader.Options
    """
    @spec retrieve_and_store_all(epop_client, Options.t) :: {:ok, integer}
-   def retrieve_and_store_all(epop_client, options) do
+   def retrieve_and_store_all(epop_client, %Options{} = options) do
         # This information returned by the server is not always reliable
         {:ok, {total_count, size_total}} = :epop_client.stat(epop_client)
         count_formatted = format_number(total_count)
@@ -104,8 +103,8 @@ defmodule Pop3mail.EpopDownloader do
    * `mail_loop_counter` - number of the email in the current session.
    * `options` - EpopDownloader.Options
    """
-   @spec retrieve_and_store(epop_client, integer, Options.t) :: {:ok, integer} | {:skip, list({:header, String.t, String.t})} | {atom, String.t} | {:error, String.t, String.t}
-   def retrieve_and_store(epop_client, mail_loop_counter, options) do
+   @spec retrieve_and_store(epop_client, integer, Options.t) :: {atom, String.t} | list({:ok, String.t} | {:error, String.t, String.t}) | {:skip, list({:header, String.t, String.t})}
+   def retrieve_and_store(epop_client, mail_loop_counter, %Options{} = options) do
       case :epop_client.bin_retrieve(epop_client, mail_loop_counter) do
         {:ok, mail_content} -> result = parse_process_and_store(mail_content, mail_loop_counter, options.delivered, options.save_raw , options.output_dir)
                                if options.delete do

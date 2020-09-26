@@ -24,7 +24,7 @@ defmodule Pop3mail.Body do
 
    @doc "Store all found body parts on filesystem"
    @spec store_multiparts(list(Part.t), String.t) :: list({:ok, String.t} | {:error, String.t, String.t})
-   def store_multiparts(multipart_part_list, dirname) do
+   def store_multiparts(multipart_part_list, dirname) when is_list(multipart_part_list) and is_binary(dirname) do
       Enum.map(multipart_part_list, &(store_part(&1, dirname)))
    end
 

@@ -1,4 +1,5 @@
 defmodule Pop3mail.FileStore do
+  alias Pop3mail.Part
 
    @moduledoc "Store header, messages and attachments on the filesystem."
 
@@ -46,7 +47,7 @@ defmodule Pop3mail.FileStore do
    Unusual characters for the filesystem will be filtered out. If creating the directory with unsafe_addition fails, the directory will be created without it.
    """
    @spec mkdir(String.t, String.t, binary) :: String.t
-   def mkdir(base_dir, name, unsafe_addition) do
+   def mkdir(base_dir, name, unsafe_addition) when is_binary(base_dir) and is_binary(name) and is_binary(unsafe_addition) do
       if String.length(unsafe_addition) > 0 do
           shortened_unsafe_addition = remove_unwanted_chars(unsafe_addition, 45)
           dirname = Path.join(base_dir, name <> "-" <> shortened_unsafe_addition)
@@ -74,8 +75,8 @@ defmodule Pop3mail.FileStore do
 
    `multipart_part` - a Pop3mail.Part. Filenames are truncated at 100 characters.
    """
-   @spec store_part(Pop3mail.Part.t, String.t) :: {:ok, String.t} | {:error, String.t, String.t}
-   def store_part(multipart_part, base_dir) do
+   @spec store_part(Part.t, String.t) :: {:ok, String.t} | {:error, String.t, String.t}
+   def store_part(%Part{} = multipart_part, base_dir) do
      dirname = Path.join(base_dir, multipart_part.path)
      unless File.dir?(dirname), do: File.mkdir_p!(dirname)
 
@@ -114,8 +115,8 @@ defmodule Pop3mail.FileStore do
 
    `multipart_part` - a Pop3mail.Part
    """
-   @spec dos2unix(Pop3mail.Part.t) :: Pop3mail.Part.t
-   def dos2unix(multipart_part) do
+   @spec dos2unix(Part.t) :: Part.t
+   def dos2unix(%Part{} = multipart_part) do
       line_sep = get_line_separator()
       unix_text = multipart_part.content |> String.splitter("\r\n") |> Enum.join(line_sep)
       %{multipart_part | content: unix_text}
@@ -126,7 +127,7 @@ defmodule Pop3mail.FileStore do
    Remove characters which are undesirable for filesystems (like \\ / : * ? " < > | [ ] and control characters)
    """
    @spec remove_unwanted_chars(binary, non_neg_integer) :: String.t
-   def remove_unwanted_chars(text, max_chars) do
+   def remove_unwanted_chars(text, max_chars) when is_binary(text) and is_integer(max_chars) and max_chars >= 0 do
       # Remove all control characters. Windows doesn't like: \ / : * ? " < > | and dots or spaces at the start/end.
       if String.printable?(text) do
         # for utf-8 compatible text we accept more than just the 7bit ascii range.
@@ -173,7 +174,7 @@ defmodule Pop3mail.FileStore do
 
    `multipart_part` - a Pop3mail.Part
    """
-   @spec set_default_filename(Pop3mail.Part.t) :: Pop3mail.Part.t
+   @spec set_default_filename(Part.t) :: Part.t
    def set_default_filename(multipart_part) do
         filename = get_default_filename(multipart_part.media_type, multipart_part.charset, multipart_part.index)
         %{multipart_part | filename: filename}

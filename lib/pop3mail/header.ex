@@ -13,7 +13,7 @@ defmodule Pop3mail.Header do
    `take`        - Optional parameter to specify maximum number of headers. Negative number takes last header values.
    """
    @spec lookup(list({:header, String.t, String.t}), String.t, integer | nil) :: String.t
-   def lookup(header_list, header_name, take \\ nil) do
+   def lookup(header_list, header_name, take \\ nil) when is_list(header_list) and is_binary(header_name) and (is_nil(take) or is_integer(take)) do
      lc_header_name = String.downcase(header_name)
      header_list
      |> Enum.filter(fn({:header, name, _}) -> String.downcase(name) == lc_header_name end)

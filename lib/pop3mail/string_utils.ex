@@ -24,7 +24,7 @@ defmodule Pop3mail.StringUtils do
 
    @doc "Print text if it valid utf-8 encoded. If not, print the alternative text."
    @spec printable(binary, String.t) :: String.t
-   def printable(str, printable_alternative \\ "") do
+   def printable(str, printable_alternative \\ "") when is_binary(str) and is_binary(printable_alternative) do
       case String.printable?(str) do
         true  -> str
         false -> printable_alternative
@@ -37,6 +37,6 @@ defmodule Pop3mail.StringUtils do
 
    @doc "true if search is found in content"
    @spec contains?(String.t | nil, String.t) :: boolean
-   def contains?(content, search), do: !is_nil(content) and String.contains?(content, search)
+   def contains?(content, search) when (is_nil(content) or is_binary(content)) and is_binary(search), do: !is_nil(content) and String.contains?(content, search)
 
 end

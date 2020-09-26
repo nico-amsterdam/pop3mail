@@ -10,7 +10,7 @@ defmodule Pop3mail.WordDecoder do
 
    @doc "Decode a text with possibly encoded-words. Returns a list with tuples {charset, text}. Not encoded text is returned with us-ascii charset."
    @spec decode_text(String.t) :: list({String.t, binary})
-   def decode_text(input_text) do
+   def decode_text(input_text) when is_binary(input_text) do
      if String.contains?(input_text, "=?") do
         # RFC 2045:
         # When displaying a particular header field that contains multiple
@@ -37,7 +37,7 @@ defmodule Pop3mail.WordDecoder do
 
    @doc "Decode a word. text with possibly encoded-words. Returns a list with tuples {charset, text}. Not encoded text is returned with us-ascii charset."
    @spec decode_word(String.t) :: {String.t, binary}
-   def decode_word(text) do
+   def decode_word(text) when is_binary(text) do
      if String.starts_with?(text, "=?") do
 
         found_word = Regex.run(~r/=\?([\w-]+)\?([BQbq])\?([^\s]*)\?=/, text)
@@ -60,7 +60,7 @@ defmodule Pop3mail.WordDecoder do
    `encoding` - B/Q B=base64 encoded, Q=Quoted-printable
    """
    @spec decode_word(String.t, <<_::8>>) :: binary
-   def decode_word(text, encoding) when encoding in ["B", "b"] do
+   def decode_word(text, encoding) when is_binary(text) and encoding in ["B", "b"] do
       try do
          Base64Decoder.decode!(text)
       rescue
@@ -68,7 +68,7 @@ defmodule Pop3mail.WordDecoder do
       end
    end
 
-   def decode_word(text, encoding) when encoding in ["Q", "q"] do
+   def decode_word(text, encoding) when is_binary(text) and encoding in ["Q", "q"] do
       # RFC 2047: The 8-bit hexadecimal value 20 (e.g., ISO-8859-1 SPACE) may be represented as "_" (underscore, ASCII 95.).
       text
       |> String.replace("_", " ")
@@ -84,7 +84,7 @@ defmodule Pop3mail.WordDecoder do
    `decoded_text_list` - list with tuples {charset, text}.
    """
    @spec get_charsets_besides_ascii(list({String.t, String.t})) :: list({String.t})
-   def get_charsets_besides_ascii(decoded_text_list) do
+   def get_charsets_besides_ascii(decoded_text_list) when is_list(decoded_text_list) do
      decoded_text_list
      |> Enum.map(fn({charset, _}) -> String.downcase(charset) end)
      |> Enum.filter(fn(charset) -> charset != "us-ascii" end)
@@ -99,7 +99,7 @@ defmodule Pop3mail.WordDecoder do
    * `add_charset_name` - put the name of the charset after the decoded text parts (when it isn't us-ascii). A hint for the reader if a text contains multiple charsets.
    """
    @spec decoded_text_list_to_string(list({String.t, String.t}), boolean) :: String.t
-   def decoded_text_list_to_string(decoded_text_list, add_charset_name \\ false) do
+   def decoded_text_list_to_string(decoded_text_list, add_charset_name \\ false) when is_list(decoded_text_list) and is_boolean(add_charset_name) do
       map_text_fun = if add_charset_name, do: &with_charset/1, else: &without_charset/1
       decoded_text_list
       |> Enum.map(map_text_fun)

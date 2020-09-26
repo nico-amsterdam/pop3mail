@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.3.3 (2020-09-26)
+
+* Bug fixes
+  * Graceful error correction of common line continuation faults in Content-Description headers
+  * Allow longer attachment filenames to be stored. Cut off at 100 characters.
+  * Fix dialyzer warnings
+
 ## v1.3.2 (2019-05-24)
 
 * Bug fixes
