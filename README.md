@@ -95,14 +95,14 @@ or without shell/batch script:
 
 \*nix
 ```sh
-$ mix run -e 'Pop3mail.CLI.main(["--help"])'
-$ mix run -e 'Pop3mail.CLI.main(["--username=<your email username>", "--password=<your email password>", "--max=10", "--raw"])'
+$ mix run_pop3mail --help
+$ mix run_pop3mail --username='<your email username>' --password='<your email password>' --max=10 --raw
 ```
 
 Windows
 ```dos
-C:\pop3mail\mix run -e "Pop3mail.CLI.main([""--help""])"
-C:\pop3mail\mix run -e "Pop3mail.CLI.main([""--username=<your email username>"", ""--password=<your email password>"", ""--max=10"", ""--raw""])"
+C:\pop3mail\mix run_pop3mail --help
+C:\pop3mail\mix run_pop3mail --username="<your email username>" --password="<your email password>" --max=10 --raw
 ```
 
 The script defaults to Gmail, but you can specify other POP3 server and port settings.

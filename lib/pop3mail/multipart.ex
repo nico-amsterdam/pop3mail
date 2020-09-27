@@ -31,8 +31,7 @@ defmodule Pop3mail.Multipart do
          top_level_multipart_part_list = parse_multipart(multipart_part.boundary, multipart_part.content, new_path)
 
          # multiparts can contain other multiparts, go deeper
-         l = Enum.flat_map(top_level_multipart_part_list, &(parse_content(&1)))
-         l
+         Enum.flat_map(top_level_multipart_part_list, &(parse_content(&1)))
       else
          # ready
          [multipart_part]
