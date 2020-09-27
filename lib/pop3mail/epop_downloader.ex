@@ -6,7 +6,7 @@ defmodule Pop3mail.EpopDownloader do
    @moduledoc "Retrieve and parse POP3 mail via the Epop client."
 
    @typedoc "Epop client from erlpop"
-   @type epop_client :: :epop_client.connection()
+   @type epop_client_type :: :epop_client.connection()
 
    defmodule Options do
 
@@ -67,7 +67,7 @@ defmodule Pop3mail.EpopDownloader do
    * `epop_client` - client returned by :epop_client.connect function.
    * `options` - EpopDownloader.Options
    """
-   @spec retrieve_and_store_all(epop_client, Options.t) :: {:ok, integer}
+   @spec retrieve_and_store_all(epop_client_type, Options.t) :: {:ok, integer}
    def retrieve_and_store_all(epop_client, %Options{} = options) do
         # This information returned by the server is not always reliable
         {:ok, {total_count, size_total}} = :epop_client.stat(epop_client)
@@ -103,7 +103,7 @@ defmodule Pop3mail.EpopDownloader do
    * `mail_loop_counter` - number of the email in the current session.
    * `options` - EpopDownloader.Options
    """
-   @spec retrieve_and_store(epop_client, integer, Options.t) :: {atom, String.t} | list({:ok, String.t} | {:error, String.t, String.t}) | {:skip, list({:header, String.t, String.t})}
+   @spec retrieve_and_store(epop_client_type, integer, Options.t) :: {atom, String.t} | list({:ok, String.t} | {:error, String.t, String.t}) | {:skip, list({:header, String.t, String.t})}
    def retrieve_and_store(epop_client, mail_loop_counter, %Options{} = options) do
       case :epop_client.bin_retrieve(epop_client, mail_loop_counter) do
         {:ok, mail_content} -> result = parse_process_and_store(mail_content, mail_loop_counter, options.delivered, options.save_raw , options.output_dir)

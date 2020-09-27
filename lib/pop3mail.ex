@@ -68,7 +68,7 @@ defmodule Pop3mail do
        iex(1)> Pop3mail.download(%{"max" => 2, "raw" => true, "username" => "hendrik.lorentz@gmail.com", "password" => "secret", "output" => "mailbox"})
 
    """
-   @spec download(keyword) :: {:ok, integer} | {:error, String.t}
+   @spec download(%{required(String.t) => String.t | boolean | non_neg_integer}) :: {:ok, integer} | {:error, String.t}
    def download(params) do
      epop_options = %Pop3mail.EpopDownloader.Options{
        username:   params["username"],
