@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.3.4 (2020-10-07)
+
+* Bug fixes
+  * Fix Elixir 1.11 warnings; add application dependencies :pop3client and :inets
+
 ## v1.3.3 (2020-09-26)
 
 * Bug fixes
