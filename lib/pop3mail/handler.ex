@@ -57,7 +57,7 @@ defmodule Pop3mail.Handler do
           process_and_store(mail, options)
       else
           date = Header.lookup(mail.header_list, "Date")
-          Logger.info "  Mail #{mail.mail_loop_counter} dated #{date} not stored because of delivered=#{mail.delivered} parameter."
+          Logger.info "  Mail #{mail.mail_loop_counter} dated #{date} not stored because of delivered=#{options.delivered} parameter."
           {:skip, mail.header_list}
       end
    end

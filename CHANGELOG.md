@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.4.1 (2023-10-11)
+* Bug fixes
+  * Option --delivered crashes when logging warning about mail without Delivered-To header
+
 ## v1.4.0 (2023-10-10)
 
 * Bug fixes
