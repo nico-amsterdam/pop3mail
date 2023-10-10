@@ -157,10 +157,13 @@ Now your email client should download all mail again.
 
 ## Access Gmail with less secure apps
 
-Ironically, google only trust google apps. Gmail is trusted, but pop3mail not.
+Google only trusts google apps. Gmail is trusted, but pop3mail not.
 You will notice that authentication fails, and google will sent you a security warning by email.
 Access with less secure apps can be turned on for your google account at: 
 https://myaccount.google.com/lesssecureapps
+2 step verification must be on: https://myaccount.google.com/signinoptions/two-step-verification
+In the 2 step verification section, it is possible to set an app password: https://myaccount.google.com/apppasswords
+Use the 16 character password.
 
 ## Google unlock captcha
 

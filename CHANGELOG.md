@@ -1,5 +1,19 @@
 # Changelog
 
+## v1.4.0 (2023-10-10)
+
+* Bug fixes
+  * Drop support for Elixir < 1.9
+  * Fix Elixir 1.15 warnings: 
+    * use Mix.Config -> import Config. Requires minimal Elixir 1.9
+    * logger format in config.ex
+    * Logger doesn't accept atoms anymore, to_string
+    * Application.get_env -> compile_env
+    * replace :http_uri.decode with URI.decode
+    * Logger.warn -> Logger.warning
+  * Fix Credo warnings: combine Enum.map and Enum.join as Enum.map_join
+  * Fix Dialyzer warnings: Erlang returns error reason as atom (not a binary) 
+
 ## v1.3.4 (2020-10-07)
 
 * Bug fixes

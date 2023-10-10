@@ -15,7 +15,7 @@ defmodule Pop3mail.FileStore do
    It will be truncated at 100 characters.
    Unusual characters for the filesystem will be filtered out. If storing with unsafe_addition fails, the file will be stored without it.
    """
-   @spec store_mail_header(String.t, String.t, binary, String.t) :: {:ok, String.t} | {:error, String.t, String.t}
+   @spec store_mail_header(String.t, String.t, binary, String.t) :: {:ok, String.t} | {:error, atom, String.t}
    def store_mail_header(content, filename_prefix, unsafe_addition, dirname) do
       if String.length(unsafe_addition) > 0 do
          filename = filename_prefix <> "." <> remove_unwanted_chars(unsafe_addition, 100) <> ".txt"
@@ -31,7 +31,7 @@ defmodule Pop3mail.FileStore do
    end
 
    @doc "store raw email"
-   @spec store_raw(String.t, String.t, String.t) :: {:ok, String.t} | {:error, String.t, String.t}
+   @spec store_raw(String.t, String.t, String.t) :: {:ok, String.t} | {:error, atom, String.t}
    def store_raw(mail_content, filename, dirname) do
      path = Path.join(dirname, filename)
      write_file(path, mail_content)
@@ -47,25 +47,26 @@ defmodule Pop3mail.FileStore do
    Unusual characters for the filesystem will be filtered out. If creating the directory with unsafe_addition fails, the directory will be created without it.
    """
    @spec mkdir(String.t, String.t, binary) :: String.t
-   def mkdir(base_dir, name, unsafe_addition) when is_binary(base_dir) and is_binary(name) and is_binary(unsafe_addition) do
-      if String.length(unsafe_addition) > 0 do
-          shortened_unsafe_addition = remove_unwanted_chars(unsafe_addition, 45)
-          dirname = Path.join(base_dir, name <> "-" <> shortened_unsafe_addition)
-          if File.dir?(dirname) do
-             dirname
-          else
-             # check if the operating system is able to create this directory, if not, try without unsafe addition
-             case File.mkdir(dirname) do
-               :ok -> dirname
-               {:error, _} -> mkdir(base_dir, name, "")  # drop the unsafe addition and re-try
-             end
-          end
+   def mkdir(base_dir, name, unsafe_addition) when is_binary(base_dir) and is_binary(name) and is_binary(unsafe_addition) and unsafe_addition != "" do
+      shortened_unsafe_addition = remove_unwanted_chars(unsafe_addition, 45)
+      dirname = Path.join(base_dir, name <> "-" <> shortened_unsafe_addition)
+      if File.dir?(dirname) do
+         dirname
       else
-          dirname = Path.join(base_dir, name)
-          unless File.dir?(dirname), do: File.mkdir!(dirname)
-          dirname
+         # check if the operating system is able to create this directory, if not, try without unsafe addition
+         case File.mkdir(dirname) do
+           :ok -> dirname
+           {:error, _} -> mkdir(base_dir, name, "")  # drop the unsafe addition and re-try
+         end
       end
    end
+
+   def mkdir(base_dir, name, unsafe_addition) when is_binary(base_dir) and is_binary(name) and is_binary(unsafe_addition) and unsafe_addition == "" do
+      dirname = Path.join(base_dir, name)
+      unless File.dir?(dirname), do: File.mkdir!(dirname)
+      dirname
+   end
+
 
    # store body content
    @doc """
@@ -75,7 +76,7 @@ defmodule Pop3mail.FileStore do
 
    `multipart_part` - a Pop3mail.Part. Filenames are truncated at 100 characters.
    """
-   @spec store_part(Part.t, String.t) :: {:ok, String.t} | {:error, String.t, String.t}
+   @spec store_part(Part.t, String.t) :: {:ok, String.t} | {:error, atom, String.t}
    def store_part(%Part{} = multipart_part, base_dir) do
      dirname = Path.join(base_dir, multipart_part.path)
      unless File.dir?(dirname), do: File.mkdir_p!(dirname)

@@ -23,13 +23,13 @@ defmodule Pop3mail.Body do
    end
 
    @doc "Store all found body parts on filesystem"
-   @spec store_multiparts(list(Part.t), String.t) :: list({:ok, String.t} | {:error, String.t, String.t})
+   @spec store_multiparts(list(Part.t), String.t) :: list({:ok, String.t} | {:error, atom, String.t})
    def store_multiparts(multipart_part_list, dirname) when is_list(multipart_part_list) and is_binary(dirname) do
       Enum.map(multipart_part_list, &(store_part(&1, dirname)))
    end
 
    @doc "Store one part on filesystem"
-   @spec store_part(Part.t, String.t) :: {:ok, String.t} | {:error, String.t, String.t}
+   @spec store_part(Part.t, String.t) :: {:ok, String.t} | {:error, atom, String.t}
    def store_part(multipart_part, base_dir) do
       # make sure we have a filename
       multipart_part =
@@ -43,7 +43,7 @@ defmodule Pop3mail.Body do
       result = FileStore.store_part(multipart_part, base_dir)
       case result do
         {:ok, _} -> result
-        {:error, reason, _} -> Logger.error(reason)
+        {:error, reason, _} -> Logger.error(to_string(reason))
                                result
       end
    end

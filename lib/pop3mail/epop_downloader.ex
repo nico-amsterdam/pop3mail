@@ -35,7 +35,7 @@ defmodule Pop3mail.EpopDownloader do
 
    `options` - EpopDownloader.Options
    """
-   @spec download(Options.t) :: {:ok, integer} | {:error, any}
+   @spec download(Options.t) :: {:ok, integer} | {:error, atom}
    def download(%Options{} = options) do
      username = to_charlist(options.username)
      password = to_charlist(options.password)
@@ -48,7 +48,7 @@ defmodule Pop3mail.EpopDownloader do
        end
      case :epop_client.connect(ensure_at_symbol(username, server), password, connect_options) do
        {:ok,    client} -> retrieve_and_store_all(client, options)
-       {:error, reason} -> Logger.error(reason)
+       {:error, reason} -> Logger.error(to_string(reason))
                            {:error, reason}
      end
    end
@@ -103,19 +103,16 @@ defmodule Pop3mail.EpopDownloader do
    * `mail_loop_counter` - number of the email in the current session.
    * `options` - EpopDownloader.Options
    """
-   @spec retrieve_and_store(epop_client_type, integer, Options.t) :: {atom, String.t} | list({:ok, String.t} | {:error, String.t, String.t}) | {:skip, list({:header, String.t, String.t})}
+   @spec retrieve_and_store(epop_client_type, integer, Options.t) :: {atom, String.t} | list({:ok, String.t} | {:error, String.t}) | {:skip, list({:header, String.t, String.t})}
    def retrieve_and_store(epop_client, mail_loop_counter, %Options{} = options) do
-      case :epop_client.bin_retrieve(epop_client, mail_loop_counter) do
-        {:ok, mail_content} -> result = parse_process_and_store(mail_content, mail_loop_counter, options.delivered, options.save_raw , options.output_dir)
-                               if options.delete do
-                                 :ok = :epop_client.delete(epop_client, mail_loop_counter)
-                               end
-                               # It might be time now to clean things up:
-                               # :erlang.garbage_collect()
-                               result
-        {:error, reason} -> Logger.error(reason)
-                            {:error, reason}
+      {:ok, mail_content} = :epop_client.bin_retrieve(epop_client, mail_loop_counter)
+      result = parse_process_and_store(mail_content, mail_loop_counter, options.delivered, options.save_raw , options.output_dir)
+      if options.delete do
+         :ok = :epop_client.delete(epop_client, mail_loop_counter)
       end
+      # It might be time now to clean things up:
+      # :erlang.garbage_collect()
+      result
    end
 
    @doc """

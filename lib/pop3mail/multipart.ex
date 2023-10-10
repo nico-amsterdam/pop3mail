@@ -67,11 +67,11 @@ defmodule Pop3mail.Multipart do
      # split at --boundary
      [_ | parts] = String.split(multipart, "--" <> boundary_name <> "\r\n")
      if parts == [] do
-        Logger.warn "    Boundary #{boundary_name} not found."
+        Logger.warning "    Boundary #{boundary_name} not found."
         []
      else
-        if length(multipart_list) <= 1, do: Logger.warn "    End boundary #{boundary_name} not found."
-        if length(multipart_list)  > 2, do: Logger.warn "    Multiple end boundaries #{boundary_name} found."
+        if length(multipart_list) <= 1, do: Logger.warning "    End boundary #{boundary_name} not found."
+        if length(multipart_list)  > 2, do: Logger.warning "    Multiple end boundaries #{boundary_name} found."
         parts |> Enum.with_index(1) |> Enum.flat_map(&(parse_part(&1, boundary_name, path)))
      end
    end
@@ -137,7 +137,7 @@ defmodule Pop3mail.Multipart do
      otherlines =
         if String.length(String.trim(line)) > 0 do
            # this is not always the case or we have an unknown header here.
-           Logger.warn "    Missing newline or unknown header in body" <> StringUtils.printable(" at line: " <> line)
+           Logger.warning "    Missing newline or unknown header in body" <> StringUtils.printable(" at line: " <> line)
            # fix; don't skip line
            [line | otherlines]
         else
@@ -205,7 +205,7 @@ defmodule Pop3mail.Multipart do
          lines_continued(line1 <> line2, otherlines ++ even_more)
       else
          if line2 =~ ~r/^\s+\S/ do
-            Logger.warn "    Non-standard header continuation" <> StringUtils.printable(" after line: " <> line1)
+            Logger.warning "    Non-standard header continuation" <> StringUtils.printable(" after line: " <> line1)
             lines_continued(line1 <> line2, otherlines ++ even_more)
          else
             {line1, [line2 | otherlines ++ even_more]}
@@ -385,7 +385,7 @@ defmodule Pop3mail.Multipart do
    @spec parse_part_unknown_header(Part.t, String.t, list(String.t)) :: Part.t
    def parse_part_unknown_header(multipart_part, encoding, [line | otherlines]) do
      {line, split_lines} = lines_continued(line, otherlines)
-     Logger.warn "    Unknown header line in body ignored" <> StringUtils.printable(": " <> line)
+     Logger.warning "    Unknown header line in body ignored" <> StringUtils.printable(": " <> line)
      parse_part_lines(multipart_part, encoding, split_lines)
    end
 
@@ -473,7 +473,7 @@ defmodule Pop3mail.Multipart do
      try do
         Base64Decoder.decode!(text)
      rescue
-        _ -> Logger.warn("    Invalid encoded base64 content. Please check.")
+        _ -> Logger.warning("    Invalid encoded base64 content. Please check.")
              "ERROR: invalid base64 encoded text:\n" <> text
      end
    end
@@ -530,8 +530,7 @@ defmodule Pop3mail.Multipart do
       # When the regex above ~r/^[^=]*\*=/ matches filename*= or filename*0*= it indicates that there should be encoding
       {_, with_charset, _} = Enum.at(name_parts, 0)
       filename = name_parts
-                 |> Enum.map(fn({_, _, val}) -> val end)
-                 |> Enum.join
+                 |> Enum.map_join(fn({_, _, val}) -> val end)
       {filename, charset} = decode_filename_and_charset(filename, charset, with_charset)
       if String.length(filename) > 0 do
          multipart_part = %{multipart_part | filename: filename}
@@ -585,9 +584,7 @@ defmodule Pop3mail.Multipart do
    # RFC 2231, extended-initial-value
    defp decoded_extended_filename_and_charset(filename) do
       uu_decoded = filename
-                   |> :erlang.binary_to_list
-                   |> :http_uri.decode
-                   |> :erlang.list_to_binary
+                   |> URI.decode
       splitted = String.split(uu_decoded, "'")
       decoded_filename = splitted |> Enum.drop(2) |> Enum.join("'")
       filename_charset = Enum.at(splitted, 0)

@@ -102,8 +102,7 @@ defmodule Pop3mail.WordDecoder do
    def decoded_text_list_to_string(decoded_text_list, add_charset_name \\ false) when is_list(decoded_text_list) and is_boolean(add_charset_name) do
       map_text_fun = if add_charset_name, do: &with_charset/1, else: &without_charset/1
       decoded_text_list
-      |> Enum.map(map_text_fun)
-      |> Enum.join
+      |> Enum.map_join(map_text_fun)
    end
 
    # return just the text

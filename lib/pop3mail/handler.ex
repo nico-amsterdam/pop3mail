@@ -49,7 +49,7 @@ defmodule Pop3mail.Handler do
    `mail`    - Handler.Mail
    `options` - Handler.Options
    """
-   @spec check_process_and_store(Mail.t, Options.t) :: list({:ok, String.t} | {:error, String.t, String.t}) | {:skip, list({:header, String.t, String.t})}
+   @spec check_process_and_store(Mail.t, Options.t) :: list({:ok, String.t} | {:error, atom, String.t}) | {:skip, list({:header, String.t, String.t})}
    def check_process_and_store(mail, options) do
      # skip or not. don't skip if delivered=nil or delivered is true/false and there is/isn't a Delivered-To header.
       run = is_nil(options.delivered) or (options.delivered == has_delivered_to_header(mail.header_list))
@@ -74,7 +74,7 @@ defmodule Pop3mail.Handler do
    `mail`    - Handler.Mail
    `options` - Handler.Options
    """
-   @spec process_and_store(Mail.t, Options.t) :: list({:ok, String.t} | {:error, String.t, String.t})
+   @spec process_and_store(Mail.t, Options.t) :: list({:ok, String.t} | {:error, atom, String.t})
    def process_and_store(mail, options) do
       date    = Header.lookup(mail.header_list, "Date")
       subject = Header.lookup(mail.header_list, "Subject")
@@ -103,7 +103,7 @@ defmodule Pop3mail.Handler do
       result = Header.store(header_list, filename_prefix, sender_name, dirname)
       case result do
            {:ok, _} -> result
-           {:error, reason, _} -> Logger.error(reason)
+           {:error, reason, _} -> Logger.error(to_string(reason))
                                   result
       end
    end
@@ -114,7 +114,7 @@ defmodule Pop3mail.Handler do
       result = FileStore.store_raw(mail_content, "raw.eml", dirname)
       case result do
            {:ok, _} -> result
-           {:error, reason, _} -> Logger.error(reason)
+           {:error, reason, _} -> Logger.error(to_string(reason))
                                   result
       end
    end
@@ -124,7 +124,7 @@ defmodule Pop3mail.Handler do
 
    `header_list` - list with tuples of {:header, header name, header value}.
    """
-   @spec process_and_store_body(list({:header, String.t, String.t}), String.t, String.t) :: list({:ok, String.t} | {:error, String.t, String.t})
+   @spec process_and_store_body(list({:header, String.t, String.t}), String.t, String.t) :: list({:ok, String.t} | {:error, atom, String.t})
    def process_and_store_body(header_list, body_content, dirname) do
       multipart_part_list = decode_body_content(header_list, body_content)
 
@@ -197,8 +197,7 @@ defmodule Pop3mail.Handler do
    def remove_encodings(text) do
       decoded_text_list = WordDecoder.decode_text(text)
       decoded_text_list
-      |> Enum.map(fn({_, val}) -> val end)
-      |> Enum.join
+      |> Enum.map_join(fn({_, val}) -> val end)
    end
 
 end

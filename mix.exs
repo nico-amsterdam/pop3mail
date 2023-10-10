@@ -1,11 +1,14 @@
 defmodule Pop3mail.Mixfile do
   use Mix.Project
 
+  @version "1.4.0"
+  @source_url "https://github.com/nico-amsterdam/pop3mail"
+
   def project do
     [
       app: :pop3mail,
-      version: "1.3.4",
-      elixir: "~> 1.4",
+      version: @version,
+      elixir: "~> 1.9",
 
       # Hex
       package: package(),
@@ -16,11 +19,12 @@ defmodule Pop3mail.Mixfile do
         source_ref: "master",
         main: "Pop3mail",
         canonical: "http://hexdocs.pm/pop3mail",
-        source_url: "https://github.com/nico-amsterdam/pop3mail"
+        source_url: @source_url
       ],
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      dialyzer: [plt_add_apps: [:mix]]
     ]
   end
 
@@ -45,8 +49,9 @@ defmodule Pop3mail.Mixfile do
   defp deps do
     [
       {:pop3client, "~> 1.3.1"},
-      {:ex_doc, "~> 0.22.6", only: :dev},
-      {:credo,  "~> 1.4"   , only: :dev}
+      {:ex_doc, "~> 0.30.6", only: :dev},
+      {:credo,  "~> 1.7"   , only: :dev},
+      {:dialyxir, "~> 1.3", only: [:dev], runtime: false}
     ]
   end
 
@@ -63,7 +68,7 @@ defmodule Pop3mail.Mixfile do
       name: :pop3mail,
       maintainers: ["Nico Hoogervorst"],
       licenses: ["MIT"],
-      links: %{"GitHub" => "https://github.com/nico-amsterdam/pop3mail"}
+      links: %{"GitHub" => @source_url}
     ]
   end
 end

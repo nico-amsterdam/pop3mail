@@ -7,7 +7,7 @@ defmodule Pop3mail.Base64Decoder do
    * mix deps.compile --force pop3mail
    """
 
-   @base64_decoder Application.get_env(:pop3mail, :base64_decoder, Pop3mail.Base64Decoder.Standard)
+   @base64_decoder Application.compile_env(:pop3mail, :base64_decoder, Pop3mail.Base64Decoder.Standard)
 
    defmodule Standard do
 

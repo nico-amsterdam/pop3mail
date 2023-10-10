@@ -1,6 +1,6 @@
 # This file is responsible for configuring your application
-# and its dependencies with the aid of the Mix.Config module.
-use Mix.Config
+# and its dependencies with the aid of the Config module.
+import Config
 
 # This configuration is loaded before any dependency and is restricted
 # to this project. If another project depends on this project, this
@@ -14,7 +14,7 @@ use Mix.Config
 #
 # And access this configuration in your application as:
 #
-#     Application.get_env(:pop3mail, :key)
+#     Application.compile_env(:pop3mail, :key)
 #
 # Or configure a 3rd-party app:
 #
@@ -22,7 +22,7 @@ use Mix.Config
 #
 
 config :logger, :console,
- format: "$level: $levelpad$message\n"
+   format: "$level: $message\n"
 
 # It is also possible to import configuration files, relative to this
 # directory. For example, you can emulate configuration per environment
