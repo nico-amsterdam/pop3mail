@@ -3,6 +3,7 @@
 ## v1.4.1 (2023-10-11)
 * Bug fixes
   * Option --delivered crashes when logging warning about mail without Delivered-To header
+  * Drop support for Elixir < 1.11. Logger.warning was introduced in 1.11.0
 
 ## v1.4.0 (2023-10-10)
 
