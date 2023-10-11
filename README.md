@@ -42,8 +42,10 @@ Also install [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
 
 ### Erlang/OTP version
 
-For some unknown reason the error 'connection_failed' occurs with OTP 26 and Erlang 1.14.
-Reverted back to OTP 25 and Erlang 1.13:
+The error 'connection_failed' is thrown with OTP 26 and Erlang 1.14.
+The pop3client must be upgraded to verify the server as mentioned in [gen_smtp issue](https://github.com/gen-smtp/gen_smtp/issues/328).
+For now, use OTP 25.
+To revert back to OTP 25 and Erlang 1.13:
 
 ```sh
 $ erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().'  -noshell
