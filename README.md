@@ -40,6 +40,37 @@ Follow the instructions on http://elixir-lang.org/install.html
 
 Also install [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) and optionally also rebar3.
 
+### Erlang/OTP version
+
+For some unknown reason the error 'connection_failed' occurs with OTP 26 and Erlang 1.14.
+Reverted back to OTP 25 and Erlang 1.13:
+
+$ erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().'  -noshell
+$ cat /usr/lib/erlang/releases/RELEASES
+$ sudo apt-get remove erlang
+$ wget https://packages.erlang-solutions.com/erlang-solutions_1.0_all.deb
+$ curl --no-progress-meter https://www.debian.org/releases/ | grep Debian | grep '<q>'
+$ # use codename bullseye to get OTP 25 in the following command:
+$ sudo dpkg -i erlang-solutions_1.0_all.deb
+$ sudo apt-get update
+$ apt-cache policy esl-erlang
+$ # if erlang-solutions was already installed, change codename in this file: 
+$ sudo vi /etc/apt/sources.list.d/erlang-solutions.list 
+$ sudo apt update
+$ apt-cache policy esl-erlang
+$ sudo apt-get install esl-erlang
+$ cat /usr/lib/erlang/releases/RELEASES
+$ asdf current
+$ asdf list-all elixir | grep 25
+$ asdf install elixir 1.15.6-otp-25
+$ asdf global elixir 1.15.6-otp-25
+$ asdf current
+$ cd pop3mail
+$ mix deps.clean --all
+$ mix clean
+$ mix deps.get
+$ mix compile
+
 
 ### Clone project
 

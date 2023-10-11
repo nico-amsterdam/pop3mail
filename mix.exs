@@ -8,7 +8,7 @@ defmodule Pop3mail.Mixfile do
     [
       app: :pop3mail,
       version: @version,
-      elixir: "~> 1.9",
+      elixir: "~> 1.11",
 
       # Hex
       package: package(),
@@ -33,7 +33,7 @@ defmodule Pop3mail.Mixfile do
   # Type "mix help compile.app" for more information
   def application do
     [
-     extra_applications: [:logger, :inets]
+     extra_applications: [:logger, :inets, :ssl]
     ]
   end
 
