@@ -45,6 +45,7 @@ Also install [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
 For some unknown reason the error 'connection_failed' occurs with OTP 26 and Erlang 1.14.
 Reverted back to OTP 25 and Erlang 1.13:
 
+```sh
 $ erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().'  -noshell
 $ cat /usr/lib/erlang/releases/RELEASES
 $ sudo apt-get remove erlang
@@ -70,7 +71,7 @@ $ mix deps.clean --all
 $ mix clean
 $ mix deps.get
 $ mix compile
-
+```
 
 ### Clone project
 
