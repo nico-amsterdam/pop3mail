@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.5.0 (2023-12-01)
+* Fixes
+  * Use upgraded pop3client v1.4 with support for OTP 26
+  * New cli parameters: cacertfile and verify
+  * No warning anymore for Content-Length headers in multipart data
+
 ## v1.4.1 (2023-10-11)
 * Bug fixes
   * Option --delivered crashes when logging warning about mail without Delivered-To header

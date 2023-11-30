@@ -110,9 +110,10 @@ defmodule Pop3mail.WordDecoder do
 
    # return text with name of charset if it isn't just ascii
    defp with_charset({charset, text}) do
-      case charset != "us-ascii" and String.length(text) > 0 do
-         true -> "#{text} (#{charset})"
-         _    -> text
+      if charset != "us-ascii" and String.length(text) > 0 do
+         "#{text} (#{charset})"
+      else
+         text
       end
    end
 

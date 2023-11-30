@@ -33,10 +33,11 @@ defmodule Pop3mail.Body do
    def store_part(multipart_part, base_dir) do
       # make sure we have a filename
       multipart_part =
-        case String.length(multipart_part.filename) == 0 do
-          # currently there is no filename, set default
-          true  -> FileStore.set_default_filename(multipart_part)
-          false -> multipart_part
+        if String.length(multipart_part.filename) == 0 do
+           # currently there is no filename, set default
+           FileStore.set_default_filename(multipart_part)
+        else
+           multipart_part
         end
       Logger.info "    " <> StringUtils.printable(multipart_part.filename, "file")
 

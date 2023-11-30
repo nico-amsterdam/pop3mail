@@ -14,8 +14,9 @@ defmodule Pop3mail.EpopDownloader do
       A struct that holds pop3mail parameter options.
 
       It's fields are:
+      * `cacertfile` - full filename of the CA certifications file. nil = OS CA Certificates.
       * `delete`     - delete email after downloading. Default: false.
-      * `delivered`  - true/false/nil. Skip emails with/without/whatever Delivered-To header.
+      * `delivered`  - true/false/nil. Skip emails with/without/never a Delivered-To header.
       * `max_mails`  - maximum number of emails to download. nil = unlimited
       * `output_dir` - output directory.
       * `password`   - email account password.
@@ -24,10 +25,11 @@ defmodule Pop3mail.EpopDownloader do
       * `server`     - pop3 server address.
       * `ssl`        - true/false. Turn on/off Secure Socket Layer.
       * `username`   - email account name.
+      * `verify`     - true/false. verify certificate of the mailserver.
       """
 
-      @type t :: %Options{username: String.t, password: String.t, server: String.t, port: integer, ssl: boolean, max_mails: integer, delete: boolean, delivered: boolean, save_raw: boolean, output_dir: String.t}
-      defstruct username: "", password: "", server: "", port: 995, ssl: true, max_mails: nil, delete: false, delivered: nil, save_raw: false, output_dir: ""
+      @type t :: %Options{username: String.t, password: String.t, server: String.t, port: integer, ssl: boolean, max_mails: integer, delete: boolean, delivered: boolean, save_raw: boolean, output_dir: String.t, cacertfile: String.t, verify: boolean}
+      defstruct username: "", password: "", server: "", port: 995, ssl: true, max_mails: nil, delete: false, delivered: nil, save_raw: false, output_dir: "", cacertfile: nil, verify: true
    end
 
    @doc """
@@ -37,14 +39,22 @@ defmodule Pop3mail.EpopDownloader do
    """
    @spec download(Options.t) :: {:ok, integer} | {:error, atom}
    def download(%Options{} = options) do
-     username = to_charlist(options.username)
-     password = to_charlist(options.password)
-     server = to_charlist(options.server)
+     username   = to_charlist(options.username)
+     password   = to_charlist(options.password)
+     server     = to_charlist(options.server)
+     cacertOptions = if !is_nil(options.cacertfile) do
+         [{:cacertfile, to_charlist(options.cacertfile)}]
+       end
      connect_options = [{:addr, server}, {:port, options.port}, {:user, username}]
      connect_options =
-       case is_nil(options.ssl) or options.ssl do
-         true  -> connect_options ++ [:ssl]
-         false -> connect_options
+       if is_nil(options.ssl) or options.ssl do
+         if options.verify do
+           connect_options ++ [{:ssl, cacertOptions || true}]
+         else
+           connect_options ++ [{:ssl, [{:verify, :verify_none}, {:fail_if_no_peer_cert, false}]}];
+         end
+       else
+         connect_options
        end
      case :epop_client.connect(ensure_at_symbol(username, server), password, connect_options) do
        {:ok,    client} -> retrieve_and_store_all(client, options)
@@ -55,9 +65,10 @@ defmodule Pop3mail.EpopDownloader do
 
    # if username does not contain the @ symbol, add it. Both parameters must be char-lists.
    defp ensure_at_symbol(username, server) do
-     case :string.chr(username, ?@) > 0 do
-       true  -> username
-       false -> username ++ '@' ++ server
+     if :string.chr(username, ?@) > 0 do
+       username
+     else
+       username ++ ~c"@" ++ server
      end
    end
 

@@ -1,7 +1,7 @@
 defmodule Pop3mail.Mixfile do
   use Mix.Project
 
-  @version "1.4.1"
+  @version "1.5.0"
   @source_url "https://github.com/nico-amsterdam/pop3mail"
 
   def project do
@@ -48,7 +48,8 @@ defmodule Pop3mail.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:pop3client, "~> 1.3.1"},
+      {:pop3client, "~> 1.4.0"},
+      {:castore, "~> 1.0"},
       {:ex_doc, "~> 0.30.6", only: :dev},
       {:credo,  "~> 1.7"   , only: :dev},
       {:dialyxir, "~> 1.3", only: [:dev], runtime: false}

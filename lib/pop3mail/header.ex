@@ -41,9 +41,10 @@ defmodule Pop3mail.Header do
       charsets = WordDecoder.get_charsets_besides_ascii(subject_decoded ++ from_decoded ++ to_decoded ++ cc_decoded)
       # mention the charsets used in the filename:
       filename_prefix =
-        case length(charsets) > 0 do
-           true  -> filename_prefix <> "." <> Enum.join(charsets, "_")
-           false -> filename_prefix
+        if length(charsets) > 0 do
+           filename_prefix <> "." <> Enum.join(charsets, "_")
+        else
+           filename_prefix
         end
 
       # mention the charset in the file content if multiple charsets are used:
@@ -57,17 +58,19 @@ defmodule Pop3mail.Header do
       # optional content
       cc = WordDecoder.decoded_text_list_to_string(cc_decoded, mention_charset)
       content =
-        case String.length(cc) > 0 do
-           true  -> content <> line_sep <> "Cc: " <> cc
-           false -> content
+        if String.length(cc) > 0 do
+           content <> line_sep <> "Cc: " <> cc
+        else
+           content
         end
 
       # optional content
       subject = WordDecoder.decoded_text_list_to_string(subject_decoded, mention_charset)
       content =
-        case String.length(subject) > 0 do
-           true  -> content <> line_sep <> "Subject: " <> subject
-           false -> content
+        if String.length(subject) > 0 do
+           content <> line_sep <> "Subject: " <> subject
+        else
+           content
         end
 
       # store

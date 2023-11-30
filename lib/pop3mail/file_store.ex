@@ -85,7 +85,7 @@ defmodule Pop3mail.FileStore do
      safe_filename = remove_unwanted_chars(multipart_part.filename, 100)
      safe_filename = if safe_filename == "", do: "unknown", else: safe_filename
      path = Path.join(dirname, safe_filename)
-     text_on_unix = String.starts_with?(multipart_part.media_type, "text/") and get_line_separator() != '\r\n'
+     text_on_unix = String.starts_with?(multipart_part.media_type, "text/") and get_line_separator() != ~c"\r\n"
      # if unix, store text file in unix format
      multipart_part = if text_on_unix, do: dos2unix(multipart_part), else: multipart_part
      write_file(path, multipart_part.content)

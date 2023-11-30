@@ -7,10 +7,13 @@ defmodule Pop3mail.CLI do
      """
      usage: pop3mail_downloader [--username=[recent:]USERNAME]
             [--password=PASSWORD] [--max=INTEGER] [--delete] [--server=SERVER]
+            [--output=DIRECTORY] [--cacertfile=FILE] [--verify=false]
             [--port=INTEGER] [--ssl=false] [--delivered] [--raw] [--help]
      Read emails from the inbox and save them including attachments on disk
      in the 'inbox' subdirectory.
 
+     --cacertfile full filename of the file with CA certificates to verify 
+                  the mailserver. Default: use OS CA certificates
      --delete     delete email after downloading. Default: false
                   Notice that Gmail ignores the delete
                   and instead uses the Gmail account settings.
@@ -29,6 +32,8 @@ defmodule Pop3mail.CLI do
      --username   email account name.  Gmail users can precede the name with
                   'recent:' to get the last 30 days mail, even if it has
                   already been downloaded elsewhere.
+     --verify     true/false. Turn on/off server certificate verification. 
+                  Default: true
      """
    end
 
@@ -39,8 +44,10 @@ defmodule Pop3mail.CLI do
          password:   :string,
          username:   :string,
          server:     :string,
+         cacertfile: :string,
          port:       :integer,
          ssl:        :boolean,
+         verify:     :boolean,
          max:        :integer,
          delete:     :boolean,
          delivered:  :boolean,
@@ -74,6 +81,8 @@ defmodule Pop3mail.CLI do
        server:     options[:server] || "pop.gmail.com",
        port:       options[:port] || 995,
        ssl:        options[:ssl],
+       verify:     options[:verify],
+       cacertfile: options[:cacertfile],
        max_mails:  options[:max],
        delete:     options[:delete],
        delivered:  options[:delivered],

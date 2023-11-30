@@ -25,9 +25,10 @@ defmodule Pop3mail.StringUtils do
    @doc "Print text if it valid utf-8 encoded. If not, print the alternative text."
    @spec printable(binary, String.t) :: String.t
    def printable(str, printable_alternative \\ "") when is_binary(str) and is_binary(printable_alternative) do
-      case String.printable?(str) do
-        true  -> str
-        false -> printable_alternative
+      if String.printable?(str) do
+        str
+      else
+        printable_alternative
       end
    end
 
