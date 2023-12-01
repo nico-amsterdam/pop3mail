@@ -32,6 +32,21 @@ defmodule Pop3mail.EpopDownloader do
       defstruct username: "", password: "", server: "", port: 995, ssl: true, max_mails: nil, delete: false, delivered: nil, save_raw: false, output_dir: "", cacertfile: nil, verify: true
    end
 
+   defp add_ssl_options(connect_options, %Options{} = options) do
+     cacert_options = if !is_nil(options.cacertfile) do
+         [{:cacertfile, to_charlist(options.cacertfile)}]
+       end
+     if is_nil(options.ssl) or options.ssl do
+       if is_nil(options.verify) or options.verify do
+         connect_options ++ [{:ssl, cacert_options || true}]
+       else
+         connect_options ++ [{:ssl, [{:verify, :verify_none}, {:fail_if_no_peer_cert, false}]}]
+       end
+     else
+       connect_options
+     end
+   end
+
    @doc """
    Read all emails and save them to disk.
 
@@ -42,24 +57,16 @@ defmodule Pop3mail.EpopDownloader do
      username   = to_charlist(options.username)
      password   = to_charlist(options.password)
      server     = to_charlist(options.server)
-     cacertOptions = if !is_nil(options.cacertfile) do
-         [{:cacertfile, to_charlist(options.cacertfile)}]
-       end
-     connect_options = [{:addr, server}, {:port, options.port}, {:user, username}]
      connect_options =
-       if is_nil(options.ssl) or options.ssl do
-         if options.verify do
-           connect_options ++ [{:ssl, cacertOptions || true}]
-         else
-           connect_options ++ [{:ssl, [{:verify, :verify_none}, {:fail_if_no_peer_cert, false}]}];
-         end
-       else
-         connect_options
-       end
+       [{:addr, server}, {:port, options.port}, {:user, username}]
+       |> add_ssl_options(options)
+
      case :epop_client.connect(ensure_at_symbol(username, server), password, connect_options) do
        {:ok,    client} -> retrieve_and_store_all(client, options)
        {:error, reason} -> Logger.error(to_string(reason))
                            {:error, reason}
+       {:EXIT, {:error, reason}} -> Logger.error(to_string(reason))
+                                    {:error, reason}
      end
    end
 
