@@ -121,7 +121,7 @@ defmodule Pop3mail.EpopDownloader do
    * `mail_loop_counter` - number of the email in the current session.
    * `options` - EpopDownloader.Options
    """
-   @spec retrieve_and_store(epop_client_type, integer, Options.t) :: {atom, String.t} | list({:ok, String.t} | {:error, String.t}) | {:skip, list({:header, String.t, String.t})}
+   @spec retrieve_and_store(epop_client_type, integer, Options.t) :: {atom, String.t} | list({:ok, String.t} | {:error, atom, String.t}) | {:skip, list({:header, String.t, String.t})}
    def retrieve_and_store(epop_client, mail_loop_counter, %Options{} = options) do
       {:ok, mail_content} = :epop_client.bin_retrieve(epop_client, mail_loop_counter)
       result = parse_process_and_store(mail_content, mail_loop_counter, options.delivered, options.save_raw , options.output_dir)
@@ -142,7 +142,7 @@ defmodule Pop3mail.EpopDownloader do
    * `save_raw` - true/false. Save or don't save the raw email message.
    * `output_dir` - directory where all emails are stored.
    """
-   @spec parse_process_and_store(String.t, integer, boolean | nil, boolean, String.t) :: {atom, String.t} | list({:ok, String.t} | {:error, String.t, String.t}) | {:skip, list({:header, String.t, String.t})}
+   @spec parse_process_and_store(String.t, integer, boolean | nil, boolean, String.t) :: {atom, String.t} | list({:ok, String.t} | {:error, atom, String.t}) | {:skip, list({:header, String.t, String.t})}
    def parse_process_and_store(mail_content, mail_loop_counter, delivered, save_raw, output_dir) do
       options = %Handler.Options{
         delivered: delivered,
