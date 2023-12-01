@@ -2,8 +2,9 @@
 
 ## v1.5.0 (2023-12-01)
 * Fixes
-  * Use upgraded pop3client v1.4 with support for OTP 26
-  * New cli parameters: cacertfile and verify
+  * Verify server certificate in OTP 25 or higher
+  * Fix connection_failed in OTP 26; use upgraded pop3client v1.4
+  * New cli parameters: cacertfile and verify true/false
   * No warning anymore for Content-Length headers in multipart data
 
 ## v1.4.1 (2023-10-11)
