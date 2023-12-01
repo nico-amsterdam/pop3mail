@@ -42,38 +42,7 @@ Also install [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
 
 ### Erlang/OTP version
 
-The error 'connection_failed' is thrown with OTP 26 and Erlang 1.14.
-The pop3client must be upgraded to verify the server as mentioned in [gen_smtp issue](https://github.com/gen-smtp/gen_smtp/issues/328).
-For now, use OTP 25.
-To revert back to OTP 25 and Erlang 1.13:
-
-```sh
-$ erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().'  -noshell
-$ cat /usr/lib/erlang/releases/RELEASES
-$ sudo apt-get remove erlang
-$ wget https://packages.erlang-solutions.com/erlang-solutions_1.0_all.deb
-$ curl --no-progress-meter https://www.debian.org/releases/ | grep Debian | grep '<q>'
-$ # use codename bullseye to get OTP 25 in the following command:
-$ sudo dpkg -i erlang-solutions_1.0_all.deb
-$ sudo apt-get update
-$ apt-cache policy esl-erlang
-$ # if erlang-solutions was already installed, change codename in this file: 
-$ sudo vi /etc/apt/sources.list.d/erlang-solutions.list 
-$ sudo apt update
-$ apt-cache policy esl-erlang
-$ sudo apt-get install esl-erlang
-$ cat /usr/lib/erlang/releases/RELEASES
-$ asdf current
-$ asdf list-all elixir | grep 25
-$ asdf install elixir 1.15.6-otp-25
-$ asdf global elixir 1.15.6-otp-25
-$ asdf current
-$ cd pop3mail
-$ mix deps.clean --all
-$ mix clean
-$ mix deps.get
-$ mix compile
-```
+Use [this list](https://hexdocs.pm/elixir/compatibility-and-deprecations.html#compatibility-between-elixir-and-erlang-otp) for Elixir and OTP compatibility.
 
 ### Clone project
 
@@ -99,6 +68,18 @@ For usage, see usage chapter below.
           [{:pop3mail, "~> 1.4"}]
         end
 ```
+
+### Upgrade to 1.5
+
+Pop3mail 1.5 uses pop3client 1.4
+
+Use pop3client 1.4 for OTP 26 and higher. Pop3client 1.3 on OTP 26 results in a connection_failed error, because it doesn't provide
+cacerts keys to the ssl connections, and OTP 26 has [safer ssl defaults](https://www.erlang.org/patches/otp-26.0#OTP-18455) to verify the server certificate. 
+
+pop3client v1.4 by default verifies the server certificate on OTP 25 and 26. It's uses the cacerts keys from the OS via :public_key.cacerts_get/0
+
+The pop3mail cli has a new cacertfile parameter to supply your own CA Certificates.
+
 ### Upgrade instructions 1.3.1 to 1.3.2
 
 Run:
@@ -150,9 +131,9 @@ Example:
 ```sh
 $ iex -S mix
 
-# notice that you must use single quotes here
-iex(1)> {:ok, client} = :epop_client.connect('user@gmail.com', 'password', 
-...(1)>   [:ssl, {:addr, 'pop.gmail.com'}, {:port, 995}, {:user, 'user@gmail.com'}])
+# notice that you must use the c-sigil ~c for character lists
+iex(1)> {:ok, client} = :epop_client.connect(~c"user@gmail.com", ~c"password", 
+...(1)>   [:ssl, {:addr, ~c"pop.gmail.com"}, {:port, 995}, {:user, ~c"user@gmail.com"}])
 iex(2)> :epop_client.stat(client) 
 iex(3)> {:ok, mail_content} = :epop_client.bin_retrieve(client, 1) 
 iex(4)> {:message, header_list, body_content } = :epop_message.bin_parse(mail_content)
