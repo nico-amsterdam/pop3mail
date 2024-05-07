@@ -6,7 +6,9 @@ defmodule Pop3mail.EpopDownloader do
    @moduledoc "Retrieve and parse POP3 mail via the Epop client."
 
    @typedoc "Epop client from erlpop"
-   @type epop_client_type :: :epop_client.connection()
+   @type epop_client_type :: {:sk,any,any,any,any,any,any,any}
+   # The above is not ideal, but dialyzer is not happy with the opaque type from the pop3client, so this doesn't work:
+   # @type epop_client_type :: :epop_client.connection()
 
    defmodule Options do
 
@@ -28,7 +30,7 @@ defmodule Pop3mail.EpopDownloader do
       * `verify`     - true/false. verify certificate of the mailserver.
       """
 
-      @type t :: %Options{username: String.t, password: String.t, server: String.t, port: integer, ssl: boolean, max_mails: integer, delete: boolean, delivered: boolean, save_raw: boolean, output_dir: String.t, cacertfile: String.t, verify: boolean}
+      @type t :: %Options{username: String.t, password: String.t, server: String.t, port: integer, ssl: boolean, max_mails: integer | nil, delete: boolean, delivered: boolean | nil, save_raw: boolean, output_dir: String.t, cacertfile: String.t | nil, verify: boolean}
       defstruct username: "", password: "", server: "", port: 995, ssl: true, max_mails: nil, delete: false, delivered: nil, save_raw: false, output_dir: "", cacertfile: nil, verify: true
    end
 

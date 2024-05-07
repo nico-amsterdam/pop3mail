@@ -41,7 +41,7 @@ defmodule Pop3mail do
        usage: ...
 
    """
-   @spec cli(any()) :: {:ok, integer} | {:error, any}
+   @spec cli(any) :: {:ok, integer} | {:error, atom | [binary() | {any, any}]}
    def cli(args) do
       Pop3mail.CLI.main(args)
    end
@@ -50,16 +50,17 @@ defmodule Pop3mail do
    Download emails from the inbox and store them (including attachments) in a subdirectory per email.
 
    Parameters must be supplied in a string-keyed map:
-   * `delete`    - delete email after downloading. Default: false. Notice that Gmail ignores the delete and instead uses the Gmail account settings.
-   * `delivered` - true/false. Skip emails with/without Delivered-To header. If you moved an email from your sent box to your inbox it will not have the Delivered-To header. Default: don't skip
-   * `max`       - maximum number of emails to download. Default: unlimited
-   * `output`    - output directory. Default: inbox
-   * `password`  - email account password.
-   * `port`      - pop3 server port. Default: 995
-   * `raw`       - also save the unprocessed mail in a file called 'raw.eml'. Usefull feature for error diagnostics.
-   * `server`    - pop3 server address. Default: pop.gmail.com
-   * `ssl`       - true/false. Turn on/off Secure Socket Layer. Default: true
-   * `username`  - email account name. Gmail users can precede the name with 'recent:' to get the last 30 days mail, even if it has already been downloaded elsewhere.
+   * `cacertfile` - full filename of the CA certifications file. nil = OS CA Certificates.
+   * `delete`     - delete email after downloading. Default: false. Notice that Gmail ignores the delete and instead uses the Gmail account settings.
+   * `delivered`  - true/false. Skip emails with/without Delivered-To header. If you moved an email from your sent box to your inbox it will not have the Delivered-To header. Default: don't skip
+   * `max`        - maximum number of emails to download. Default: unlimited
+   * `output`     - output directory. Default: inbox
+   * `password`   - email account password.
+   * `port`       - pop3 server port. Default: 995
+   * `raw`        - also save the unprocessed mail in a file called 'raw.eml'. Usefull feature for error diagnostics.
+   * `server`     - pop3 server address. Default: pop.gmail.com
+   * `ssl`        - true/false. Turn on/off Secure Socket Layer. Default: true
+   * `username`   - email account name. Gmail users can precede the name with 'recent:' to get the last 30 days mail, even if it has already been downloaded elsewhere.
 
    ## Example
 
@@ -68,7 +69,7 @@ defmodule Pop3mail do
        iex(1)> Pop3mail.download(%{"max" => 2, "raw" => true, "username" => "hendrik.lorentz@gmail.com", "password" => "secret", "output" => "mailbox"})
 
    """
-   @spec download(%{required(String.t) => String.t | boolean | non_neg_integer}) :: {:ok, integer} | {:error, String.t}
+   @spec download(%{String.t => String.t | boolean | non_neg_integer}) :: {:ok, integer} | {:error, atom}
    def download(params) do
      epop_options = %Pop3mail.EpopDownloader.Options{
        username:   params["username"],
@@ -80,7 +81,8 @@ defmodule Pop3mail do
        delete:     params["delete"],
        delivered:  params["delivered"],
        save_raw:   params["raw"],
-       output_dir: params["output"] || "inbox"
+       output_dir: params["output"] || "inbox",
+       cacertfile: params["cacertfile"]
      }
      Pop3mail.EpopDownloader.download(epop_options)
    end
