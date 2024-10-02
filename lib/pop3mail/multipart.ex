@@ -168,20 +168,20 @@ defmodule Pop3mail.Multipart do
          String.starts_with?(lc_line, "content-disposition:")       -> parse_part_disposition(multipart_part, encoding, all_lines)
          String.starts_with?(lc_line, "content-id:")                -> parse_part_content_id(multipart_part, encoding, all_lines)
          String.starts_with?(lc_line, "content-location:")          -> parse_part_content_location(multipart_part, encoding, all_lines)
-         is_skip_header(lc_line)                                    -> parse_part_skip(multipart_part, encoding, all_lines)
-         is_unknown_header(lc_line)                                 -> parse_part_unknown_header(multipart_part, encoding, all_lines)
+         is_skip_header?(lc_line)                                   -> parse_part_skip(multipart_part, encoding, all_lines)
+         is_unknown_header?(lc_line)                                -> parse_part_unknown_header(multipart_part, encoding, all_lines)
          true -> parse_part_finish(multipart_part, encoding, all_lines)
        end
    end
 
    # Analyze multipart header not parsed by other functions. Assume it's an unknown header if it starts with 'content-'
-   defp is_unknown_header(lc_line) do
+   defp is_unknown_header?(lc_line) do
       String.starts_with?(lc_line, "content-") && String.contains?(lc_line, ":")
    end
 
    # Some multipart headers are not interesting for pop3mail. Skip them.
    # `lc_line` - lowercased line
-   defp is_skip_header(lc_line) do
+   defp is_skip_header?(lc_line) do
       String.starts_with?(lc_line, "content-description:") ||
       String.starts_with?(lc_line, "content-length:")      ||
       String.starts_with?(lc_line, "mime-version:")        ||

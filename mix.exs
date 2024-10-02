@@ -49,9 +49,9 @@ defmodule Pop3mail.Mixfile do
   defp deps do
     [
       {:pop3client, "~> 1.4.0"},
-      {:ex_doc, "~> 0.30.9", only: :dev},
-      {:credo,  "~> 1.7"   , only: :dev},
-      {:dialyxir, "~> 1.4", only: [:dev], runtime: false}
+      {:ex_doc, "~> 0.34.2", only: :dev, runtime: false},
+      {:credo,  "~> 1.7"   , only: :dev, runtime: false},
+      {:dialyxir, "~> 1.4" , only: :dev, runtime: false}
     ]
   end
 

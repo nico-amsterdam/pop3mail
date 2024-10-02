@@ -14,3 +14,4 @@ defmodule Mix.Tasks.RunPop3mail do
     Pop3mail.cli(args)
   end
 end
+

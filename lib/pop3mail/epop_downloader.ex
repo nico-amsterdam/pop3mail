@@ -6,7 +6,7 @@ defmodule Pop3mail.EpopDownloader do
    @moduledoc "Retrieve and parse POP3 mail via the Epop client."
 
    @typedoc "Epop client from erlpop"
-   @type epop_client_type :: {:sk,list,list,any,integer,boolean,boolean,boolean}
+   @type epop_client_type :: {:sk, list, list, any, integer, boolean, boolean, boolean}
    # The above is not ideal, but dialyzer is not happy with the opaque type from the pop3client, so this doesn't work:
    # @type epop_client_type :: :epop_client.connection()
 
@@ -30,8 +30,11 @@ defmodule Pop3mail.EpopDownloader do
       * `verify`     - true/false. verify certificate of the mailserver.
       """
 
-      @type t :: %Options{username: String.t, password: String.t, server: String.t, port: integer, ssl: boolean, max_mails: integer | nil, delete: boolean, delivered: boolean | nil, save_raw: boolean, output_dir: String.t, cacertfile: String.t | nil, verify: boolean}
-      defstruct username: "", password: "", server: "", port: 995, ssl: true, max_mails: nil, delete: false, delivered: nil, save_raw: false, output_dir: "", cacertfile: nil, verify: true
+      @type t :: %Options{username: String.t, password: String.t, server: String.t, port: integer, ssl: boolean,
+                          max_mails: integer | nil, delete: boolean, delivered: boolean | nil, save_raw: boolean,
+                          output_dir: String.t, cacertfile: String.t | nil, verify: boolean}
+      defstruct username: "", password: "", server: "", port: 995, ssl: true, max_mails: nil, delete: false,
+                delivered: nil, save_raw: false, output_dir: "", cacertfile: nil, verify: true
    end
 
    defp add_ssl_options(connect_options, %Options{} = options) do
@@ -123,7 +126,8 @@ defmodule Pop3mail.EpopDownloader do
    * `mail_loop_counter` - number of the email in the current session.
    * `options` - EpopDownloader.Options
    """
-   @spec retrieve_and_store(epop_client_type, integer, Options.t) :: {atom, String.t} | list({:ok, String.t} | {:error, atom, String.t}) | {:skip, list({:header, String.t, String.t})}
+   @spec retrieve_and_store(epop_client_type, integer, Options.t) ::
+                            {atom, String.t} | list({:ok, String.t} | {:error, atom, String.t}) | {:skip, list({:header, String.t, String.t})}
    def retrieve_and_store(epop_client, mail_loop_counter, %Options{} = options) do
       {:ok, mail_content} = :epop_client.bin_retrieve(epop_client, mail_loop_counter)
       result = parse_process_and_store(mail_content, mail_loop_counter, options.delivered, options.save_raw , options.output_dir)
@@ -144,7 +148,9 @@ defmodule Pop3mail.EpopDownloader do
    * `save_raw` - true/false. Save or don't save the raw email message.
    * `output_dir` - directory where all emails are stored.
    """
-   @spec parse_process_and_store(String.t, integer, boolean | nil, boolean, String.t) :: {atom, String.t} | list({:ok, String.t} | {:error, atom, String.t}) | {:skip, list({:header, String.t, String.t})}
+   @spec parse_process_and_store(String.t, integer, boolean | nil, boolean, String.t) :: 
+                                 {atom, String.t} | list({:ok, String.t} | {:error, atom, String.t}) |
+                                 {:skip, list({:header, String.t, String.t})}
    def parse_process_and_store(mail_content, mail_loop_counter, delivered, save_raw, output_dir) do
       options = %Handler.Options{
         delivered: delivered,
