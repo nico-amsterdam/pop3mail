@@ -26,7 +26,7 @@ defmodule Pop3mail.DateConverter do
         end
      # httpd_util requires that single digit days have a leading zero. This is not always the case.
      day_and_date = date_str
-                    |> String.slice(5..-1)
+                    |> String.slice(5..-1//1)
                     |> String.trim_leading
      # add leading zero
      date_str =

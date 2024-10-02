@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.5.1 (2024-10-02)
+* Fixes
+  * Fix Elixir 1.16 warning, see: [String] Deprecate passing a range with negative step on String.slice/2, give first..last//1 instead
+
 ## v1.5.0 (2023-12-01)
 * Fixes
   * Verify server certificate in OTP 25 or higher

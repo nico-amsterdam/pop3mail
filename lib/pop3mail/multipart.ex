@@ -223,7 +223,7 @@ defmodule Pop3mail.Multipart do
    """
    @spec parse_part_content_type(Part.t, String.t, list(String.t)) :: Part.t
    def parse_part_content_type(multipart_part, encoding, [line | otherlines]) do
-       content_type = String.slice(line, String.length("content-type:")..-1)
+       content_type = String.slice(line, String.length("content-type:")..-1//1)
        {content_type, split_lines} = lines_continued(content_type, otherlines)
        # Logger.debug "      Content-type: " <> content_type
        content_type_parameters = String.split(content_type, ~r/\s*;\s*/)
@@ -317,7 +317,7 @@ defmodule Pop3mail.Multipart do
    @spec parse_part_content_id(Part.t, String.t, list(String.t)) :: Part.t
    def parse_part_content_id(multipart_part, encoding, [line | otherlines]) do
        content_id = line
-                    |> String.slice(String.length("content-id:")..-1)
+                    |> String.slice(String.length("content-id:")..-1//1)
                     |> String.trim
                     |> StringUtils.unquoted
        {content_id, split_lines} = lines_continued(content_id, otherlines)
@@ -336,7 +336,7 @@ defmodule Pop3mail.Multipart do
    @spec parse_part_content_location(Part.t, String.t, list(String.t)) :: Part.t
    def parse_part_content_location(multipart_part, encoding, [line | otherlines]) do
        content_location = line
-                          |> String.slice(String.length("content-location:")..-1)
+                          |> String.slice(String.length("content-location:")..-1//1)
                           |> String.trim
                           |> StringUtils.unquoted
        {content_location, split_lines} = lines_continued(content_location, otherlines)
@@ -355,7 +355,7 @@ defmodule Pop3mail.Multipart do
    @spec parse_part_transfer_encoding(Part.t, String.t, list(String.t)) :: Part.t
    def parse_part_transfer_encoding(multipart_part, _, [line | otherlines]) do
        encoding = line
-                  |> String.slice(String.length("content-transfer-encoding:")..-1)
+                  |> String.slice(String.length("content-transfer-encoding:")..-1//1)
                   |> String.trim
                   |> StringUtils.unquoted
        {encoding, split_lines} = lines_continued(encoding, otherlines)
@@ -400,7 +400,7 @@ defmodule Pop3mail.Multipart do
    """
    @spec parse_part_disposition(Part.t, String.t, list(String.t)) :: Part.t
    def parse_part_disposition(multipart_part, encoding, [line | otherlines]) do
-       disposition = String.slice(line, String.length("content-disposition:")..-1)
+       disposition = String.slice(line, String.length("content-disposition:")..-1//1)
        {disposition, split_lines} = lines_continued(disposition, otherlines)
        # Logger.debug "      Disposition: " <> disposition
        multipart_part = parse_disposition(multipart_part, disposition)
