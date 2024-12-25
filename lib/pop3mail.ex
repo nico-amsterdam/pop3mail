@@ -276,7 +276,7 @@ defmodule Pop3mail do
    """
    @spec decode_raw_file(String.t, String.t) :: {atom, String.t} | list({:ok, String.t} | {:error, String.t, String.t}) | {:skip, list({:header, String.t, String.t})}
    def decode_raw_file(filename, output_dir) do
-      unless File.dir?(output_dir), do: File.mkdir! output_dir
+      if !File.dir?(output_dir), do: File.mkdir! output_dir
       case :file.read_file(filename) do
          {:ok, mail_content}  -> mail_content |> Pop3mail.EpopDownloader.parse_process_and_store(1, nil, false, output_dir)
          {:error, :enoent}    -> reason = "File '" <> filename <> "' not found."

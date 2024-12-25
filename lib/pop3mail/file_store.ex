@@ -63,7 +63,7 @@ defmodule Pop3mail.FileStore do
 
    def mkdir(base_dir, name, unsafe_addition) when is_binary(base_dir) and is_binary(name) and is_binary(unsafe_addition) and unsafe_addition == "" do
       dirname = Path.join(base_dir, name)
-      unless File.dir?(dirname), do: File.mkdir!(dirname)
+      if !File.dir?(dirname), do: File.mkdir!(dirname)
       dirname
    end
 
@@ -79,7 +79,7 @@ defmodule Pop3mail.FileStore do
    @spec store_part(Part.t, String.t) :: {:ok, String.t} | {:error, atom, String.t}
    def store_part(%Part{} = multipart_part, base_dir) do
      dirname = Path.join(base_dir, multipart_part.path)
-     unless File.dir?(dirname), do: File.mkdir_p!(dirname)
+     if !File.dir?(dirname), do: File.mkdir_p!(dirname)
 
      # this is also protection against filenames like: /etc/passwd
      safe_filename = remove_unwanted_chars(multipart_part.filename, 100)
