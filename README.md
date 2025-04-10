@@ -180,11 +180,8 @@ https://myaccount.google.com/lesssecureapps
 In the 2 step verification section, it is possible to set an app password: https://myaccount.google.com/apppasswords
 Use the 16 character password.
 
-## Google unlock captcha
+More info: [Sign in with app passwords](https://support.google.com/accounts/answer/185833)
 
-If you get an error 'web login required', push the 'Continue' button in the browser:
-
-https://accounts.google.com/DisplayUnlockCaptcha
 
 ## License
 
