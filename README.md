@@ -65,7 +65,7 @@ For usage, see usage chapter below.
   1. Add pop3mail to your list of dependencies in `mix.exs`:
 ```
         def deps do
-          [{:pop3mail, "~> 1.4"}]
+          [{:pop3mail, "~> 1.5"}]
         end
 ```
 
