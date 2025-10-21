@@ -222,7 +222,7 @@ defmodule Pop3mail.Multipart do
    * `list` - lines
    """
    @spec parse_part_content_type(Part.t, String.t, list(String.t)) :: Part.t
-   def parse_part_content_type(multipart_part, encoding, [line | otherlines]) do
+   def parse_part_content_type(%Part{} = multipart_part, encoding, [line | otherlines]) do
        content_type = String.slice(line, String.length("content-type:")..-1//1)
        {content_type, split_lines} = lines_continued(content_type, otherlines)
        # Logger.debug "      Content-type: " <> content_type
@@ -280,7 +280,7 @@ defmodule Pop3mail.Multipart do
    end
 
    # set multipart_part.boundary if available
-   defp set_boundary(multipart_part, boundary_keyval) do
+   defp set_boundary(%Part{} = multipart_part, boundary_keyval) do
       if StringUtils.contains?(boundary_keyval, "=") do
          value = get_value(boundary_keyval)
          boundary_name = value |> String.trim |> StringUtils.unquoted
@@ -291,7 +291,7 @@ defmodule Pop3mail.Multipart do
    end
 
    # set multipart_part.charset if available
-   defp set_charset(multipart_part, charset_keyval) do
+   defp set_charset(%Part{} = multipart_part, charset_keyval) do
       if StringUtils.contains?(charset_keyval, "=") do
          value = get_value(charset_keyval)
          charset = value |> String.trim |> StringUtils.unquoted |> String.downcase
@@ -315,7 +315,7 @@ defmodule Pop3mail.Multipart do
    * `list` - lines
    """
    @spec parse_part_content_id(Part.t, String.t, list(String.t)) :: Part.t
-   def parse_part_content_id(multipart_part, encoding, [line | otherlines]) do
+   def parse_part_content_id(%Part{} = multipart_part, encoding, [line | otherlines]) do
        content_id = line
                     |> String.slice(String.length("content-id:")..-1//1)
                     |> String.trim
@@ -334,7 +334,7 @@ defmodule Pop3mail.Multipart do
    * `list` - lines
    """
    @spec parse_part_content_location(Part.t, String.t, list(String.t)) :: Part.t
-   def parse_part_content_location(multipart_part, encoding, [line | otherlines]) do
+   def parse_part_content_location(%Part{} = multipart_part, encoding, [line | otherlines]) do
        content_location = line
                           |> String.slice(String.length("content-location:")..-1//1)
                           |> String.trim
@@ -353,7 +353,7 @@ defmodule Pop3mail.Multipart do
    * `list` - lines
    """
    @spec parse_part_transfer_encoding(Part.t, String.t, list(String.t)) :: Part.t
-   def parse_part_transfer_encoding(multipart_part, _, [line | otherlines]) do
+   def parse_part_transfer_encoding(%Part{} = multipart_part, _, [line | otherlines]) do
        encoding = line
                   |> String.slice(String.length("content-transfer-encoding:")..-1//1)
                   |> String.trim
@@ -371,7 +371,7 @@ defmodule Pop3mail.Multipart do
    * `list` - lines
    """
    @spec parse_part_skip(Part.t, String.t, list(String.t)) :: Part.t
-   def parse_part_skip(multipart_part, encoding, [line | otherlines]) do
+   def parse_part_skip(%Part{} = multipart_part, encoding, [line | otherlines]) do
        {_skipped_line, split_lines} = lines_continued(line, otherlines)
        # Logger.debug "      Skipped " <> skipped_line
        parse_part_lines(multipart_part, encoding, split_lines)
@@ -385,7 +385,7 @@ defmodule Pop3mail.Multipart do
    * `list` - lines
    """
    @spec parse_part_unknown_header(Part.t, String.t, list(String.t)) :: Part.t
-   def parse_part_unknown_header(multipart_part, encoding, [line | otherlines]) do
+   def parse_part_unknown_header(%Part{} = multipart_part, encoding, [line | otherlines]) do
      {line, split_lines} = lines_continued(line, otherlines)
      Logger.warning "    Unknown header line in body ignored" <> StringUtils.printable(": " <> line)
      parse_part_lines(multipart_part, encoding, split_lines)
@@ -399,7 +399,7 @@ defmodule Pop3mail.Multipart do
    * `list` - lines
    """
    @spec parse_part_disposition(Part.t, String.t, list(String.t)) :: Part.t
-   def parse_part_disposition(multipart_part, encoding, [line | otherlines]) do
+   def parse_part_disposition(%Part{} = multipart_part, encoding, [line | otherlines]) do
        disposition = String.slice(line, String.length("content-disposition:")..-1//1)
        {disposition, split_lines} = lines_continued(disposition, otherlines)
        # Logger.debug "      Disposition: " <> disposition
@@ -527,7 +527,7 @@ defmodule Pop3mail.Multipart do
    end
 
    # Extract (file-)name from (file-)name list (together one value). Returns Pop3mail.Part with filled-in filename and filename_charset.
-   defp extract_and_set_filename_from_name_parts(multipart_part, name_parts) do
+   defp extract_and_set_filename_from_name_parts(%Part{} = multipart_part, name_parts) do
       charset = ""
       name_parts = sort_name_parts(name_parts)
       # RFC 2231

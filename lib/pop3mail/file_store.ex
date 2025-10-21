@@ -85,7 +85,7 @@ defmodule Pop3mail.FileStore do
      safe_filename = remove_unwanted_chars(multipart_part.filename, 100)
      safe_filename = if safe_filename == "", do: "unknown", else: safe_filename
      path = Path.join(dirname, safe_filename)
-     text_on_unix = String.starts_with?(multipart_part.media_type, "text/") and get_line_separator() != ~c"\r\n"
+     text_on_unix = String.starts_with?(multipart_part.media_type, "text/") and get_line_separator() != "\r\n"
      # if unix, store text file in unix format
      multipart_part = if text_on_unix, do: dos2unix(multipart_part), else: multipart_part
      write_file(path, multipart_part.content)
@@ -176,7 +176,7 @@ defmodule Pop3mail.FileStore do
    `multipart_part` - a Pop3mail.Part
    """
    @spec set_default_filename(Part.t) :: Part.t
-   def set_default_filename(multipart_part) do
+   def set_default_filename(%Part{} = multipart_part) do
         filename = get_default_filename(multipart_part.media_type, multipart_part.charset, multipart_part.index)
         %{multipart_part | filename: filename}
    end

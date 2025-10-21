@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.5.2 (2025-10-21)
+* Fixes
+  * Fixed unnecessary dos2unix call on windows
+  * Pattern match structs in function parameters to help type inference
+  * Fixed dialyzer underspec warnings
+  * Tested with Elixir 1.19 and OTP 28
+ 
 ## v1.5.1 (2024-10-02)
 * Fixes
   * Fix Elixir 1.16 warning, see: [String] Deprecate passing a range with negative step on String.slice/2, give first..last//1 instead

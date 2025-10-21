@@ -1,7 +1,7 @@
 defmodule Pop3mail.Mixfile do
   use Mix.Project
 
-  @version "1.5.1"
+  @version "1.5.2"
   @source_url "https://github.com/nico-amsterdam/pop3mail"
 
   def project do
@@ -24,7 +24,7 @@ defmodule Pop3mail.Mixfile do
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      dialyzer: [plt_add_apps: [:mix]]
+      dialyzer: [plt_add_apps: [:mix], flags: [:unmatched_returns, :error_handling, :underspecs]]
     ]
   end
 
@@ -49,7 +49,7 @@ defmodule Pop3mail.Mixfile do
   defp deps do
     [
       {:pop3client, "~> 1.4.0"},
-      {:ex_doc, "~> 0.36"  , only: :dev, runtime: false},
+      {:ex_doc, "~> 0.38"  , only: :dev, runtime: false},
       {:credo,  "~> 1.7"   , only: :dev, runtime: false},
       {:dialyxir, "~> 1.4" , only: :dev, runtime: false}
     ]

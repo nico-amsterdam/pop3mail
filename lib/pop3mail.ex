@@ -41,7 +41,7 @@ defmodule Pop3mail do
        usage: ...
 
    """
-   @spec cli(any) :: {:ok, integer} | {:error, atom | [binary() | {any, any}]}
+   @spec cli(any) :: {:ok, integer} | {:error, atom | [binary() | {binary(),nil | binary()}]}
    def cli(args) do
       Pop3mail.CLI.main(args)
    end
