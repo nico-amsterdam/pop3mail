@@ -1,14 +1,13 @@
 defmodule Pop3mail.EpopDownloader do
   alias Pop3mail.Handler
+  @dialyzer :no_opaque
 
   require Logger
 
    @moduledoc "Retrieve and parse POP3 mail via the Epop client."
 
    @typedoc "Epop client from erlpop"
-   @type epop_client_type :: {:sk, list, list, any, integer, boolean, boolean, boolean}
-   # The above is not ideal, but dialyzer is not happy with the opaque type from the pop3client, so this doesn't work:
-   # @type epop_client_type :: :epop_client.connection()
+   @type epop_client_type :: :epop_client.connection()
 
    defmodule Options do
 

@@ -4,7 +4,7 @@
 * Fixes
   * Fixed unnecessary dos2unix call on windows
   * Pattern match structs in function parameters to help type inference
-  * Fixed dialyzer underspec warnings
+  * Fixed dialyzer underspec and opaque warnings
   * Tested with Elixir 1.19 and OTP 28
  
 ## v1.5.1 (2024-10-02)
