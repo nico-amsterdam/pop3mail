@@ -69,7 +69,8 @@ For usage, see usage chapter below.
         end
 ```
 
-### Upgrade to 1.5
+<details>
+<summary>Upgrade to 1.5</summary>
 
 Pop3mail 1.5 uses pop3client 1.4
 
@@ -79,8 +80,10 @@ cacerts keys to the ssl connections, and OTP 26 has [safer ssl defaults](https:/
 pop3client v1.4 by default verifies the server certificate on OTP 25 and 26. It's uses the cacerts keys from the OS via :public_key.cacerts_get/0
 
 The pop3mail cli has a new cacertfile parameter to supply your own CA Certificates.
+</details>
 
-### Upgrade instructions 1.3.1 to 1.3.2
+<details>
+<summary>Upgrade instructions 1.3.1 to 1.3.2</summary>
 
 Run:
 ```elixir
@@ -88,12 +91,15 @@ mix deps.clean erlpop
 mix deps.update pop3mail
 ```
 After the `mix deps.clean erlpop` command, the `deps/erlpop` directory should be gone, and also the `_build/dev/lib/erlpop` and `_build/test/lib/erlpop` should be vanished.
+</details>
 
-### Upgrade instructions 1.3.0 to 1.3.1
+<details>
+<summary>Upgrade instructions 1.3.0 to 1.3.1</summary>
 
 Version 1.3.1 doesn't require erlpop as github dependency anymore, because it is now available in hex.pm as 'pop3client'
 and added as dependency for pop3mail. Remove {:erlpop, github: "nico-amsterdam/erlpop"} in your mix.exs. 
-If you don't mix reports: 'Dependencies have diverged'
+If you don't, mix reports: 'Dependencies have diverged'
+</details>
 
 ## Usage
 
